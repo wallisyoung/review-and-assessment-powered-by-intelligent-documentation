@@ -8,7 +8,7 @@
  *
  * 実行: cd backend && npm run db:seed:touki
  * ※ 事前にスキーマ反映（prisma migrate / generate）済みであること。
- * 冪等: 同名セットが既にあればスキップする。
+ * 冪等: upsert + delete & re-insert（毎デプロイで最新ルールに更新される）。CDK デプロイの Prisma マイグレーション Lambda から自動実行される。
  */
 
 import { PrismaClient } from "../api/core/db";
@@ -18,6 +18,9 @@ const prisma = new PrismaClient();
 
 const DEFAULT_USER_ID = "user123";
 const SET_NAME = "登記書類整合性審査（抵当権設定）";
+
+// upsert 用の固定 set ID（増分デプロイで同一レコードを更新するため）
+const TOUKI_SET_ID = "01HZ0UKISET000000000000000";
 
 /** CheckListSet が期待する 文書タイプ（ビジネス上の書類種別。pdf/image はキャリアであり別物） */
 const TOUKI_DOCUMENT_TYPES = [
@@ -145,21 +148,14 @@ const COMPARISON_RULES: ComparisonRule[] = [
 ];
 
 async function main(): Promise<void> {
-  console.log("登記審査 seed を開始します...");
+  console.log("登記審査 seed を開始します（upsert・増分更新）...");
 
-  const existing = await prisma.checkListSet.findFirst({
-    where: { name: SET_NAME },
-  });
-  if (existing) {
-    console.log(
-      `既に存在します（id=${existing.id}）。seed をスキップします。再投入する場合は先に当該セットを削除してください。`
-    );
-    return;
-  }
+  const setId = TOUKI_SET_ID;
 
-  const setId = ulid();
-  await prisma.checkListSet.create({
-    data: {
+  // 1. CheckListSet を upsert（固定 ID で毎回同一レコードを更新）
+  await prisma.checkListSet.upsert({
+    where: { id: setId },
+    create: {
       id: setId,
       name: SET_NAME,
       description:
@@ -167,10 +163,33 @@ async function main(): Promise<void> {
       userId: DEFAULT_USER_ID,
       declaredDocumentTypes: [...TOUKI_DOCUMENT_TYPES],
     },
+    update: {
+      name: SET_NAME,
+      description:
+        "抵当権設定案件の書類間・書類と案件情報の整合性を審査するデモ用チェックリスト（17 件の比較ルール）。",
+      declaredDocumentTypes: [...TOUKI_DOCUMENT_TYPES],
+    },
   });
-  console.log(`CheckListSet を作成しました: ${SET_NAME} (id=${setId})`);
+  console.log(`CheckListSet を upsert しました: ${SET_NAME} (id=${setId})`);
 
-  // 総合審査 親項目（cascade で 総合判定 を算出）
+  // 2. 既存の子項目を全削除（ReviewResult も事前削除で FK 制約を回避）
+  const existingItems = await prisma.checkList.findMany({
+    where: { checkListSetId: setId },
+    select: { id: true },
+  });
+  if (existingItems.length > 0) {
+    await prisma.reviewResult.deleteMany({
+      where: { checkId: { in: existingItems.map((i) => i.id) } },
+    });
+  }
+  const deleted = await prisma.checkList.deleteMany({
+    where: { checkListSetId: setId },
+  });
+  console.log(
+    `既存の子項目を ${deleted.count} 件削除しました（ReviewResult 含む）`
+  );
+
+  // 3. 親項目「総合審査」+ 17 ルールを新規挿入
   const parentId = ulid();
   await prisma.checkList.create({
     data: {
@@ -181,7 +200,6 @@ async function main(): Promise<void> {
       checkListSetId: setId,
     },
   });
-  console.log("親項目「総合審査」を作成しました");
 
   for (const rule of COMPARISON_RULES) {
     await prisma.checkList.create({
@@ -196,7 +214,7 @@ async function main(): Promise<void> {
     });
   }
   console.log(
-    `葉項目（比較ルール）を ${COMPARISON_RULES.length} 件作成しました`
+    `親「総合審査」+ 葉項目 ${COMPARISON_RULES.length} 件を作成しました`
   );
 
   console.log("登記審査 seed が完了しました");

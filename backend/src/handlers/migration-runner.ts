@@ -8,29 +8,31 @@ type AllowedCommand = (typeof ALLOWED_COMMANDS)[number];
 
 /**
  * Validates if the provided command is one of the allowed Prisma migration commands
- * @param command The command to validate
- * @returns The validated command or "deploy" as default
  */
 const validateCommand = (command: unknown): AllowedCommand => {
   if (typeof command !== "string") return "deploy";
-
   const sanitizedCommand = command.trim().toLowerCase();
   if (ALLOWED_COMMANDS.includes(sanitizedCommand as AllowedCommand)) {
     return sanitizedCommand as AllowedCommand;
   }
-
-  // If not a valid command, return the default
   return "deploy";
 };
 
+/** exec を Promise<number> で包む（exit code を返す） */
+const execAsync = (cmd: string): Promise<number> =>
+  new Promise((resolve) => {
+    exec(cmd, (error, stdout, stderr) => {
+      console.log(stdout);
+      if (stderr) console.error(stderr);
+      resolve(error ? error.code ?? 1 : 0);
+    });
+  });
+
 /**
- * Handler for running Prisma migrations
+ * Handler for running Prisma migrations + 登記 seed
  */
 export const handler: Handler = async (event, _) => {
-  // DATABASE_URLを環境変数に設定（マイグレーション実行前に必要）
   process.env.DATABASE_URL = await getDatabaseUrl();
-
-  // Sanitize the command input
   const command: AllowedCommand = validateCommand(event.command);
   let options: string[] = [];
 
@@ -39,26 +41,22 @@ export const handler: Handler = async (event, _) => {
   }
 
   try {
-    const exitCode = await new Promise<number>((resolve, _) => {
-      exec(
-        `npx prisma migrate ${command} ${options.join(" ")}`,
-        (error, stdout, stderr) => {
-          console.log(stdout);
-          if (stderr) console.error(stderr);
-          if (error != null) {
-            console.log(
-              `npx prisma migrate ${command} exited with error ${error.message}`
-            );
-            resolve(error.code ?? 1);
-          } else {
-            resolve(0);
-          }
-        }
-      );
-    });
+    // マイグレーション実行
+    const exitCode = await execAsync(
+      `npx prisma migrate ${command} ${options.join(" ")}`
+    );
 
     if (exitCode !== 0)
       throw Error(`command ${command} failed with exit code ${exitCode}`);
+
+    // マイグレーション成功後、登記 seed を実行（deploy のみ、non-blocking）
+    if (command === "deploy") {
+      console.log("[SEED] 登記 seed 実行...");
+      const seedCode = await execAsync("node dist/scripts/seed-touki.js");
+      if (seedCode !== 0)
+        console.warn(`[SEED] exited ${seedCode} (non-blocking)`);
+      else console.log("[SEED] 登記 seed 完了");
+    }
   } catch (e) {
     console.log(e);
     throw e;
