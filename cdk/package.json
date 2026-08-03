@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@cdklabs/generative-ai-cdk-constructs": "^0.1.312",
+    "@types/aws-lambda": "^8.10.148",
     "@types/jest": "^29.5.14",
     "@types/node": "22.7.9",
     "aws-cdk": "^2.1128.1",
@@ -25,6 +26,7 @@
   },
   "dependencies": {
     "@aws-cdk/aws-lambda-python-alpha": "^2.258.1-alpha.0",
+    "@aws-sdk/client-bedrock-agentcore": "^3.798.0",
     "aws-cdk-lib": "2.258.1",
     "constructs": "^10.6.0",
     "deploy-time-build": "^0.3.50",
