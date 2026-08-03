@@ -60,7 +60,7 @@ export class PrismaMigration extends Construct {
         path.join(__dirname, "../../../backend/"),
         {
           file: "Dockerfile.prisma.lambda",
-          platform: Platform.LINUX_X86_64,
+          platform: Platform.LINUX_ARM64,
           cmd: ["dist/handlers/migration-runner.handler"],
         },
       ),
@@ -72,7 +72,7 @@ export class PrismaMigration extends Construct {
       database: props.databaseConnection,
       timeout: cdk.Duration.minutes(15),
       memorySize: 1024,
-      architecture: cdk.aws_lambda.Architecture.X86_64,
+      architecture: cdk.aws_lambda.Architecture.ARM_64,
     });
 
     // 自動マイグレーションが有効な場合、Custom Resourceを作成

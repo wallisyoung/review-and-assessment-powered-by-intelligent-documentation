@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 public.ecr.aws/docker/library/node:22
+FROM --platform=linux/arm64 public.ecr.aws/docker/library/node:22
 # Lambda Web Adapter を追加
 COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.9.0 /lambda-adapter /opt/extensions/lambda-adapter
 

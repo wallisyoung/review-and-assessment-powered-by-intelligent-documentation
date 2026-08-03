@@ -119,7 +119,7 @@ export class Api extends Construct {
       code: lambda.DockerImageCode.fromImageAsset(
         path.join(__dirname, "../../../backend"),
         {
-          platform: Platform.LINUX_X86_64,
+          platform: Platform.LINUX_ARM64,
         },
       ),
       vpc: props.vpc,
@@ -134,7 +134,7 @@ export class Api extends Construct {
       },
       timeout: cdk.Duration.seconds(30),
       memorySize: 1024,
-      architecture: cdk.aws_lambda.Architecture.X86_64,
+      architecture: cdk.aws_lambda.Architecture.ARM_64,
     });
 
     // CloudWatch Logs グループの作成 - スタックIDを含めて名前の衝突を防止

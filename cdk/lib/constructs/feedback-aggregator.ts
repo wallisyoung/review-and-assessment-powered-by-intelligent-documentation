@@ -48,7 +48,7 @@ export class FeedbackAggregator extends Construct {
         path.join(__dirname, "../../../backend/"),
         {
           file: "Dockerfile.prisma.lambda",
-          platform: Platform.LINUX_X86_64,
+          platform: Platform.LINUX_ARM64,
           cmd: ["dist/feedback-aggregator/index.handler"],
         },
       ),
@@ -66,7 +66,7 @@ export class FeedbackAggregator extends Construct {
       },
       securityGroups: [this.securityGroup],
       database: props.databaseConnection,
-      architecture: lambda.Architecture.X86_64,
+      architecture: lambda.Architecture.ARM_64,
     });
 
     // Bedrock permissions
