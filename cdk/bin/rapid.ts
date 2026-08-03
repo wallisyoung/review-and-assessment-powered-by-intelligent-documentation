@@ -39,7 +39,7 @@ const waf = useS3ApiGwFrontend
       allowedIpV6AddressRanges: parameters.allowedIpV6AddressRanges,
     });
 
-new RapidStack(app, "RapidStack", {
+new RapidStack(app, "RapidStackTouki", {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION || "us-west-2",
