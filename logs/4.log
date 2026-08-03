@@ -1,0 +1,236 @@
+[ec2-user@ip-172-31-7-81 cdk]$ npx cdk deploy --all --require-approval never
+Bundling asset RapidStack/ReviewProcessor/InvokeAgentFunction/Code/Stage...
+
+  cdk.out/bundling-temp-5b8fa1dbab6500a9069d93526c9bebf4df31c2f564b996a1e203025a6859f5dd-building/index.mjs  3.7kb
+
+⚡ Done in 47ms
+fatal: No names found, cannot describe anything.
+WARNING Failed to get latest Git tag: Error: Command failed: git describe --tags --abbrev=0
+fatal: No names found, cannot describe anything. (Construct Annotations)
+   RapidStack
+   Acknowledge with 'Construct-Annotations::warning-annotation'
+
+✨  Synthesis time: 23.46s
+
+RapidFrontendWafStack: start: Building RapidFrontendWafStack Template
+RapidFrontendWafStack: success: Built RapidFrontendWafStack Template
+RapidStack: start: Building RapidStack/Custom::VpcRestrictDefaultSGCustomResourceProvider Code
+RapidStack: success: Built RapidStack/Custom::VpcRestrictDefaultSGCustomResourceProvider Code
+RapidStack: start: Building AWS679f53fac002430cb0da5b7982bd2287/Code
+RapidStack: success: Built AWS679f53fac002430cb0da5b7982bd2287/Code
+RapidStack: start: Building ReviewProcessor/InvokeAgentFunction/Code
+RapidStack: success: Built ReviewProcessor/InvokeAgentFunction/Code
+RapidStack: start: Building ReviewQueueProcessorConstruct/PythonFunction/Code
+RapidStack: success: Built ReviewQueueProcessorConstruct/PythonFunction/Code
+RapidStack: start: Building NodejsBuildCustomResourceHandler25648b212c404f09aa65b6bbb0c44659/Code
+RapidStack: success: Built NodejsBuildCustomResourceHandler25648b212c404f09aa65b6bbb0c44659/Code
+RapidStack: start: Building Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend--
+RapidStack: success: Built Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend--
+RapidStack: start: Building Frontend/ReactBuild/Deploy/AwsCliLayer/Code
+RapidStack: success: Built Frontend/ReactBuild/Deploy/AwsCliLayer/Code
+RapidStack: start: Building Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C512MiB/Code
+RapidStack: success: Built Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C512MiB/Code
+RapidStack: start: Building RapidStack Template
+RapidStack: success: Built RapidStack Template
+RapidStack: start: Building PrismaMigration/MigrationFunction/AssetImage
+RapidFrontendWafStack: start: Publishing RapidFrontendWafStack Template (527083197543-us-east-1-5c31b40d)
+RapidFrontendWafStack: fail: arn:aws:kms:us-east-1:527083197543:key/a877dfc6-88df-45da-82b4-f6e9089b11aa is pending deletion.
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.prisma.lambda
+#1 transferring dockerfile: 332B done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for public.ecr.aws/lambda/nodejs:22-arm64
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/7] FROM public.ecr.aws/lambda/nodejs:22-arm64@sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2
+#4 resolve public.ecr.aws/lambda/nodejs:22-arm64@sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2 0.0s done
+#4 sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2 1.58kB / 1.58kB done
+#4 sha256:9ae980233dcf987f309d5e8a681255607865e5b8d24904342ae775e12d88aade 4.76kB / 4.76kB done
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 0B / 38.02MB 0.1s
+#4 sha256:a24f48c46e8a93db5affc869a0c987000647228b05b9c8b3685836e69fd62fdd 0B / 88.12kB 0.1s
+#4 sha256:7d0ba1d4deebda1e139e7549b18cb2ee78dd209d417d7c56dc8d34986ba75fe2 0B / 417B 0.1s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 2.10MB / 38.02MB 0.2s
+#4 sha256:a24f48c46e8a93db5affc869a0c987000647228b05b9c8b3685836e69fd62fdd 88.12kB / 88.12kB 0.1s done
+#4 sha256:7d0ba1d4deebda1e139e7549b18cb2ee78dd209d417d7c56dc8d34986ba75fe2 417B / 417B 0.1s done
+#4 sha256:3e0c6b9e8d42f858c52ff772b9a9c276cc73d9d0785318f0cd973354b789c64a 0B / 3.45MB 0.2s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 0B / 67.31MB 0.2s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 8.39MB / 38.02MB 0.3s
+#4 sha256:3e0c6b9e8d42f858c52ff772b9a9c276cc73d9d0785318f0cd973354b789c64a 3.45MB / 3.45MB 0.3s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 19.92MB / 38.02MB 0.5s
+#4 sha256:3e0c6b9e8d42f858c52ff772b9a9c276cc73d9d0785318f0cd973354b789c64a 3.45MB / 3.45MB 0.3s done
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 9.44MB / 67.31MB 0.5s
+#4 sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 3.15MB / 24.14MB 0.5s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 23.07MB / 38.02MB 0.6s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 14.68MB / 67.31MB 0.6s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 26.21MB / 38.02MB 0.7s
+#4 sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 10.49MB / 24.14MB 0.7s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 38.02MB / 38.02MB 0.9s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 26.21MB / 67.31MB 0.9s
+#4 sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 19.92MB / 24.14MB 0.9s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 38.02MB / 38.02MB 0.9s done
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 30.41MB / 67.31MB 1.0s
+#4 sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 24.14MB / 24.14MB 1.0s done
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 46.14MB / 67.31MB 1.3s
+#4 extracting sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 0.2s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 53.48MB / 67.31MB 1.4s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 62.91MB / 67.31MB 1.6s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 67.31MB / 67.31MB 1.7s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 67.31MB / 67.31MB 1.8s done
+#4 extracting sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 5.7s
+#4 extracting sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 6.0s done
+#4 extracting sha256:a24f48c46e8a93db5affc869a0c987000647228b05b9c8b3685836e69fd62fdd done
+#4 extracting sha256:7d0ba1d4deebda1e139e7549b18cb2ee78dd209d417d7c56dc8d34986ba75fe2 done
+#4 extracting sha256:3e0c6b9e8d42f858c52ff772b9a9c276cc73d9d0785318f0cd973354b789c64a
+#4 extracting sha256:3e0c6b9e8d42f858c52ff772b9a9c276cc73d9d0785318f0cd973354b789c64a 0.4s done
+#4 extracting sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85
+#4 ...
+
+#5 [internal] load build context
+#5 transferring context: 250.92MB 9.9s
+#5 ...
+
+#4 [1/7] FROM public.ecr.aws/lambda/nodejs:22-arm64@sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2
+#4 extracting sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 5.0s
+#4 extracting sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 5.4s done
+#4 extracting sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 0.1s
+#4 ...
+
+#5 [internal] load build context
+#5 transferring context: 453.19MB 14.0s done
+#5 DONE 14.1s
+
+#4 [1/7] FROM public.ecr.aws/lambda/nodejs:22-arm64@sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2
+#4 extracting sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 3.5s done
+#4 DONE 17.2s
+
+#6 [2/7] WORKDIR /var/task
+#6 DONE 0.6s
+
+#7 [3/7] COPY package*.json ./
+#7 DONE 0.2s
+
+#8 [4/7] COPY prisma ./prisma
+#8 DONE 0.1s
+
+#9 [5/7] RUN npm ci --omit=dev && npm run prisma:generate
+#9 0.679 exec /bin/sh: exec format error
+#9 ERROR: process "/bin/sh -c npm ci --omit=dev && npm run prisma:generate" did not complete successfully: exit code: 255
+------
+ > [5/7] RUN npm ci --omit=dev && npm run prisma:generate:
+0.679 exec /bin/sh: exec format error
+------
+Dockerfile.prisma.lambda:7
+--------------------
+   5 |     COPY prisma ./prisma
+   6 |
+   7 | >>> RUN npm ci --omit=dev && npm run prisma:generate
+   8 |     COPY . .
+   9 |     RUN npm run build
+--------------------
+ERROR: failed to solve: process "/bin/sh -c npm ci --omit=dev && npm run prisma:generate" did not complete successfully: exit code: 255
+RapidStack: fail: docker build --tag cdkasset-a528748c5e9b3e141a36e8c93aa64fb1b93505dcc41ebd0aafdbca6cafd6926a --file Dockerfile.prisma.lambda --platform linux/arm64 . exited with error code 1: #0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.prisma.lambda
+#1 transferring dockerfile: 332B done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for public.ecr.aws/lambda/nodejs:22-arm64
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/7] FROM public.ecr.aws/lambda/nodejs:22-arm64@sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2
+#4 resolve public.ecr.aws/lambda/nodejs:22-arm64@sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2 0.0s done
+#4 sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2 1.58kB / 1.58kB done
+#4 sha256:9ae980233dcf987f309d5e8a681255607865e5b8d24904342ae775e12d88aade 4.76kB / 4.76kB done
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 0B / 38.02MB 0.1s
+#4 sha256:a24f48c46e8a93db5affc869a0c987000647228b05b9c8b3685836e69fd62fdd 0B / 88.12kB 0.1s
+#4 sha256:7d0ba1d4deebda1e139e7549b18cb2ee78dd209d417d7c56dc8d34986ba75fe2 0B / 417B 0.1s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 2.10MB / 38.02MB 0.2s
+#4 sha256:a24f48c46e8a93db5affc869a0c987000647228b05b9c8b3685836e69fd62fdd 88.12kB / 88.12kB 0.1s done
+#4 sha256:7d0ba1d4deebda1e139e7549b18cb2ee78dd209d417d7c56dc8d34986ba75fe2 417B / 417B 0.1s done
+#4 sha256:3e0c6b9e8d42f858c52ff772b9a9c276cc73d9d0785318f0cd973354b789c64a 0B / 3.45MB 0.2s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 0B / 67.31MB 0.2s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 8.39MB / 38.02MB 0.3s
+#4 sha256:3e0c6b9e8d42f858c52ff772b9a9c276cc73d9d0785318f0cd973354b789c64a 3.45MB / 3.45MB 0.3s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 19.92MB / 38.02MB 0.5s
+#4 sha256:3e0c6b9e8d42f858c52ff772b9a9c276cc73d9d0785318f0cd973354b789c64a 3.45MB / 3.45MB 0.3s done
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 9.44MB / 67.31MB 0.5s
+#4 sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 3.15MB / 24.14MB 0.5s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 23.07MB / 38.02MB 0.6s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 14.68MB / 67.31MB 0.6s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 26.21MB / 38.02MB 0.7s
+#4 sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 10.49MB / 24.14MB 0.7s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 38.02MB / 38.02MB 0.9s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 26.21MB / 67.31MB 0.9s
+#4 sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 19.92MB / 24.14MB 0.9s
+#4 sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 38.02MB / 38.02MB 0.9s done
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 30.41MB / 67.31MB 1.0s
+#4 sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 24.14MB / 24.14MB 1.0s done
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 46.14MB / 67.31MB 1.3s
+#4 extracting sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 0.2s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 53.48MB / 67.31MB 1.4s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 62.91MB / 67.31MB 1.6s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 67.31MB / 67.31MB 1.7s
+#4 sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 67.31MB / 67.31MB 1.8s done
+#4 extracting sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 5.7s
+#4 extracting sha256:1e7a143ef8c2b00d612f1506919de8c2de4a6f10d443f33dfc9da9d0a95cecb0 6.0s done
+#4 extracting sha256:a24f48c46e8a93db5affc869a0c987000647228b05b9c8b3685836e69fd62fdd done
+#4 extracting sha256:7d0ba1d4deebda1e139e7549b18cb2ee78dd209d417d7c56dc8d34986ba75fe2 done
+#4 extracting sha256:3e0c6b9e8d42f858c52ff772b9a9c276cc73d9d0785318f0cd973354b789c64a
+#4 extracting sha256:3e0c6b9e8d42f858c52ff772b9a9c276cc73d9d0785318f0cd973354b789c64a 0.4s done
+#4 extracting sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85
+#4 ...
+
+#5 [internal] load build context
+#5 transferring context: 250.92MB 9.9s
+#5 ...
+
+#4 [1/7] FROM public.ecr.aws/lambda/nodejs:22-arm64@sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2
+#4 extracting sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 5.0s
+#4 extracting sha256:87b701d02b3a20468165cc46fe07c4526703879b3fd42dc1e970c869c70f6f85 5.4s done
+#4 extracting sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 0.1s
+#4 ...
+
+#5 [internal] load build context
+#5 transferring context: 453.19MB 14.0s done
+#5 DONE 14.1s
+
+#4 [1/7] FROM public.ecr.aws/lambda/nodejs:22-arm64@sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2
+#4 extracting sha256:680b9c52dbc47b11aaf1bdef5e0aad77d0e18095de9ca4a2c8b13f49690d966e 3.5s done
+#4 DONE 17.2s
+
+#6 [2/7] WORKDIR /var/task
+#6 DONE 0.6s
+
+#7 [3/7] COPY package*.json ./
+#7 DONE 0.2s
+
+#8 [4/7] COPY prisma ./prisma
+#8 DONE 0.1s
+
+#9 [5/7] RUN npm ci --omit=dev && npm run prisma:generate
+#9 0.679 exec /bin/sh: exec format error
+#9 ERROR: process "/bin/sh -c npm ci --omit=dev && npm run prisma:generate" did not complete successfully: exit code: 255
+------
+ > [5/7] RUN npm ci --omit=dev && npm run prisma:generate:
+0.679 exec /bin/sh: exec format error
+------
+Dockerfile.prisma.lambda:7
+--------------------
+   5 |     COPY prisma ./prisma
+   6 |
+   7 | >>> RUN npm ci --omit=dev && npm run prisma:generate
+   8 |     COPY . .
+   9 |     RUN npm run build
+--------------------
+ERROR: failed to solve: process "/bin/sh -c npm ci --omit=dev && npm run prisma:generate" did not complete successfully: exit code: 255
+Failed to build asset PrismaMigration/MigrationFunction/AssetImage
