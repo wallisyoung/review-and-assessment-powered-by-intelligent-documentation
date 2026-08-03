@@ -1,0 +1,108 @@
+[ec2-user@ip-172-31-7-81 review-item-processor]$ uv run python smoke_touki.py /home/ec2-user/toukidocs/136-4.pdf
+[smoke] scan = /home/ec2-user/toukidocs/136-4.pdf
+[smoke] rule = 債務者氏名の一致
+[smoke] calling process_review_from_local (touki branch) ...
+/home/ec2-user/review-and-assessment-powered-by-intelligent-documentation/review-item-processor/.venv/lib/python3.14/site-packages/opentelemetry/instrumentation/threading/__init__.py:171: UserWarning: cache_prompt is deprecated. Use SystemContentBlock with cachePoint instead.
+  return original_func(*func_args, **func_kwargs)
+審査を開始します。まず、添付の登記簿謄本（document block）から抵当権設定に関する債務者氏名を読み取り、案件情報の顧客氏名と正規化して比較します。
+
+**ステップ1：書類から債務者氏名を読み取る**
+
+登記簿謄本（乙区・順位番号１）の抵当権設定欄を確認します。連帯債務者として記載されている氏名を確認します。
+
+**ステップ2：正規化ツールで両者を正規化する**
+
+案件情報の「顧客氏名」と、書類から読み取った「債務者氏名」をそれぞれ正規化します。
+Tool #1: normalize_name_tool
+
+Tool #2: normalize_name_tool
+**ステップ3：比較・判定**
+
+- 案件情報「顧客氏名」（正規化後）：**山田一郎**
+- 登記簿謄本・乙区１番「連帯債務者」（正規化後）：**仮名太郎**（※本書類はサンプルダミーデータのため架空化済み）
+
+両者は一致しません。
+
+<<JSON_START>>
+{
+  "result": "fail",
+  "confidence": 0.95,
+  "explanation": "登記簿謄本（乙区・順位番号１「抵当権設定」）の連帯債務者欄に記載された氏名「仮　名　太　郎」をnormalize_name_toolで正規化すると「仮名太郎」となります。一方、案件情報の「顧客氏名」は「山田一郎」（正規化後も「山田一郎」）であり、両者は一致しません。なお、本書類は「サンプルダミーデータ／個人名・紐づく住所のみ架空化」と明記されており 、個人名が架空化されているため、実務上は原本書類との照合が必要です。",
+  "advice": "抵当権設定契約証書（表面）の「債務者氏名」欄と案件情報の「顧客氏名」が不一致です。本書類はダミーデータによる架空化が施されているため、実際の原本書類（抵当権設定契約証書：表面）を取得し、記載された債務者氏名と案件情報の顧客氏名「山田一郎」が一致しているか改めて確認してください。不一致の場合は、案件情報の顧客氏名または契約書類の記載内容 に誤りがないか、担当者へエスカレーションしてください。",
+  "comparisons": [
+    { "role": "target", "name": "案件情報：顧客氏名", "value": "山田一郎" },
+    { "role": "source", "name": "登記簿謄本（乙区１番）：連帯債務者氏名", "value": "仮名太郎" }
+  ]
+}
+<<JSON_END>>
+
+---
+
+**補足説明**
+
+登記簿謄本の乙区・順位番号１「抵当権設定」欄には、連帯債務者として「仮　名　太　郎」と記載されています。ただし、本書類末尾に「【サンプルダミーデータ／個人名・紐づく住所のみ架 空化】」と明記されており、個人名はすべて架空のものに置き換えられています。そのため、実務審査においては必ず**原本の抵当権設定契約証書**を参照し、債務者氏名と案件情報の顧客氏名 「山田一郎」との一致を直接確認することを強く推奨します。[smoke] result:
+{
+  "result": "fail",
+  "confidence": 0.95,
+  "explanation": "登記簿謄本（乙区・順位番号１「抵当権設定」）の連帯債務者欄に記載された氏名「仮　名　太　郎」をnormalize_name_toolで正規化すると「仮名太郎」となります。一方、案件情報の「顧客氏名」は「山田一郎」（正規化後も「山田一郎」）であり、両者は一致しません。なお、本書類は「サンプルダミーデータ／個人名・紐づく住所のみ架空化」と明記されており 、個人名が架空化されているため、実務上は原本書類との照合が必要です。\n\n【アドバイス】抵当権設定契約証書（表面）の「債務者氏名」欄と案件情報の「顧客氏名」が不一致です。本書類 はダミーデータによる架空化が施されているため、実際の原本書類（抵当権設定契約証書：表面）を取得し、記載された債務者氏名と案件情報の顧客氏名「山田一郎」が一致しているか改めて確 認してください。不一致の場合は、案件情報の顧客氏名または契約書類の記載内容に誤りがないか、担当者へエスカレーションしてください。",
+  "shortExplanation": "登記簿謄本（乙区・順位番号１「抵当権設定」）の連帯債務者欄に記載された氏名「仮　名　太　郎」をnormalize_name_toolで正規化すると「仮名太郎」と",
+  "reviewType": "TOUKI",
+  "sourceReferences": [
+    {
+      "documentId": "smoke-doc-1"
+    }
+  ],
+  "reviewMeta": {
+    "model_id": "global.anthropic.claude-sonnet-4-6",
+    "input_tokens": 23172,
+    "output_tokens": 1194,
+    "input_cost": 0.06951600000000001,
+    "output_cost": 0.01791,
+    "total_cost": 0.087426,
+    "pricing": {
+      "input_per_1k": 0.003,
+      "output_per_1k": 0.015
+    },
+    "duration_seconds": 28.77,
+    "timestamp": "2026-08-03T05:08:01.793966+00:00",
+    "comparisons": [
+      {
+        "role": "target",
+        "name": "案件情報：顧客氏名",
+        "value": "山田一郎"
+      },
+      {
+        "role": "source",
+        "name": "登記簿謄本（乙区１番）：連帯債務者氏名",
+        "value": "仮名太郎"
+      }
+    ]
+  },
+  "inputTokens": 23172,
+  "outputTokens": 1194,
+  "totalCost": 0.087426,
+  "verificationDetails": {
+    "sourcesDetails": [
+      {
+        "toolUseId": "tooluse_ZNJVIAbRFGhrRmq2sGw3QM",
+        "toolName": "normalize_name_tool",
+        "input": {
+          "name": "仮　名　太　郎"
+        },
+        "output": "仮名太郎",
+        "status": "success"
+      },
+      {
+        "toolUseId": "tooluse_WGAZU7x7369Y0nyEoyBMbz",
+        "toolName": "normalize_name_tool",
+        "input": {
+          "name": "山田一郎"
+        },
+        "output": "山田一郎",
+        "status": "success"
+      }
+    ]
+  },
+  "extractedText": "",
+  "pageNumber": 1
+}
