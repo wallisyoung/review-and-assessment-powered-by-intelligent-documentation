@@ -110,7 +110,7 @@ export default function ReviewResultItem({
 
     if (result.result === REVIEW_RESULT.UNDETERMINABLE) {
       return (
-        <span className="rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-800">
+        <span className="bg-yellow-100 text-yellow-800 rounded-full px-2 py-1 text-xs">
           ⚠️ {t("review.undeterminable", "判定不能")}
         </span>
       );
@@ -193,10 +193,7 @@ export default function ReviewResultItem({
 
   return (
     <>
-      <ResultCard
-        variant={getCardVariant()}
-        emphasize={isBelowThreshold}
-      >
+      <ResultCard variant={getCardVariant()} emphasize={isBelowThreshold}>
         <div
           id={`result-item-${result.id}`}
           className="grid grid-cols-[auto_1fr_auto] gap-4">
@@ -330,8 +327,7 @@ export default function ReviewResultItem({
                         {result.extractedText.map((citation, index) => (
                           <div
                             key={index}
-                            className="rounded border border-light-gray bg-white p-2 text-aws-font-color-gray"
-                          >
+                            className="rounded border border-light-gray bg-white p-2 text-aws-font-color-gray">
                             {citation}
                           </div>
                         ))}
@@ -422,11 +418,9 @@ export default function ReviewResultItem({
                           {t("review.externalSources", "External Sources")}:
                         </p>
                         <div className="space-y-2">
-                          {result.externalSources.map(
-                            (source, idx: number) => (
-                              <ExternalSourceItem key={idx} source={source} />
-                            )
-                          )}
+                          {result.externalSources.map((source, idx: number) => (
+                            <ExternalSourceItem key={idx} source={source} />
+                          ))}
                         </div>
                       </div>
                     )}

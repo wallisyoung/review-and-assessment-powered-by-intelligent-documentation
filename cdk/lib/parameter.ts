@@ -24,13 +24,13 @@ export const parameters = {
   // Bedrock設定
   // Amazon Bedrockを利用するリージョンを指定します
   // ---------------------------------------------------
-  // bedrockRegion: "us-east-1", // Bedrockを利用するリージョン（デフォルト：us-west-2）
+  bedrockRegion: "us-east-1", // Bedrockを利用するリージョン（デフォルト：us-west-2）
   // AI モデル設定
   // デフォルトモデル以外を使用したい場合に設定します
   // 注意: モデルIDのプレフィックス（us., eu., apac.など）はbedrockRegionに対応している必要があります
   // 詳細: https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html
   // ---------------------------------------------------
-  // documentProcessingModelId: "global.anthropic.claude-sonnet-4-6", // Claude Sonnet 4.6 (Global)
+  documentProcessingModelId: "global.anthropic.claude-sonnet-4-6", // Claude Sonnet 4.6 (Global)
   // documentProcessingModelId: "us.anthropic.claude-sonnet-4-6", // Claude Sonnet 4.6 (US)
   // documentProcessingModelId: "eu.anthropic.claude-sonnet-4-6", // Claude Sonnet 4.6 (EU)
   // documentProcessingModelId: "jp.anthropic.claude-sonnet-4-6", // Claude Sonnet 4.6 (JP)
@@ -47,7 +47,7 @@ export const parameters = {
   // documentProcessingModelId: "apac.anthropic.claude-3-7-sonnet-20250219-v1:0",  // 日本リージョンでClaude利用する場合
   // documentProcessingModelId: "mistral.mistral-large-2407-v1:0", // Mistral利用する場合
   // documentProcessingModelId: "us.amazon.nova-2-omni-v1:0", // Nova 2 Omni
-  // imageReviewModelId: "global.anthropic.claude-sonnet-4-6", // Claude Sonnet 4.6 (Global)
+  imageReviewModelId: "global.anthropic.claude-sonnet-4-6", // Claude Sonnet 4.6 (Global)
   // imageReviewModelId: "us.anthropic.claude-sonnet-4-6", // Claude Sonnet 4.6 (US)
   // imageReviewModelId: "eu.anthropic.claude-sonnet-4-6", // Claude Sonnet 4.6 (EU)
   // imageReviewModelId: "jp.anthropic.claude-sonnet-4-6", // Claude Sonnet 4.6 (JP)
@@ -67,24 +67,24 @@ export const parameters = {
   // カスタマイズする場合はコメントを外して編集してください
   // 空配列に設定するとモデル選択UIが非表示になります
   // ---------------------------------------------------
-  // availableModels: [
-  //   {
-  //     modelId: "global.anthropic.claude-opus-4-6-v1",
-  //     displayName: "Claude Opus 4.6 (Global)",
-  //   },
-  //   {
-  //     modelId: "global.anthropic.claude-sonnet-4-6",
-  //     displayName: "Claude Sonnet 4.6 (Global)",
-  //   },
-  //   {
-  //     modelId: "global.anthropic.claude-haiku-4-5-20251001-v1:0",
-  //     displayName: "Claude Haiku 4.5 (Global)",
-  //   },
-  //   {
-  //     modelId: "global.anthropic.claude-sonnet-4-20250514-v1:0",
-  //     displayName: "Claude Sonnet 4 (Global)",
-  //   },
-  // ],
+  availableModels: [
+    // {
+    //   modelId: "global.anthropic.claude-opus-4-6-v1",
+    //   displayName: "Claude Opus 4.6 (Global)",
+    // },
+    {
+      modelId: "global.anthropic.claude-sonnet-4-6",
+      displayName: "Claude Sonnet 4.6 (Global)",
+    },
+    {
+      modelId: "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+      displayName: "Claude Haiku 4.5 (Global)",
+    },
+    {
+      modelId: "global.anthropic.claude-sonnet-4-20250514-v1:0",
+      displayName: "Claude Sonnet 4 (Global)",
+    },
+  ],
   // // モデル選択UIを無効にする場合:
   // // availableModels: [],
   // Cognito認証関連の設定

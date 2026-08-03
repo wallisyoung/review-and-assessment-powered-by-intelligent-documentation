@@ -68,17 +68,17 @@ export const CreateReviewPage: React.FC = () => {
 
   const uploadedCount = Object.values(typeUploads).filter(Boolean).length;
   const isReady =
-    uploadedCount > 0 &&
-    selectedChecklistId !== null &&
-    jobName.trim() !== "";
+    uploadedCount > 0 && selectedChecklistId !== null && jobName.trim() !== "";
 
   // スロットごとのファイルアップロード
   const handleSlotUpload = async (docType: string, file: File) => {
     try {
       const result = await uploadDocument(file);
-      setTypeUploads((prev) => ({ ...prev, [docType]: result as UploadResult }));
-      if (errors.files)
-        setErrors((prev) => ({ ...prev, files: "" }));
+      setTypeUploads((prev) => ({
+        ...prev,
+        [docType]: result as UploadResult,
+      }));
+      if (errors.files) setErrors((prev) => ({ ...prev, files: "" }));
     } catch (error) {
       console.error("Upload failed:", error);
     }
@@ -279,7 +279,8 @@ export const CreateReviewPage: React.FC = () => {
                 案件情報（JSON）
               </label>
               <p className="mb-2 text-xs text-aws-font-color-gray">
-                touki-check-data.json の「案件情報」部分を貼り付けるか、ファイルを読み込んでください。
+                touki-check-data.json
+                の「案件情報」部分を貼り付けるか、ファイルを読み込んでください。
               </p>
               <div className="mb-2">
                 <input
@@ -290,7 +291,7 @@ export const CreateReviewPage: React.FC = () => {
                 />
               </div>
               <textarea
-                className="w-full rounded border border-light-gray p-2 font-mono text-sm"
+                className="font-mono w-full rounded border border-light-gray p-2 text-sm"
                 rows={6}
                 value={caseDataText}
                 onChange={(e) => setCaseDataText(e.target.value)}
