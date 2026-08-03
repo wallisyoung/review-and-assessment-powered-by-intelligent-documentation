@@ -172,6 +172,27 @@ async function main(): Promise<void> {
   });
   console.log(`CheckListSet を upsert しました: ${SET_NAME} (id=${setId})`);
 
+  // 1b. ステータスを COMPLETED にするためのダミードキュメント
+  //     （フロントが status=completed でフィルタするため、document が1件必要）
+  await prisma.checkListDocument.upsert({
+    where: { id: "01HZ0UKIDOC000000000000000" },
+    create: {
+      id: "01HZ0UKIDOC000000000000000",
+      filename: "登記テンプレート（seed）",
+      s3Path: "",
+      fileType: "template",
+      uploadDate: new Date(),
+      checkListSetId: setId,
+      userId: DEFAULT_USER_ID,
+      status: "completed",
+    },
+    update: {
+      filename: "登記テンプレート（seed）",
+      status: "completed",
+    },
+  });
+  console.log("ダミードキュメント（status=completed）を upsert しました");
+
   // 2. 既存の子項目を全削除（ReviewResult も事前削除で FK 制約を回避）
   const existingItems = await prisma.checkList.findMany({
     where: { checkListSetId: setId },
