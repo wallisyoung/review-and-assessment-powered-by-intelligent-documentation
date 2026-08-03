@@ -1,0 +1,142 @@
+[ec2-user@ip-172-31-7-81 cdk]$ npm run deploy
+
+> cdk_init@0.1.0 deploy
+> npm ci && npm run build:all && npx cdk deploy --all --require-approval never
+
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+
+> cdk_init@0.1.0 preinstall
+> cd ../backend && npm ci && npm run prisma:generate
+
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+
+added 536 packages, and audited 537 packages in 16s
+
+114 packages are looking for funding
+  run `npm fund` for details
+
+7 vulnerabilities (1 low, 2 moderate, 4 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> rapid-backend@1.0.0 prisma:generate
+> prisma generate
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from prisma/.env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.19.3) to ./prisma/client in 157ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+
+added 306 packages, and audited 345 packages in 29s
+
+39 packages are looking for funding
+  run `npm fund` for details
+
+7 vulnerabilities (2 low, 5 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> cdk_init@0.1.0 build:all
+> npm run build:backend && npm run build
+
+
+> cdk_init@0.1.0 build:backend
+> cd ../backend && npm ci && npm run prisma:generate && npm run build
+
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+
+added 536 packages, and audited 537 packages in 15s
+
+114 packages are looking for funding
+  run `npm fund` for details
+
+7 vulnerabilities (1 low, 2 moderate, 4 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> rapid-backend@1.0.0 prisma:generate
+> prisma generate
+
+warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from prisma/.env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.19.3) to ./prisma/client in 165ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+
+> rapid-backend@1.0.0 build
+> tsc
+
+
+> cdk_init@0.1.0 build
+> tsc
+
+lib/constructs/lambda/invoke-agent/index.ts:1:25 - error TS2307: Cannot find module 'aws-lambda' or its corresponding type declarations.
+
+1 import { Handler } from "aws-lambda";
+                          ~~~~~~~~~~~~
+
+lib/constructs/lambda/invoke-agent/index.ts:5:8 - error TS2307: Cannot find module '@aws-sdk/client-bedrock-agentcore' or its corresponding type declarations.
+
+5 } from "@aws-sdk/client-bedrock-agentcore";
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+lib/constructs/lambda/invoke-agent/index.ts:42:4 - error TS7006: Parameter 'next' implicitly has an 'any' type.
+
+42   (next, context) => async (args: any) => {
+      ~~~~
+
+lib/constructs/lambda/invoke-agent/index.ts:42:10 - error TS7006: Parameter 'context' implicitly has an 'any' type.
+
+42   (next, context) => async (args: any) => {
+            ~~~~~~~
+
+
+Found 4 errors in the same file, starting at: lib/constructs/lambda/invoke-agent/index.ts:1
+
+[ec2-user@ip-172-31-7-81 cdk]$ cd log
