@@ -65,7 +65,7 @@ export class AmbiguityDetectionProcessor extends Construct {
         path.join(__dirname, "../../../backend/"),
         {
           file: "Dockerfile.prisma.lambda",
-          platform: Platform.LINUX_ARM64,
+          platform: Platform.LINUX_X86_64,
           cmd: ["dist/handlers/ambiguity-detection-handler.handler"],
         },
       ),
@@ -77,7 +77,7 @@ export class AmbiguityDetectionProcessor extends Construct {
       },
       securityGroups: [this.securityGroup],
       database: props.databaseConnection,
-      architecture: lambda.Architecture.ARM_64,
+      architecture: lambda.Architecture.X86_64,
       environment: {
         BEDROCK_REGION: props.bedrockRegion,
         DOCUMENT_PROCESSING_MODEL_ID: props.documentProcessingModelId,

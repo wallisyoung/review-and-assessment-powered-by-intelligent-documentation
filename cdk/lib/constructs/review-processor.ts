@@ -111,7 +111,7 @@ export class ReviewProcessor extends Construct {
           path.join(__dirname, "../../../backend/"),
           {
             file: "Dockerfile.prisma.lambda",
-            platform: Platform.LINUX_ARM64,
+            platform: Platform.LINUX_X86_64,
             cmd: ["dist/review-workflow/index.handler"],
           },
         ),
@@ -131,7 +131,7 @@ export class ReviewProcessor extends Construct {
         },
         securityGroups: [this.securityGroup],
         database: props.databaseConnection,
-        architecture: lambda.Architecture.ARM_64,
+        architecture: lambda.Architecture.X86_64,
       },
     );
 
@@ -189,7 +189,7 @@ export class ReviewProcessor extends Construct {
           AGENT_RUNTIME_ARN: this.reviewAgent.runtimeArn,
           BEDROCK_REGION: props.bedrockRegion,
         },
-        architecture: lambda.Architecture.ARM_64,
+        architecture: lambda.Architecture.X86_64,
         bundling: {
           format: lambdaNodejs.OutputFormat.ESM,
           target: "node24",
