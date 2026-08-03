@@ -1,0 +1,145 @@
+[ec2-user@ip-172-31-7-81 cdk]$ npx cdk deploy --all --require-approval never
+Bundling asset RapidStack/ReviewProcessor/InvokeAgentFunction/Code/Stage...
+
+  cdk.out/bundling-temp-5b8fa1dbab6500a9069d93526c9bebf4df31c2f564b996a1e203025a6859f5dd-building/index.mjs  3.7kb
+
+⚡ Done in 36ms
+fatal: No names found, cannot describe anything.
+WARNING Failed to get latest Git tag: Error: Command failed: git describe --tags --abbrev=0
+fatal: No names found, cannot describe anything. (Construct Annotations)
+   RapidStack
+   Acknowledge with 'Construct-Annotations::warning-annotation'
+
+✨  Synthesis time: 26.63s
+
+RapidFrontendWafStack: start: Building RapidFrontendWafStack Template
+RapidFrontendWafStack: success: Built RapidFrontendWafStack Template
+RapidStack: start: Building RapidStack/Custom::VpcRestrictDefaultSGCustomResourceProvider Code
+RapidStack: success: Built RapidStack/Custom::VpcRestrictDefaultSGCustomResourceProvider Code
+RapidStack: start: Building AWS679f53fac002430cb0da5b7982bd2287/Code
+RapidStack: success: Built AWS679f53fac002430cb0da5b7982bd2287/Code
+RapidStack: start: Building ReviewProcessor/InvokeAgentFunction/Code
+RapidStack: success: Built ReviewProcessor/InvokeAgentFunction/Code
+RapidStack: start: Building ReviewQueueProcessorConstruct/PythonFunction/Code
+RapidStack: success: Built ReviewQueueProcessorConstruct/PythonFunction/Code
+RapidStack: start: Building NodejsBuildCustomResourceHandler25648b212c404f09aa65b6bbb0c44659/Code
+RapidStack: success: Built NodejsBuildCustomResourceHandler25648b212c404f09aa65b6bbb0c44659/Code
+RapidStack: start: Building Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend--
+RapidStack: success: Built Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend--
+RapidStack: start: Building Frontend/ReactBuild/Deploy/AwsCliLayer/Code
+RapidStack: success: Built Frontend/ReactBuild/Deploy/AwsCliLayer/Code
+RapidStack: start: Building Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C512MiB/Code
+RapidStack: success: Built Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C512MiB/Code
+RapidStack: start: Building RapidStack Template
+RapidStack: success: Built RapidStack Template
+RapidStack: start: Building PrismaMigration/MigrationFunction/AssetImage
+RapidFrontendWafStack: start: Publishing RapidFrontendWafStack Template (527083197543-us-east-1-5c31b40d)
+RapidFrontendWafStack: success: Published RapidFrontendWafStack Template (527083197543-us-east-1-5c31b40d)
+RapidFrontendWafStack
+RapidFrontendWafStack: creating CloudFormation changeset...
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.prisma.lambda
+#1 transferring dockerfile: 332B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for public.ecr.aws/lambda/nodejs:22-arm64
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/7] FROM public.ecr.aws/lambda/nodejs:22-arm64@sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 3.59MB 2.6s done
+#5 DONE 2.6s
+
+#6 [3/7] COPY package*.json ./
+#6 CACHED
+
+#7 [2/7] WORKDIR /var/task
+#7 CACHED
+
+#8 [4/7] COPY prisma ./prisma
+#8 CACHED
+
+#9 [5/7] RUN npm ci --omit=dev && npm run prisma:generate
+#9 0.583 exec /bin/sh: exec format error
+#9 ERROR: process "/bin/sh -c npm ci --omit=dev && npm run prisma:generate" did not complete successfully: exit code: 255
+------
+ > [5/7] RUN npm ci --omit=dev && npm run prisma:generate:
+0.583 exec /bin/sh: exec format error
+------
+Dockerfile.prisma.lambda:7
+--------------------
+   5 |     COPY prisma ./prisma
+   6 |
+   7 | >>> RUN npm ci --omit=dev && npm run prisma:generate
+   8 |     COPY . .
+   9 |     RUN npm run build
+--------------------
+ERROR: failed to solve: process "/bin/sh -c npm ci --omit=dev && npm run prisma:generate" did not complete successfully: exit code: 255
+RapidStack: fail: docker build --tag cdkasset-a528748c5e9b3e141a36e8c93aa64fb1b93505dcc41ebd0aafdbca6cafd6926a --file Dockerfile.prisma.lambda --platform linux/arm64 . exited with error code 1: #0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.prisma.lambda
+#1 transferring dockerfile: 332B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for public.ecr.aws/lambda/nodejs:22-arm64
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/7] FROM public.ecr.aws/lambda/nodejs:22-arm64@sha256:4554a7be1a02844919b1d54561c7c0912da927c351f6071a16d3e82780573ce2
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 3.59MB 2.6s done
+#5 DONE 2.6s
+
+#6 [3/7] COPY package*.json ./
+#6 CACHED
+
+#7 [2/7] WORKDIR /var/task
+#7 CACHED
+
+#8 [4/7] COPY prisma ./prisma
+#8 CACHED
+
+#9 [5/7] RUN npm ci --omit=dev && npm run prisma:generate
+#9 0.583 exec /bin/sh: exec format error
+#9 ERROR: process "/bin/sh -c npm ci --omit=dev && npm run prisma:generate" did not complete successfully: exit code: 255
+------
+ > [5/7] RUN npm ci --omit=dev && npm run prisma:generate:
+0.583 exec /bin/sh: exec format error
+------
+Dockerfile.prisma.lambda:7
+--------------------
+   5 |     COPY prisma ./prisma
+   6 |
+   7 | >>> RUN npm ci --omit=dev && npm run prisma:generate
+   8 |     COPY . .
+   9 |     RUN npm run build
+--------------------
+ERROR: failed to solve: process "/bin/sh -c npm ci --omit=dev && npm run prisma:generate" did not complete successfully: exit code: 255
+Changeset arn:aws:cloudformation:us-east-1:527083197543:changeSet/cdk-deploy-change-set/25ad1c17-47d5-4c97-bc48-c94999f1852b created and waiting in review for manual execution (--no-execute)
+RapidFrontendWafStack: deploying... [1/2]
+
+⚠️  Some resources failed to delete but were skipped. These resources may still exist and could incur charges. Clean them up manually.
+
+
+ ✅  RapidFrontendWafStack
+
+✨  Deployment time: 212.38s
+
+Outputs:
+RapidFrontendWafStack.ExportsOutputFnGetAttWebAclArnEF1FFB35 = arn:aws:wafv2:us-east-1:527083197543:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
+RapidFrontendWafStack.WebAclId = arn:aws:wafv2:us-east-1:527083197543:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
+Stack ARN:
+arn:aws:cloudformation:us-east-1:527083197543:stack/RapidFrontendWafStack/c6b8ed60-529c-11f1-9641-0eb95eda6921
+Failed to build asset PrismaMigration/MigrationFunction/AssetImage
