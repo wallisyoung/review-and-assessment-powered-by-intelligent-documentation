@@ -108,6 +108,14 @@ export default function ReviewResultItem({
       );
     }
 
+    if (result.result === REVIEW_RESULT.UNDETERMINABLE) {
+      return (
+        <span className="rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-800">
+          ⚠️ {t("review.undeterminable", "判定不能")}
+        </span>
+      );
+    }
+
     return (
       <span className="bg-gray-100 text-gray-800 rounded-full px-2 py-1 text-xs">
         {t("common.unknown")}

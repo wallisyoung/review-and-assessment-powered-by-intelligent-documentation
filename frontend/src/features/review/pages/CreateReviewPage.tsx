@@ -4,44 +4,40 @@ import { useTranslation } from "react-i18next";
 import Button from "../../../components/Button";
 import PageHeader from "../../../components/PageHeader";
 import FormTextField from "../../../components/FormTextField";
-import { FileUploader } from "../../../components/FileUploader";
 import ChecklistSelector from "../components/ChecklistSelector";
-import ComparisonIndicator from "../components/ComparisonIndicator";
 import { useCreateReviewJob } from "../hooks/useReviewJobMutations";
 import { useDocumentUpload } from "../../../hooks/useDocumentUpload";
-import { useChecklistSets } from "../../checklist/hooks/useCheckListSetQueries";
-import { CHECK_LIST_STATUS, CheckListSet } from "../../checklist/types";
 import {
-  HiExclamationCircle,
-  HiDocumentText,
-  HiPhotograph,
-} from "react-icons/hi";
-import SegmentedControl from "../../../components/SegmentedControl";
+  useChecklistSets,
+  useChecklistSetDetail,
+} from "../../checklist/hooks/useCheckListSetQueries";
+import { CHECK_LIST_STATUS } from "../../checklist/types";
 import { REVIEW_FILE_TYPE } from "../types";
-import {
-  validateFileSize,
-  formatFileSize,
-} from "../../../utils/fileValidation";
-import { MAX_FILE_SIZE } from "../../../constants/index";
+import { HiExclamationCircle, HiTrash } from "react-icons/hi";
+
+interface UploadResult {
+  documentId: string;
+  filename: string;
+  s3Key: string;
+  fileType: string;
+}
 
 export const CreateReviewPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [selectedChecklist, setSelectedChecklist] =
-    useState<CheckListSet | null>(null);
-  const [jobName, setJobName] = useState("");
-  const [fileType, setFileType] = useState<REVIEW_FILE_TYPE>(
-    REVIEW_FILE_TYPE.PDF
+  const [selectedChecklistId, setSelectedChecklistId] = useState<string | null>(
+    null
   );
+  const [jobName, setJobName] = useState("");
+  const [typeUploads, setTypeUploads] = useState<
+    Record<string, UploadResult | null>
+  >({});
+  const [caseDataText, setCaseDataText] = useState("");
   const [checklistPage, setChecklistPage] = useState(1);
   const [checklistLimit] = useState(5);
-  const [errors, setErrors] = useState({
-    name: "",
-    files: "",
-  });
+  const [errors, setErrors] = useState({ name: "", files: "", caseData: "" });
 
-  // チェックリストセット一覧を取得（完成状態のみ）
+  // チェックリストセット一覧（完成状態のみ）
   const {
     items: checkListSets,
     isLoading: isLoadingCheckListSets,
@@ -56,230 +52,116 @@ export const CreateReviewPage: React.FC = () => {
     CHECK_LIST_STATUS.COMPLETED
   );
 
-  // 審査ジョブ作成フック
+  // 選択中セットの詳細（declaredDocumentTypes を取得）
+  const { checklistSet: selectedDetail } =
+    useChecklistSetDetail(selectedChecklistId);
+  const declaredDocumentTypes: string[] =
+    (selectedDetail as any)?.declaredDocumentTypes ?? [];
+
   const { createReviewJob, status, error: createError } = useCreateReviewJob();
   const isSubmitting = status === "loading";
 
-  // ドキュメントアップロードフック
-  const {
-    uploadDocument,
-    uploadDocuments,
-    clearUploadedDocuments,
-    deleteDocument,
-    isUploading,
-    error: uploadError,
-    uploadedDocuments,
-  } = useDocumentUpload({
+  const { uploadDocument, isUploading } = useDocumentUpload({
     presignedUrlEndpoint: "/documents/review/presigned-url",
-    imagesPresignedUrlEndpoint: "/documents/review/images/presigned-url",
     deleteEndpointPrefix: "/documents/review/",
   });
 
-  // ファイルが選択されチェックリストも選択されているかチェック
+  const uploadedCount = Object.values(typeUploads).filter(Boolean).length;
   const isReady =
-    uploadedDocuments?.length > 0 &&
-    selectedChecklist !== null &&
+    uploadedCount > 0 &&
+    selectedChecklistId !== null &&
     jobName.trim() !== "";
 
-  // ファイルタイプ選択ハンドラ
-  const handleFileTypeChange = (value: string) => {
-    setFileType(value as REVIEW_FILE_TYPE);
-    setSelectedFiles([]);
-    clearUploadedDocuments();
+  // スロットごとのファイルアップロード
+  const handleSlotUpload = async (docType: string, file: File) => {
+    try {
+      const result = await uploadDocument(file);
+      setTypeUploads((prev) => ({ ...prev, [docType]: result as UploadResult }));
+      if (errors.files)
+        setErrors((prev) => ({ ...prev, files: "" }));
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
+  };
+
+  const handleSlotRemove = (docType: string) => {
+    setTypeUploads((prev) => ({ ...prev, [docType]: null }));
+  };
+
+  // 案件情報ファイル読み込み
+  const handleCaseDataFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCaseDataText(String(reader.result || ""));
+    reader.readAsText(file);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (name === "jobName") {
-      setJobName(value);
-    }
-
-    // 入力時にエラーをクリア
-    if (errors[name as keyof typeof errors]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
+    if (name === "jobName") setJobName(value);
+    if (errors.name as keyof typeof errors)
+      setErrors((prev) => ({ ...prev, name: "" }));
   };
 
-  // ファイル変更ハンドラ
-  const handleFilesChange = async (newFiles: File[]) => {
-    // ファイルサイズ検証
-    const oversizedFiles = newFiles.filter(
-      (file) => !validateFileSize(file, MAX_FILE_SIZE)
-    );
-    if (oversizedFiles.length > 0) {
-      const oversizedFileNames = oversizedFiles
-        .map((file) => `${file.name} (${formatFileSize(file.size)})`)
-        .join(", ");
-      setErrors((prev) => ({
-        ...prev,
-        files: `${t("review.fileSizeError")}: ${oversizedFileNames}`,
-      }));
-      return;
-    }
-
-    // ファイルタイプに基づいて検証
-    if (fileType === REVIEW_FILE_TYPE.PDF && newFiles.length > 1) {
-      setErrors((prev) => ({
-        ...prev,
-        files: t("review.pdfLimitError"),
-      }));
-      return;
-    }
-
-    if (fileType === REVIEW_FILE_TYPE.IMAGE && newFiles.length > 20) {
-      setErrors((prev) => ({
-        ...prev,
-        files: t("review.imageLimitError"),
-      }));
-      return;
-    }
-
-    setSelectedFiles(newFiles);
-
-    // 新しく追加されたファイルのみをアップロード
-    const existingFilenames =
-      uploadedDocuments?.map((doc) => doc.filename) || [];
-    const filesToUpload = newFiles.filter(
-      (file) => !existingFilenames.includes(file.name)
-    );
-
-    if (filesToUpload.length === 0) return;
-
-    try {
-      if (fileType === REVIEW_FILE_TYPE.PDF) {
-        // PDFファイルの場合は1つだけアップロード
-        const file = filesToUpload[0];
-        const uploadResult = await uploadDocument(file);
-
-        // ファイル名をジョブ名の初期値として設定（ファイルが1つの場合）
-        if (newFiles.length === 1 && !jobName) {
-          // 拡張子を除いたファイル名を設定
-          const fileName = file.name;
-          const nameWithoutExtension =
-            fileName.substring(0, fileName.lastIndexOf(".")) || fileName;
-          setJobName(`${nameWithoutExtension}${t("review.jobNameSuffix")}`);
-        }
-      } else {
-        // 画像ファイルの場合は複数アップロード
-        const uploadResults = await uploadDocuments(filesToUpload);
-
-        // ファイル名をジョブ名の初期値として設定（ファイルが1つの場合）
-        if (newFiles.length === 1 && !jobName) {
-          const fileName = newFiles[0].name;
-          const nameWithoutExtension =
-            fileName.substring(0, fileName.lastIndexOf(".")) || fileName;
-          setJobName(`${nameWithoutExtension}${t("review.jobNameSuffix")}`);
-        }
-      }
-
-      // ファイル選択時にエラーをクリア
-      if (errors.files) {
-        setErrors((prev) => ({
-          ...prev,
-          files: "",
-        }));
-      }
-    } catch (error) {
-      console.error(t("review.fileUploadError"), error);
-    }
-  };
-
-  // ファイル削除ハンドラ
-  const handleFileRemove = async (index: number) => {
-    const fileToRemove = selectedFiles[index];
-
-    // 選択済みファイルリストから削除
-    const newSelectedFiles = [...selectedFiles];
-    newSelectedFiles.splice(index, 1);
-    setSelectedFiles(newSelectedFiles);
-
-    // アップロード済みドキュメントリストからも削除
-    const docToRemove = uploadedDocuments.find(
-      (doc) => doc.filename === fileToRemove.name
-    );
-    if (docToRemove) {
-      // S3からも削除
-      await deleteDocument(docToRemove.documentId);
-    }
-
-    // ファイルがなくなった場合はエラーを表示
-    if (newSelectedFiles.length === 0) {
-      setErrors((prev) => ({
-        ...prev,
-        files: t("review.fileRequired"),
-      }));
-    }
-  };
-
-  // チェックリスト選択ハンドラ
-  const handleChecklistSelect = (checklist: CheckListSet) => {
-    setSelectedChecklist(checklist);
-  };
-
-  // バリデーション
   const validate = () => {
-    const newErrors = {
-      name: "",
-      files: "",
-    };
-
-    if (!jobName.trim()) {
-      newErrors.name = t("review.nameRequired");
+    const newErrors = { name: "", files: "", caseData: "" };
+    if (!jobName.trim()) newErrors.name = t("review.nameRequired");
+    if (uploadedCount === 0) newErrors.files = t("review.fileRequired");
+    if (caseDataText.trim()) {
+      try {
+        JSON.parse(caseDataText);
+      } catch {
+        newErrors.caseData = "Invalid JSON format";
+      }
     }
-
-    if (!uploadedDocuments?.length) {
-      newErrors.files = t("review.fileRequired");
-    }
-
     setErrors(newErrors);
-    return !Object.values(newErrors).some((error) => error);
+    return !Object.values(newErrors).some(Boolean);
   };
 
-  // フォーム送信ハンドラ
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validate() || !selectedChecklist) return;
+    if (!validate() || !selectedChecklistId) return;
 
     try {
-      // すべてのドキュメントを同じ構造で扱う
-      const documents = uploadedDocuments.map((doc) => ({
-        id: doc.documentId,
-        filename: doc.filename,
-        s3Key: doc.s3Key,
-        fileType: fileType,
-      }));
+      const documents = Object.entries(typeUploads)
+        .filter(([, doc]) => doc !== null)
+        .map(([docType, doc]) => ({
+          id: doc!.documentId,
+          filename: doc!.filename,
+          s3Key: doc!.s3Key,
+          fileType: doc!.fileType.includes("pdf")
+            ? REVIEW_FILE_TYPE.PDF
+            : REVIEW_FILE_TYPE.IMAGE,
+          documentType: docType,
+        }));
+
+      let caseData: unknown = undefined;
+      if (caseDataText.trim()) {
+        caseData = JSON.parse(caseDataText);
+      }
 
       await createReviewJob({
         name: jobName,
-        checkListSetId: selectedChecklist.id,
-        documents: documents,
+        checkListSetId: selectedChecklistId,
+        documents,
+        caseData,
       });
 
-      clearUploadedDocuments();
-
-      // 作成成功後、一覧ページに遷移
       navigate("/review", { replace: true });
     } catch (error) {
       console.error(t("review.createError"), error);
     }
   };
 
-  // 表示するエラー
-  const displayError = uploadError || createError;
+  const displayError = createError;
 
   return (
     <div>
       <PageHeader
         title={t("review.createTitle")}
         description={t("review.createDescription")}
-        backLink={{
-          to: "/review",
-          label: t("review.backToList"),
-        }}
+        backLink={{ to: "/review", label: t("review.backToList") }}
       />
 
       {displayError && (
@@ -307,87 +189,118 @@ export const CreateReviewPage: React.FC = () => {
             error={errors.name}
           />
 
+          {/* チェックリスト選択 */}
           <div className="mb-6">
-            <label className="mb-2 block font-medium text-aws-squid-ink-light dark:text-aws-font-color-white-dark">
-              {t("review.fileType")} <span className="text-red">*</span>
-            </label>
-            <SegmentedControl
-              name="fileType"
-              options={[
-                {
-                  value: REVIEW_FILE_TYPE.PDF,
-                  label: t("review.pdfFile"),
-                  icon: <HiDocumentText />,
-                },
-                {
-                  value: REVIEW_FILE_TYPE.IMAGE,
-                  label: t("review.imageFiles"),
-                  icon: <HiPhotograph />,
-                },
-              ]}
-              value={fileType}
-              onChange={handleFileTypeChange}
-            />
-          </div>
-
-          <div className="mb-2">
-            <label className="block font-medium text-aws-squid-ink-light dark:text-aws-font-color-white-dark">
-              {t("review.targetFiles")} <span className="text-red">*</span>
-            </label>
-            {errors.files && (
-              <p className="mt-1 text-sm text-red">{errors.files}</p>
+            {isLoadingCheckListSets ? (
+              <div className="flex h-32 items-center justify-center">
+                <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2 border-t-2"></div>
+              </div>
+            ) : checkListSetsError ? (
+              <div className="rounded-md border border-red p-4 text-red">
+                {t("checklist.loadError")}
+              </div>
+            ) : (
+              <ChecklistSelector
+                checklists={checkListSets as any}
+                selectedChecklistId={selectedChecklistId}
+                onSelectChecklist={(checklist: any) =>
+                  setSelectedChecklistId(checklist.id)
+                }
+                currentPage={checklistPage}
+                totalPages={checklistTotalPages}
+                totalItems={checklistTotal}
+                itemsPerPage={checklistLimit}
+                onPageChange={setChecklistPage}
+                isLoading={isLoadingCheckListSets}
+              />
             )}
           </div>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-7">
-            {/* 左側: ファイルアップロード */}
-            <div className="flex lg:col-span-3">
-              <FileUploader
-                files={selectedFiles}
-                onFilesChange={handleFilesChange}
-                isUploading={isUploading}
-                multiple={fileType === REVIEW_FILE_TYPE.IMAGE}
-                uploadedDocuments={uploadedDocuments}
-                onDeleteFile={handleFileRemove}
-                fillHeight
-                acceptedFileTypes={
-                  fileType === REVIEW_FILE_TYPE.PDF
-                    ? { "application/pdf": [".pdf"] }
-                    : { "image/png": [".png"], "image/jpeg": [".jpg", ".jpeg"] }
-                }
-              />
-            </div>
-
-            {/* 中央: 比較アイコン */}
-            <div className="flex items-center justify-center py-4 lg:col-span-1">
-              <ComparisonIndicator isReady={isReady} />
-            </div>
-
-            {/* 右側: チェックリスト選択 */}
-            <div className="lg:col-span-3">
-              {isLoadingCheckListSets ? (
-                <div className="flex h-full items-center justify-center p-8">
-                  <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2 border-t-2"></div>
-                </div>
-              ) : checkListSetsError ? (
-                <div className="rounded-md border border-red p-4 text-red">
-                  {t("checklist.loadError")}
+          {/* 複合レビュー：文書タイプ別アップロード */}
+          {selectedChecklistId && (
+            <div className="mb-6">
+              <label className="mb-2 block font-medium text-aws-squid-ink-light dark:text-aws-font-color-white-dark">
+                審査対象書類（文書タイプごとにアップロード）{" "}
+                <span className="text-red">*</span>
+              </label>
+              {declaredDocumentTypes.length > 0 ? (
+                <div className="space-y-3">
+                  {declaredDocumentTypes.map((docType) => (
+                    <div
+                      key={docType}
+                      className="flex items-center gap-3 rounded border border-light-gray p-3">
+                      <span className="min-w-[200px] text-sm font-medium">
+                        {docType}
+                      </span>
+                      {typeUploads[docType] ? (
+                        <>
+                          <span className="text-sm text-aws-font-color-gray">
+                            {typeUploads[docType]!.filename}
+                          </span>
+                          <Button
+                            onClick={() => handleSlotRemove(docType)}
+                            variant="text"
+                            size="sm"
+                            icon={<HiTrash className="h-4 w-4" />}
+                            className="text-red">
+                            {t("common.delete", "削除")}
+                          </Button>
+                        </>
+                      ) : (
+                        <input
+                          type="file"
+                          accept=".pdf,image/*"
+                          onChange={(e) =>
+                            e.target.files?.[0] &&
+                            handleSlotUpload(docType, e.target.files[0])
+                          }
+                          className="text-sm"
+                          disabled={isUploading}
+                        />
+                      )}
+                    </div>
+                  ))}
+                  {errors.files && (
+                    <p className="text-sm text-red">{errors.files}</p>
+                  )}
                 </div>
               ) : (
-                <ChecklistSelector
-                  checklists={checkListSets || []}
-                  selectedChecklistId={selectedChecklist?.id || null}
-                  onSelectChecklist={handleChecklistSelect}
-                  currentPage={checklistPage}
-                  totalPages={checklistTotalPages}
-                  totalItems={checklistTotal}
-                  itemsPerPage={checklistLimit}
-                  onPageChange={setChecklistPage}
-                  isLoading={isLoadingCheckListSets}
-                />
+                <p className="text-sm text-aws-font-color-gray">
+                  このチェックリストセットは複合レビュー（文書タイプ別）に対応していません。
+                </p>
               )}
             </div>
-          </div>
+          )}
+
+          {/* 案件情報（JSON） */}
+          {selectedChecklistId && declaredDocumentTypes.length > 0 && (
+            <div className="mb-6">
+              <label className="mb-1 block font-medium text-aws-squid-ink-light dark:text-aws-font-color-white-dark">
+                案件情報（JSON）
+              </label>
+              <p className="mb-2 text-xs text-aws-font-color-gray">
+                touki-check-data.json の「案件情報」部分を貼り付けるか、ファイルを読み込んでください。
+              </p>
+              <div className="mb-2">
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleCaseDataFile}
+                  className="text-sm"
+                />
+              </div>
+              <textarea
+                className="w-full rounded border border-light-gray p-2 font-mono text-sm"
+                rows={6}
+                value={caseDataText}
+                onChange={(e) => setCaseDataText(e.target.value)}
+                placeholder='{"案件情報": {"顧客氏名": "山田一郎", ...}}'
+              />
+              {errors.caseData && (
+                <p className="text-sm text-red">{errors.caseData}</p>
+              )}
+            </div>
+          )}
 
           <div className="mt-8 flex justify-end space-x-3">
             <Button outline to="/review">

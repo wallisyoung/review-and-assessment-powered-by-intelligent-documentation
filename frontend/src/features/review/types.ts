@@ -32,6 +32,7 @@ export enum REVIEW_RESULT_STATUS {
 export enum REVIEW_RESULT {
   PASS = "pass",
   FAIL = "fail",
+  UNDETERMINABLE = "undeterminable",
 }
 
 /**
@@ -74,7 +75,9 @@ export interface CreateReviewJobRequest {
     filename: string;
     s3Key: string;
     fileType: REVIEW_FILE_TYPE;
+    documentType?: string;
   }>;
+  caseData?: unknown;
   userId?: string;
   mcpServerName?: string;
 }
