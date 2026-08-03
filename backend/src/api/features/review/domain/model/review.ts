@@ -29,6 +29,7 @@ export enum REVIEW_RESULT_STATUS {
 export enum REVIEW_RESULT {
   PASS = "pass",
   FAIL = "fail",
+  UNDETERMINABLE = "undeterminable",
 }
 
 /**
@@ -52,11 +53,15 @@ export interface ReviewJobEntity {
   status: REVIEW_JOB_STATUS;
   checkListSetId: string;
   userId?: string;
+  // 案件情報（システム抽出データ、自然言語の名値対）。複合レビューの比較対象。
+  caseData?: unknown;
   documents: Array<{
     id: string;
     filename: string;
     s3Key: string;
     fileType: REVIEW_FILE_TYPE;
+    // 文書タイプ（抵当権設定契約証書 などの業務書類種別）。pdf/image はキャリア。
+    documentType?: string;
   }>;
   results: ReviewResultEntity[];
 }
@@ -78,6 +83,7 @@ export interface ReviewJobSummary {
     filename: string;
     s3Path: string;
     fileType: REVIEW_FILE_TYPE;
+    documentType?: string;
   }>;
   checkListSet: {
     id: string;
@@ -101,7 +107,10 @@ export interface ReviewJobDetail {
     filename: string;
     s3Path: string;
     fileType: REVIEW_FILE_TYPE;
+    documentType?: string;
   }>;
+  // 案件情報（システム抽出データ）
+  caseData?: unknown;
   // ジョブ作成者（所有者） - 存在しない場合もあるためオプショナル
   userId?: string;
   createdAt: Date;

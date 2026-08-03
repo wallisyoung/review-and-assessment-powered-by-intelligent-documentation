@@ -17,6 +17,9 @@ from logger import logger
 from model_config import ModelConfig
 from tool_history_collector import ToolHistoryCollector
 from tools.factory import create_custom_tools
+from tools.normalization_tools import create_normalization_tools
+from touki.agent_runner import run_touki_review
+from touki.prompt import ToukiDocument
 
 
 class ReviewMetaTracker:
@@ -263,6 +266,9 @@ def _execute_review_core(
     model_id: str,
     toolConfiguration: dict[str, Any] | None,
     feedback_summary: str | None,
+    case_data: Any = None,
+    document_types: Optional[List[str]] = None,
+    document_ids: Optional[List[str]] = None,
 ) -> dict[str, Any]:
     """
     Execute review from local files (common logic).
@@ -280,6 +286,21 @@ def _execute_review_core(
     Returns:
         Review result dict
     """
+    # 登記（複合レビュー）の場合は touki パイプラインへ分岐（ADR-0001/0002）
+    if case_data is not None:
+        return _execute_touki_review(
+            file_paths=file_paths,
+            has_images=has_images,
+            check_name=check_name,
+            check_description=check_description,
+            language_name=language_name,
+            model_id=model_id,
+            toolConfiguration=toolConfiguration,
+            case_data=case_data,
+            document_types=document_types,
+            document_ids=document_ids,
+        )
+
     # Determine processing method
     use_document_block = _should_use_document_block(file_paths, model_id, has_images)
 
@@ -364,6 +385,176 @@ def _execute_review_core(
     logger.info(f"Review completed with reviewType: {result['reviewType']}")
 
     return result
+
+
+def _run_touki_agent(
+    file_paths: list[str],
+    has_images: bool,
+    model_id: str,
+    system_prompt: str,
+    prompt: str,
+    toolConfiguration: Optional[Dict[str, Any]] = None,
+):
+    """登記審査用に Strands Agent を構築して実行し、(response, meta_tracker, history) を返す。
+
+    既存の _run_agent_with_document_block / _run_agent_with_file_read_tool と同じ構築パターンだが、
+    それらを変更せず新設する（既存 PDF/IMAGE パスへの回帰リスクを避けるため）。
+    """
+    model = ModelConfig.create(model_id)
+    meta_tracker = ReviewMetaTracker(model_id)
+    history_collector = ToolHistoryCollector(truncate_length=TOOL_TEXT_TRUNCATE_LENGTH)
+
+    custom_tools = create_custom_tools(toolConfiguration)
+    norm_tools = create_normalization_tools()
+
+    bedrock_config = {
+        "model_id": model_id,
+        "region_name": BEDROCK_REGION,
+        "temperature": 0.0,
+        "streaming": False,
+    }
+    if model.supports_caching:
+        bedrock_config["cache_prompt"] = "default"
+        bedrock_config["cache_tools"] = "default"
+
+    use_document_block = _should_use_document_block(file_paths, model_id, has_images)
+
+    if use_document_block:
+        # PDF を document block として埋め込み
+        content = []
+        for file_path in file_paths:
+            try:
+                with open(file_path, "rb") as f:
+                    file_bytes = f.read()
+            except Exception as e:
+                logger.error(f"[TOUKI] Failed to read file {file_path}: {e}")
+                continue
+            sanitized_name = sanitize_file_name(os.path.basename(file_path))
+            content.append(
+                {
+                    "document": {
+                        "name": sanitized_name,
+                        "source": {"bytes": file_bytes},
+                        "format": "pdf",
+                        "citations": {"enabled": model.supports_citation},
+                    }
+                }
+            )
+        content.append({"text": prompt})
+        tools = custom_tools + norm_tools
+        agent = Agent(
+            model=BedrockModel(**bedrock_config),
+            tools=tools,
+            system_prompt=system_prompt,
+            hooks=[history_collector],
+        )
+        logger.debug("[TOUKI] Executing agent with document block")
+        response = agent(content)
+    else:
+        # file_read / image_reader ツールで読取
+        base_tools = ([file_read, image_reader] if has_images else [file_read])
+        tools = base_tools + custom_tools + norm_tools
+        files_prompt = "\n".join([f"- '{fp}'" for fp in file_paths])
+        full_prompt = f"{prompt}\n\nPlease analyze the following files:\n{files_prompt}"
+        agent = Agent(
+            model=BedrockModel(**bedrock_config),
+            tools=tools,
+            system_prompt=system_prompt,
+            hooks=[history_collector],
+        )
+        logger.debug("[TOUKI] Executing agent with file_read/image_reader tools")
+        response = agent(full_prompt)
+
+    return response, meta_tracker, history_collector
+
+
+def _execute_touki_review(
+    file_paths: list[str],
+    has_images: bool,
+    check_name: str,
+    check_description: str,
+    language_name: str,
+    model_id: str,
+    toolConfiguration: Optional[Dict[str, Any]],
+    case_data: Any,
+    document_types: Optional[List[str]],
+    document_ids: Optional[List[str]],
+) -> Dict[str, Any]:
+    """登記（複合レビュー）の判定: touki パイプラインでプロンプト構築→Agent 実行→結果解析。"""
+    # file_paths と document_types を並びで対応付けて ToukiDocument 構築
+    if document_types and len(document_types) != len(file_paths):
+        logger.warning(
+            f"[TOUKI] document_types length ({len(document_types)}) != file_paths ({len(file_paths)}); "
+            f"generic labels will be used for the unmatched files"
+        )
+    docs = []
+    for i, fp in enumerate(file_paths):
+        dtype = (
+            document_types[i]
+            if document_types and i < len(document_types)
+            else "(不明)"
+        )
+        docs.append(ToukiDocument(document_type=dtype, filename=os.path.basename(fp)))
+
+    meta_holder: Dict[str, Any] = {}
+    system_prompt = (
+        f"You are an AI assistant that conducts 整合性審査 (consistency review) "
+        f"for Japanese 登記 documents. All responses must be in {language_name}."
+    )
+
+    def model_fn(prompt: str, _docs) -> Any:
+        response, meta_tracker, history = _run_touki_agent(
+            file_paths=file_paths,
+            has_images=has_images,
+            model_id=model_id,
+            system_prompt=system_prompt,
+            prompt=prompt,
+            toolConfiguration=toolConfiguration,
+        )
+        meta_holder["meta"] = meta_tracker.get_review_meta(response)
+        meta_holder["history"] = history.executions
+        return response.message
+
+    touki = run_touki_review(
+        rule_name=check_name,
+        rule_text=check_description,
+        documents=docs,
+        case_data=case_data,
+        model_fn=model_fn,
+        language_name=language_name,
+    )
+
+    logger.info(f"[TOUKI] Review completed with result: {touki.result}")
+    return _touki_result_to_dict(touki, meta_holder, document_ids, has_images)
+
+
+def _touki_result_to_dict(
+    touki,
+    meta_holder: Dict[str, Any],
+    document_ids: Optional[List[str]],
+    has_images: bool,
+) -> Dict[str, Any]:
+    """ToukiReviewResult → 既存の結果 dict 形式へ変換（3 状態を維持）。"""
+    advice = f"\n\n【アドバイス】{touki.advice}" if touki.advice else ""
+    meta = meta_holder.get("meta", {}) or {}
+    comparisons = [
+        {"role": c.role, "name": c.name, "value": c.value} for c in touki.comparisons
+    ]
+    result: Dict[str, Any] = {
+        "result": touki.result,  # pass | fail | undeterminable
+        "confidence": touki.confidence,
+        "explanation": (touki.explanation or "") + advice,
+        "shortExplanation": (touki.explanation or "")[:80],
+        "reviewType": "TOUKI",
+        "sourceReferences": [{"documentId": did} for did in (document_ids or [])],
+        "reviewMeta": {**meta, "comparisons": comparisons},
+        "inputTokens": meta.get("input_tokens"),
+        "outputTokens": meta.get("output_tokens"),
+        "totalCost": meta.get("total_cost"),
+        "verificationDetails": {"sourcesDetails": meta_holder.get("history", [])},
+    }
+    # 安全なデフォルト補完（result キーは存在するので 3 状態は維持される）
+    return _validate_and_complete_result(result, has_images)
 
 
 def list_tools_sync(client: MCPClient) -> List[Dict[str, Any]]:
@@ -1083,6 +1274,9 @@ def process_review_from_s3(
     model_id: Optional[str] = None,
     toolConfiguration: Optional[Dict[str, Any]] = None,
     feedback_summary: Optional[str] = None,
+    case_data: Any = None,
+    document_types: Optional[List[str]] = None,
+    document_ids: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """
     Download files from S3 and execute review (for production environment).
@@ -1140,6 +1334,9 @@ def process_review_from_s3(
             model_id=selected_model_id,
             toolConfiguration=toolConfiguration,
             feedback_summary=feedback_summary,
+            case_data=case_data,
+            document_types=document_types,
+            document_ids=document_ids,
         )
 
         logger.info("S3 review completed successfully")
@@ -1166,6 +1363,9 @@ def process_review_from_local(
     model_id: str | None = None,
     toolConfiguration: dict[str, Any] | None = None,
     feedback_summary: str | None = None,
+    case_data: Any = None,
+    document_types: list[str] | None = None,
+    document_ids: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     Execute review directly from local files (for eval environment).
@@ -1209,6 +1409,9 @@ def process_review_from_local(
         model_id=selected_model_id,
         toolConfiguration=toolConfiguration,
         feedback_summary=feedback_summary,
+        case_data=case_data,
+        document_types=document_types,
+        document_ids=document_ids,
     )
 
     logger.info("Local review completed successfully")
@@ -1224,6 +1427,9 @@ def process_review(
     model_id: Optional[str] = None,
     toolConfiguration: dict[str, Any] | None = None,
     feedback_summary: str | None = None,
+    case_data: Any = None,
+    document_types: Optional[List[str]] = None,
+    document_ids: Optional[List[str]] = None,
 ) -> dict[str, Any]:
     """
     Alias function for backward compatibility.
@@ -1253,4 +1459,7 @@ def process_review(
         model_id=model_id,
         toolConfiguration=toolConfiguration,
         feedback_summary=feedback_summary,
+        case_data=case_data,
+        document_types=document_types,
+        document_ids=document_ids,
     )

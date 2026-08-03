@@ -46,19 +46,61 @@ import { preReviewItemProcessor } from "../review-preprocessing/pre-review-item"
 
 // --- Helpers ---
 
-const makeJobDetail = (overrides?: Partial<{ documents: any[] }>) => ({
+const makeJobDetail = (
+  overrides?: Partial<{ documents: any[]; caseData: unknown }>
+) => ({
   id: "job-1",
   name: "Test Job",
   status: "processing",
+  caseData: { 案件情報: { 顧客氏名: "山田一郎" } },
   documents: [
     {
       id: "doc-1",
       filename: "test.pdf",
       s3Path: "s3://bucket/test.pdf",
       fileType: "pdf",
+      documentType: "抵当権設定契約証書",
     },
   ],
   ...overrides,
+});
+
+// 4 文書タイプの複合レビュー対象（登記デモ用）
+const makeToukiJobDetail = () => ({
+  id: "job-1",
+  name: "Touki Job",
+  status: "processing",
+  caseData: { 案件情報: { 顧客氏名: "山田一郎" } },
+  documents: [
+    {
+      id: "doc-teitou",
+      filename: "teitou.pdf",
+      s3Path: "s3://bucket/teitou.pdf",
+      fileType: "pdf",
+      documentType: "抵当権設定契約証書",
+    },
+    {
+      id: "doc-kanryo",
+      filename: "kanryo.pdf",
+      s3Path: "s3://bucket/kanryo.pdf",
+      fileType: "pdf",
+      documentType: "登記完了証",
+    },
+    {
+      id: "doc-sikibetsu",
+      filename: "sikibetsu.pdf",
+      s3Path: "s3://bucket/sikibetsu.pdf",
+      fileType: "pdf",
+      documentType: "登記情報識別通知",
+    },
+    {
+      id: "doc-touki",
+      filename: "touki.pdf",
+      s3Path: "s3://bucket/touki.pdf",
+      fileType: "pdf",
+      documentType: "登記簿謄本",
+    },
+  ],
 });
 
 const makeCheckListItem = (overrides?: Record<string, unknown>) => ({
@@ -152,6 +194,8 @@ describe("preReviewItemProcessor", () => {
       languageName: "English",
       documentPaths: ["s3://bucket/test.pdf"],
       documentIds: ["doc-1"],
+      documentTypes: ["抵当権設定契約証書"],
+      caseData: { 案件情報: { 顧客氏名: "山田一郎" } },
       toolConfiguration: null,
       modelId: "anthropic.claude-sonnet-4",
     });
@@ -259,5 +303,86 @@ describe("preReviewItemProcessor", () => {
     });
 
     expect(result.modelId).toBeNull();
+  });
+
+  // --- ADR-0002: 規則ごとの requiredDocumentTypes によるスキャン部分投入 ---
+
+  it("subsets documents to a single requiredDocumentType", async () => {
+    mockReviewJobRepo.findReviewJobById.mockResolvedValue(makeToukiJobDetail());
+    mockCheckRepo.findCheckListItemById.mockResolvedValue(
+      makeCheckListItem({ requiredDocumentTypes: ["登記簿謄本"] })
+    );
+
+    const result = await preReviewItemProcessor({
+      reviewJobId: "job-1",
+      checkId: "check-1",
+      reviewResultId: "result-1",
+    });
+
+    expect(result.documentIds).toEqual(["doc-touki"]);
+    expect(result.documentTypes).toEqual(["登記簿謄本"]);
+  });
+
+  it("subsets documents to multiple requiredDocumentTypes", async () => {
+    mockReviewJobRepo.findReviewJobById.mockResolvedValue(makeToukiJobDetail());
+    mockCheckRepo.findCheckListItemById.mockResolvedValue(
+      makeCheckListItem({
+        requiredDocumentTypes: ["抵当権設定契約証書", "登記簿謄本"],
+      })
+    );
+
+    const result = await preReviewItemProcessor({
+      reviewJobId: "job-1",
+      checkId: "check-1",
+      reviewResultId: "result-1",
+    });
+
+    expect(result.documentIds).toEqual(["doc-teitou", "doc-touki"]);
+    expect(result.documentTypes).toEqual([
+      "抵当権設定契約証書",
+      "登記簿謄本",
+    ]);
+  });
+
+  it("passes all documents when requiredDocumentTypes is empty", async () => {
+    mockReviewJobRepo.findReviewJobById.mockResolvedValue(makeToukiJobDetail());
+    mockCheckRepo.findCheckListItemById.mockResolvedValue(
+      makeCheckListItem({ requiredDocumentTypes: [] })
+    );
+
+    const result = await preReviewItemProcessor({
+      reviewJobId: "job-1",
+      checkId: "check-1",
+      reviewResultId: "result-1",
+    });
+
+    expect(result.documentIds).toEqual([
+      "doc-teitou",
+      "doc-kanryo",
+      "doc-sikibetsu",
+      "doc-touki",
+    ]);
+  });
+
+  it("passes all documents when requiredDocumentTypes is undefined", async () => {
+    mockReviewJobRepo.findReviewJobById.mockResolvedValue(makeToukiJobDetail());
+    mockCheckRepo.findCheckListItemById.mockResolvedValue(makeCheckListItem());
+
+    const result = await preReviewItemProcessor({
+      reviewJobId: "job-1",
+      checkId: "check-1",
+      reviewResultId: "result-1",
+    });
+
+    expect(result.documentIds).toEqual([
+      "doc-teitou",
+      "doc-kanryo",
+      "doc-sikibetsu",
+      "doc-touki",
+    ]);
+    // caseData もそのまま透過される
+    expect(result.caseData).toEqual({
+      案件情報: { 顧客氏名: "山田一郎" },
+    });
   });
 });

@@ -130,11 +130,16 @@ export const deleteReviewDocumentHandler = async (
 export interface CreateReviewJobRequest {
   name: string;
   checkListSetId: string;
+  // 案件情報（システム抽出データ、自然言語の名値対）。登記審査など複合レビューで使用。
+  caseData?: unknown;
   documents: Array<{
     id: string;
     filename: string;
     s3Key: string;
     fileType: REVIEW_FILE_TYPE;
+    // 文書タイプ（業務書類種別）。CheckListSet.declaredDocumentTypes に対応。
+    // 宣言された文書タイプを持つセットでは必須（usecase で検証）。
+    documentType?: string;
   }>;
   userId?: string;
 }

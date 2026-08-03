@@ -73,16 +73,28 @@ export async function preReviewItemProcessor(
     (doc) => doc.fileType === REVIEW_FILE_TYPE.IMAGE
   );
 
-  const documentsToProcess = [...pdfDocuments, ...imageDocuments];
+  const allDocuments = [...pdfDocuments, ...imageDocuments];
 
-  if (documentsToProcess.length === 0) {
+  if (allDocuments.length === 0) {
     throw new Error(
       `No PDF or image documents found for review job ${reviewJobId}`
     );
   }
 
+  // ADR-0002: 規則ごとに requiredDocumentTypes でスキャンを部分投入。
+  // checkList.requiredDocumentTypes が空の場合は全件投入（安全なデフォルト）。
+  const requiredDocumentTypes = checkList.requiredDocumentTypes ?? [];
+  const documentsToProcess = requiredDocumentTypes.length
+    ? allDocuments.filter(
+        (doc) =>
+          doc.documentType && requiredDocumentTypes.includes(doc.documentType)
+      )
+    : allDocuments;
+
   console.log(
-    `[DEBUG PRE] Prepared review item data for ${reviewResultId}, found ${pdfDocuments.length} PDF documents and ${imageDocuments.length} image documents`
+    `[DEBUG PRE] Prepared review item data for ${reviewResultId}: ${pdfDocuments.length} PDF / ${imageDocuments.length} image; requiredDocumentTypes=${JSON.stringify(
+      requiredDocumentTypes
+    )} -> ${documentsToProcess.length} document(s) 投入`
   );
 
   // ツール設定を取得
@@ -124,6 +136,10 @@ export async function preReviewItemProcessor(
     languageName: getLanguageName(userLanguage),
     documentPaths: documentsToProcess.map((doc) => doc.s3Path),
     documentIds: documentsToProcess.map((doc) => doc.id),
+    // 文書タイプラベル（agent が各スキャンがどの書類か区別するため）
+    documentTypes: documentsToProcess.map((doc) => doc.documentType),
+    // 案件情報（システム抽出データ）。複合レビューの比較対象。
+    caseData: jobDetail.caseData,
     toolConfiguration,
     modelId: validatedModelId,
   };

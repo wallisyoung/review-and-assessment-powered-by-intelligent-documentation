@@ -19,6 +19,7 @@ export type PrismaCheckList = {
   feedbackSummaryUpdatedAt?: Date | null;
   ambiguityReview?: any | null;
   documentId?: string | null;
+  requiredDocumentTypes?: any | null;
 };
 
 export enum CHECK_LIST_STATUS {
@@ -64,6 +65,9 @@ export interface CheckListSetDetailModel {
   description: string;
   userId: string;
   documents: ChecklistDocumentEntity[];
+  // このセットが期待する 文書タイプ（業務書類種別）の一覧。
+  // 宣言されている場合、複合レビュー（1書類タイプ=1スキャン）として扱う。
+  declaredDocumentTypes?: string[];
   processingStatus: CHECK_LIST_STATUS;
   isEditable: boolean;
   errorSummary?: string;
@@ -90,6 +94,7 @@ export interface CheckListItemEntity {
   ambiguityReview?: AmbiguityDetectionResult;
   toolConfigurationId?: string;
   modelId?: string;
+  requiredDocumentTypes?: string[];
   feedbackSummary?: string;
   feedbackSummaryUpdatedAt?: Date;
 }
@@ -205,6 +210,8 @@ export const CheckListItemDomain = {
       parentId: prismaItem.parentId ?? undefined,
       toolConfigurationId: prismaItem.toolConfigurationId ?? undefined,
       modelId: prismaItem.modelId ?? undefined,
+      requiredDocumentTypes:
+        (prismaItem.requiredDocumentTypes as string[] | undefined) ?? undefined,
       feedbackSummary: prismaItem.feedbackSummary ?? undefined,
       feedbackSummaryUpdatedAt:
         prismaItem.feedbackSummaryUpdatedAt ?? undefined,
@@ -255,6 +262,8 @@ export const CheckListItemDomain = {
       description: prismaItem.description ?? undefined,
       parentId: prismaItem.parentId ?? undefined,
       modelId: prismaItem.modelId ?? undefined,
+      requiredDocumentTypes:
+        (prismaItem.requiredDocumentTypes as string[] | undefined) ?? undefined,
       feedbackSummary: prismaItem.feedbackSummary ?? undefined,
       feedbackSummaryUpdatedAt:
         prismaItem.feedbackSummaryUpdatedAt ?? undefined,

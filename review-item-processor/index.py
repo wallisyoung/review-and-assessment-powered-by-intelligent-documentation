@@ -69,6 +69,9 @@ def handler(event, context):
     check_name = event.get("checkName", "")
     check_description = event.get("checkDescription", "")
     language_name = event.get("languageName", "日本語")
+    case_data = event.get("caseData")
+    document_types = event.get("documentTypes")
+    document_ids = event.get("documentIds")
 
     if not document_paths:
         raise ValueError("Missing document paths")
@@ -101,6 +104,9 @@ def handler(event, context):
             model_id=model_id_override,
             toolConfiguration=tool_configuration,
             feedback_summary=feedback_summary,
+            case_data=case_data,
+            document_types=document_types,
+            document_ids=document_ids,
         )
 
         # Return results to Step Functions - handle both PDF and image results

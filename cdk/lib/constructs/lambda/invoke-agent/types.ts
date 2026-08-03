@@ -10,6 +10,8 @@ export interface StepFunctionsInput {
       languageName: string;
       documentPaths: string[];
       documentIds: string[];
+      documentTypes?: string[];
+      caseData?: any;
       mcpServers: McpServerConfig[];
       toolConfiguration: any;
       modelId: string | null;
@@ -28,6 +30,9 @@ export interface AgentPayload {
   checkId: string;
   reviewResultId: string;
   documentPaths: string[];
+  documentIds?: string[];
+  documentTypes?: string[];
+  caseData?: any;
   checkName: string;
   checkDescription: string;
   feedbackSummary: string | null;

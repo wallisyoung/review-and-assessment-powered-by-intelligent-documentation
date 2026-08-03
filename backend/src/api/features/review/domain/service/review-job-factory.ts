@@ -47,6 +47,7 @@ export const createInitialReviewJobModel = async (params: {
     status: REVIEW_JOB_STATUS.PENDING,
     checkListSetId: req.checkListSetId,
     userId: req.userId,
+    caseData: req.caseData,
     documents: req.documents,
     results: initialResults,
   };

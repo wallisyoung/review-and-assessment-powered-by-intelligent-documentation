@@ -40,6 +40,7 @@ model CheckListSet {
   name        String              @db.VarChar(255)
   description String?             @db.Text
   userId      String              @map("user_id") @db.VarChar(50)
+  declaredDocumentTypes Json?     @map("declared_document_types")
   checkLists  CheckList[]
   documents   CheckListDocument[]
   reviewJobs  ReviewJob[]
@@ -73,6 +74,7 @@ model CheckList {
   ambiguityReview          Json?              @map("ambiguity_review")
   toolConfigurationId      String?            @map("tool_configuration_id") @db.VarChar(26)
   modelId                  String?            @map("model_id") @db.VarChar(255)
+  requiredDocumentTypes    Json?              @map("required_document_types")
   feedbackSummary          String?            @map("feedback_summary") @db.Text
   feedbackSummaryUpdatedAt DateTime?          @map("feedback_summary_updated_at") @db.Timestamp(0)
   checkListSet             CheckListSet       @relation(fields: [checkListSetId], references: [id])
@@ -114,12 +116,13 @@ model ReviewDocument {
   id          String    @id @map("review_document_id") @db.VarChar(26)
   filename    String    @db.VarChar(255)
   s3Path      String    @map("s3_path") @db.VarChar(512)
-  fileType    String    @map("file_type") @db.VarChar(50)
-  uploadDate  DateTime  @map("upload_date") @db.Timestamp(0)
-  userId      String?   @map("user_id") @db.VarChar(50)
-  status      String    @default("pending") @db.VarChar(20)
-  reviewJobId String    @map("review_job_id") @db.VarChar(26)
-  reviewJob   ReviewJob @relation(fields: [reviewJobId], references: [id])
+  fileType     String    @map("file_type") @db.VarChar(50)
+  documentType String?   @map("document_type") @db.VarChar(50)
+  uploadDate   DateTime  @map("upload_date") @db.Timestamp(0)
+  userId       String?   @map("user_id") @db.VarChar(50)
+  status       String    @default("pending") @db.VarChar(20)
+  reviewJobId  String    @map("review_job_id") @db.VarChar(26)
+  reviewJob    ReviewJob @relation(fields: [reviewJobId], references: [id])
 
   @@index([reviewJobId], map: "review_documents_review_job_id_fkey")
   @@map("review_documents")
@@ -131,6 +134,7 @@ model ReviewJob {
   status            String           @default("pending") @db.VarChar(20)
   errorDetail       String?          @map("error_detail") @db.Text
   checkListSetId    String           @map("check_list_set_id") @db.VarChar(26)
+  caseData          Json?            @map("case_data")
   createdAt         DateTime         @map("created_at") @db.Timestamp(0)
   updatedAt         DateTime         @map("updated_at") @db.Timestamp(0)
   completedAt       DateTime?        @map("completed_at") @db.Timestamp(0)

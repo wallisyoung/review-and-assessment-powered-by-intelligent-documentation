@@ -404,6 +404,7 @@ export const makePrismaCheckRepository = async (
         ambiguityReview: true,
         toolConfigurationId: true,
         modelId: true,
+        requiredDocumentTypes: true,
         feedbackSummary: true,
         feedbackSummaryUpdatedAt: true,
         toolConfiguration: {
@@ -538,6 +539,9 @@ export const makePrismaCheckRepository = async (
       name: checkListSet.name,
       description: checkListSet.description ?? "",
       userId: checkListSet.userId,
+      declaredDocumentTypes:
+        (checkListSet.declaredDocumentTypes as string[] | undefined) ??
+        undefined,
       documents: checkListSet.documents.map((doc: any) => ({
         id: doc.id,
         filename: doc.filename,
@@ -623,6 +627,7 @@ export const makePrismaCheckRepository = async (
         ambiguityReview: true,
         toolConfigurationId: true,
         modelId: true,
+        requiredDocumentTypes: true,
         feedbackSummary: true,
         feedbackSummaryUpdatedAt: true,
       },

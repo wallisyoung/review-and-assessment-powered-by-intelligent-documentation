@@ -62,14 +62,22 @@ export const updateCheckResultCascade = async (params: {
     const childModels = childIds.map((cid) => modelMap.get(cid)!);
     // Are all child models completed?
     if (childModels.every((c) => c.status === REVIEW_RESULT_STATUS.COMPLETED)) {
-      // Are all child models pass?
-      const allPass = childModels.every((c) => c.result === REVIEW_RESULT.PASS);
+      // 3状態の cascade: fail > undeterminable > pass
+      const hasFail = childModels.some((c) => c.result === REVIEW_RESULT.FAIL);
+      const hasUndeterminable = childModels.some(
+        (c) => c.result === REVIEW_RESULT.UNDETERMINABLE
+      );
+      const aggregate: REVIEW_RESULT = hasFail
+        ? REVIEW_RESULT.FAIL
+        : hasUndeterminable
+          ? REVIEW_RESULT.UNDETERMINABLE
+          : REVIEW_RESULT.PASS;
 
       // Update the parent node
       node.status = REVIEW_RESULT_STATUS.COMPLETED;
-      node.result = allPass ? REVIEW_RESULT.PASS : REVIEW_RESULT.FAIL;
+      node.result = aggregate;
       node.confidenceScore = calculateMinimumConfidence(childModels);
-      node.explanation = generateParentExplanation(childModels, allPass);
+      node.explanation = generateParentExplanation(childModels, aggregate);
       node.extractedText = [];
 
       toUpdate.push(node);
@@ -105,15 +113,20 @@ const calculateMinimumConfidence = (children: ReviewResultDetail[]): number => {
 /** 子アイテムの結果から、親の説明文を生成 */
 const generateParentExplanation = (
   children: ReviewResultDetail[],
-  allPass: boolean
+  aggregate: REVIEW_RESULT
 ): string => {
-  if (allPass) {
+  if (aggregate === REVIEW_RESULT.PASS) {
     return "すべての子項目がパスしています。";
-  } else {
-    const failed = children
-      .filter((c) => c.result === REVIEW_RESULT.FAIL)
-      .map((c) => c.checkList.name || "不明な項目")
-      .join("、");
-    return `以下の子項目が不適合です: ${failed}`;
   }
+  const failed = children
+    .filter((c) => c.result === REVIEW_RESULT.FAIL)
+    .map((c) => c.checkList.name || "不明な項目");
+  const undeterminable = children
+    .filter((c) => c.result === REVIEW_RESULT.UNDETERMINABLE)
+    .map((c) => c.checkList.name || "不明な項目");
+  const parts: string[] = [];
+  if (failed.length) parts.push(`不適合: ${failed.join("、")}`);
+  if (undeterminable.length)
+    parts.push(`判定不能: ${undeterminable.join("、")}`);
+  return `以下の子項目に問題があります: ${parts.join(" / ")}`;
 };

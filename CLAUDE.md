@@ -61,3 +61,17 @@ beacon/
 - Parameters: `cdk/lib/parameter.ts` (user config) + `cdk/lib/parameter-schema.ts` (schema/validation)
 - To add a parameter: add to schema in `parameter-schema.ts` with Zod validation and default
 - Deploy: `cd cdk && npm run deploy` or use `/deploy-cdk-stack` skill
+
+## Agent skills
+
+### Issue tracker
+
+Issues live as GitHub issues, managed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Five canonical labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context — root `CONTEXT.md` + `docs/adr/`. See `docs/agents/domain.md`.

@@ -167,6 +167,35 @@ export const createReviewJob = async (params: {
     throw new ApplicationError("Maximum 20 documents allowed");
   }
 
+  // 複合レビュー（文書タイプ宣言付きセット）の検証:
+  // 各文書の documentType は宣言された文書タイプに属し、重複しないこと。
+  // 宣言がないセット（従来型）では documentType を要求しない（後方互換）。
+  const checkListSetDetail = await checkRepo.findCheckListSetDetailById(
+    params.requestBody.checkListSetId
+  );
+  const declaredDocumentTypes = checkListSetDetail.declaredDocumentTypes ?? [];
+  if (declaredDocumentTypes.length > 0) {
+    const seenDocumentTypes = new Set<string>();
+    for (const doc of params.requestBody.documents) {
+      if (!doc.documentType) {
+        throw new ApplicationError(
+          "documentType is required for each document (set declares 文書タイプ)"
+        );
+      }
+      if (!declaredDocumentTypes.includes(doc.documentType)) {
+        throw new ApplicationError(
+          `Unknown documentType: ${doc.documentType}. Declared: ${declaredDocumentTypes.join(", ")}`
+        );
+      }
+      if (seenDocumentTypes.has(doc.documentType)) {
+        throw new ApplicationError(
+          `Duplicate documentType: ${doc.documentType}. One scan per 文書タイプ.`
+        );
+      }
+      seenDocumentTypes.add(doc.documentType);
+    }
+  }
+
   // Validate file sizes from S3
   const bucketName = process.env.DOCUMENT_BUCKET;
   if (!bucketName) {
