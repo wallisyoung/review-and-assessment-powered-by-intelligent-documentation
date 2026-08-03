@@ -293,7 +293,7 @@ export const ReviewResultDomain = (() => {
 
       // 共通フィールド
       documents: DocumentInfo[];
-      reviewType: "PDF" | "IMAGE";
+      reviewType: "PDF" | "IMAGE" | "TOUKI";
       verificationDetails?: {
         sourcesDetails: Array<{
           toolUseId: string;
@@ -320,6 +320,9 @@ export const ReviewResultDomain = (() => {
           label: string;
           coordinates: [number, number, number, number];
         }>;
+
+        // 登記(TOUKI)固有データ: agent が返した sourceReferences（documentId ベース）
+        sourceReferences?: SourceReference[];
       };
     }): ReviewResultEntity => {
       const {
@@ -337,7 +340,15 @@ export const ReviewResultDomain = (() => {
       let sourceReferences: SourceReference[] = [];
 
       // レビュータイプによる分岐
-      if (reviewType === "PDF") {
+      if (reviewType === "TOUKI") {
+        // 登記: agent が返した sourceReferences（documentId ベース）を優先、
+        // 無ければ投入ドキュメントから生成。比較元/先(comparisons)は reviewMeta に保持。
+        const agentRefs = typeSpecificData?.sourceReferences;
+        sourceReferences =
+          Array.isArray(agentRefs) && agentRefs.length > 0
+            ? agentRefs
+            : documents.map((doc) => ({ documentId: doc.documentId }));
+      } else if (reviewType === "PDF") {
         // PDFのソース参照作成
         sourceReferences = documents.map((doc) => ({
           documentId: doc.documentId,

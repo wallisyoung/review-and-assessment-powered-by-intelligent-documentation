@@ -86,7 +86,47 @@ export async function postReviewItemProcessor(
 
     let updated;
 
-    if (reviewType === "IMAGE") {
+    if (reviewType === "TOUKI") {
+      // 登記（複合レビュー）の結果マッピング: agent の ToukiReviewResult → ReviewResult
+      const reviewJobRepository = await makePrismaReviewJobRepository();
+      const jobDetail = await reviewJobRepository.findReviewJobById({
+        reviewJobId,
+      });
+
+      // documentIds は pre-review が投入したサブセット（規則ごとのスキャン）
+      const documents = documentIds.map((docId) => {
+        const doc = jobDetail.documents.find((d) => d.id === docId);
+        return {
+          documentId: docId,
+          filename: doc ? doc.filename : "",
+        };
+      });
+
+      // Convert reviewMeta from snake_case to camelCase（comparisons も含まれる）
+      if (resolvedReviewData.reviewMeta) {
+        resolvedReviewData.reviewMeta = convertSnakeToCamelCase(
+          resolvedReviewData.reviewMeta
+        );
+      }
+
+      updated = ReviewResultDomain.fromReviewData({
+        current,
+        result: resolvedReviewData.result || "fail",
+        confidenceScore: resolvedReviewData.confidence || 0.5,
+        explanation: resolvedReviewData.explanation || "",
+        shortExplanation: resolvedReviewData.shortExplanation || "",
+        documents,
+        reviewType: "TOUKI",
+        typeSpecificData: {
+          sourceReferences: resolvedReviewData.sourceReferences || [],
+        },
+        verificationDetails: resolvedReviewData.verificationDetails,
+        reviewMeta: resolvedReviewData.reviewMeta || null,
+        inputTokens: resolvedReviewData.inputTokens || null,
+        outputTokens: resolvedReviewData.outputTokens || null,
+        totalCost: resolvedReviewData.totalCost || null,
+      });
+    } else if (reviewType === "IMAGE") {
       // Get documents to construct the image buffers structure expected by fromImageLlmReviewData
       const reviewJobRepository = await makePrismaReviewJobRepository();
       const jobDetail = await reviewJobRepository.findReviewJobById({
