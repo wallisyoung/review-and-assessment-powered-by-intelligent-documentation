@@ -44,7 +44,7 @@ export default function ReviewResultFilter({
     {
       value: "undeterminable" as FilterType,
       label: filterLabels["undeterminable"],
-      icon: <HiExclamation className="h-4 w-4 text-yellow-500" />,
+      icon: <HiExclamation className="text-yellow-500 h-4 w-4" />,
     },
   ];
 

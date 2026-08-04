@@ -4,7 +4,12 @@ import type {
   GetReviewResultItemsResponse,
 } from "../types";
 
-export type FilterType = "all" | "pass" | "fail" | "undeterminable" | "processing";
+export type FilterType =
+  | "all"
+  | "pass"
+  | "fail"
+  | "undeterminable"
+  | "processing";
 
 /**
  * 審査結果項目のキャッシュキーを生成する関数
