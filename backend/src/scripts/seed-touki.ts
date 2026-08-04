@@ -148,14 +148,24 @@ const COMPARISON_RULES: ComparisonRule[] = [
 ];
 
 async function main(): Promise<void> {
-  console.log("登記審査 seed を開始します（upsert・増分更新）...");
+  console.log("登記審査 seed を開始します...");
 
   const setId = TOUKI_SET_ID;
 
-  // 1. CheckListSet を upsert（固定 ID で毎回同一レコードを更新）
-  await prisma.checkListSet.upsert({
+  // 既に存在する場合は完全スキップ（審査結果を保護）
+  const existing = await prisma.checkListSet.findUnique({
     where: { id: setId },
-    create: {
+  });
+  if (existing) {
+    console.log(
+      `登記セット既存（id=${setId}）→ seed スキップ（審査結果保護）。ルール変更は duplicateChecklistSet で複製後に行うこと。`
+    );
+    return;
+  }
+
+  // 1. CheckListSet を作成
+  await prisma.checkListSet.create({
+    data: {
       id: setId,
       name: SET_NAME,
       description:
@@ -163,20 +173,12 @@ async function main(): Promise<void> {
       userId: DEFAULT_USER_ID,
       declaredDocumentTypes: [...TOUKI_DOCUMENT_TYPES],
     },
-    update: {
-      name: SET_NAME,
-      description:
-        "抵当権設定案件の書類間・書類と案件情報の整合性を審査するデモ用チェックリスト（17 件の比較ルール）。",
-      declaredDocumentTypes: [...TOUKI_DOCUMENT_TYPES],
-    },
   });
-  console.log(`CheckListSet を upsert しました: ${SET_NAME} (id=${setId})`);
+  console.log(`CheckListSet を作成しました: ${SET_NAME} (id=${setId})`);
 
   // 1b. ステータスを COMPLETED にするためのダミードキュメント
-  //     （フロントが status=completed でフィルタするため、document が1件必要）
-  await prisma.checkListDocument.upsert({
-    where: { id: "01HZ0UKIDOC000000000000000" },
-    create: {
+  await prisma.checkListDocument.create({
+    data: {
       id: "01HZ0UKIDOC000000000000000",
       filename: "登記テンプレート（seed）",
       s3Path: "",
@@ -186,31 +188,10 @@ async function main(): Promise<void> {
       userId: DEFAULT_USER_ID,
       status: "completed",
     },
-    update: {
-      filename: "登記テンプレート（seed）",
-      status: "completed",
-    },
   });
-  console.log("ダミードキュメント（status=completed）を upsert しました");
+  console.log("ダミードキュメント（status=completed）を作成しました");
 
-  // 2. 既存の子項目を全削除（ReviewResult も事前削除で FK 制約を回避）
-  const existingItems = await prisma.checkList.findMany({
-    where: { checkListSetId: setId },
-    select: { id: true },
-  });
-  if (existingItems.length > 0) {
-    await prisma.reviewResult.deleteMany({
-      where: { checkId: { in: existingItems.map((i) => i.id) } },
-    });
-  }
-  const deleted = await prisma.checkList.deleteMany({
-    where: { checkListSetId: setId },
-  });
-  console.log(
-    `既存の子項目を ${deleted.count} 件削除しました（ReviewResult 含む）`
-  );
-
-  // 3. 親項目「総合審査」+ 17 ルールを新規挿入
+  // 2. 親項目「総合審査」+ 17 ルールを作成
   const parentId = ulid();
   await prisma.checkList.create({
     data: {

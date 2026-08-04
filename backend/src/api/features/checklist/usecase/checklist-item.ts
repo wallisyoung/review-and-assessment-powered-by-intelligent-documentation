@@ -19,6 +19,7 @@ import {
   assertHasOwnerAccessOrThrow,
   RequestUser,
 } from "../../../core/middleware/authorization";
+import { ApplicationError } from "../../../core/errors/application-errors";
 
 const assertChecklistSetOwner = async (params: {
   user: RequestUser;
@@ -26,10 +27,23 @@ const assertChecklistSetOwner = async (params: {
   repo: CheckRepository;
   api: string;
   resourceId?: string;
+  operation: "read" | "write";
 }): Promise<void> => {
   const checkListSet = await params.repo.findCheckListSetDetailById(
     params.setId
   );
+
+  // 共有チェックリスト（declaredDocumentTypes 非 null）のアクセス制御
+  const isShared = (checkListSet.declaredDocumentTypes ?? []).length > 0;
+  if (isShared) {
+    if (params.operation === "read") return;
+    if (params.operation === "write" && params.user.isAdmin) return;
+    throw new ApplicationError(
+      "共有チェックリストは管理者のみ変更可能です"
+    );
+  }
+
+  // 非共有 → 従来通り所有者チェック
   const ownerUserId = checkListSet.userId;
   assertHasOwnerAccessOrThrow(params.user, ownerUserId, {
     api: params.api,
@@ -56,6 +70,7 @@ export const createChecklistItem = async (params: {
     setId,
     repo,
     api: "createChecklistItem",
+    operation: "write",
   });
 
   const isEditable = await repo.checkSetEditable({
@@ -98,6 +113,7 @@ export const getCheckListItem = async (params: {
     setId: checkListItem.setId,
     repo,
     api: "getCheckListItem",
+    operation: "read",
     resourceId: itemId,
   });
 
@@ -118,6 +134,7 @@ export const modifyCheckListItem = async (params: {
     setId: params.req.Params.setId,
     repo,
     api: "modifyCheckListItem",
+    operation: "write",
     resourceId: params.req.Params.itemId,
   });
 
@@ -160,6 +177,7 @@ export const removeCheckListItem = async (params: {
     setId: params.setId,
     repo,
     api: "removeCheckListItem",
+    operation: "write",
     resourceId: params.itemId,
   });
 
@@ -201,6 +219,7 @@ export const bulkAssignToolConfiguration = async (params: {
     setId,
     repo,
     api: "bulkAssignToolConfiguration",
+    operation: "write",
   });
   const updatedCount = await repo.bulkUpdateToolConfiguration({
     checkIds: params.checkIds,
@@ -235,6 +254,7 @@ export const updateCheckListItemModel = async (params: {
     setId: params.setId,
     repo,
     api: "updateCheckListItemModel",
+    operation: "write",
     resourceId: params.itemId,
   });
 
