@@ -1,0 +1,245 @@
+[ec2-user@ip-172-31-7-81 cdk]$ npx cdk deploy RapidStackTouki --require-approval never
+Bundling asset RapidStackTouki/ReviewProcessor/InvokeAgentFunction/Code/Stage...
+
+  cdk.out/bundling-temp-5b8fa1dbab6500a9069d93526c9bebf4df31c2f564b996a1e203025a6859f5dd-building/index.mjs  3.7kb
+
+⚡ Done in 36ms
+fatal: No names found, cannot describe anything.
+Including dependency stacks: RapidFrontendWafStack
+WARNING Failed to get latest Git tag: Error: Command failed: git describe --tags --abbrev=0
+fatal: No names found, cannot describe anything. (Construct Annotations)
+   RapidStackTouki
+   Acknowledge with 'Construct-Annotations::warning-annotation'
+
+✨  Synthesis time: 26.28s
+
+RapidFrontendWafStack
+RapidStackTouki: start: Building Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend--
+RapidStackTouki: success: Built Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend--
+RapidStackTouki: start: Building RapidStackTouki Template
+RapidStackTouki: success: Built RapidStackTouki Template
+RapidStackTouki: start: Building PrismaMigration/MigrationFunction/AssetImage
+RapidFrontendWafStack: creating CloudFormation changeset...
+RapidFrontendWafStack: deploying... [1/2]
+
+ ✅  RapidFrontendWafStack (no changes)
+
+✨  Deployment time: 0s
+
+Outputs:
+RapidFrontendWafStack.ExportsOutputFnGetAttWebAclArnEF1FFB35 = arn:aws:wafv2:us-east-1:555599995555:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
+RapidFrontendWafStack.WebAclId = arn:aws:wafv2:us-east-1:555599995555:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
+Stack ARN:
+arn:aws:cloudformation:us-east-1:555599995555:stack/RapidFrontendWafStack/c6b8ed60-529c-11f1-9641-0eb95eda6921
+RapidStackTouki: start: Publishing RapidStackTouki Template (555599995555-us-east-1-3724ec0b)
+RapidStackTouki: start: Publishing Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend-- (555599995555-us-east-1-300772a3)
+RapidStackTouki: success: Published RapidStackTouki Template (555599995555-us-east-1-3724ec0b)
+RapidStackTouki: success: Published Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend-- (555599995555-us-east-1-300772a3)
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.prisma.lambda
+#1 transferring dockerfile: 332B done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for public.ecr.aws/lambda/nodejs:22-arm64
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/7] FROM public.ecr.aws/lambda/nodejs:22-arm64@sha256:f5931eef023376141cd311fec86babd0e6073260f0c3ee353750bffd4b99b0a3
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 160.98MB 5.0s
+#5 transferring context: 252.41MB 10.1s
+#5 transferring context: 453.20MB 12.8s done
+#5 DONE 12.9s
+
+#6 [2/7] WORKDIR /var/task
+#6 CACHED
+
+#7 [3/7] COPY package*.json ./
+#7 CACHED
+
+#8 [4/7] COPY prisma ./prisma
+#8 CACHED
+
+#9 [5/7] RUN npm ci --omit=dev && npm run prisma:generate
+#9 CACHED
+
+#10 [6/7] COPY . .
+#10 DONE 24.6s
+
+#11 [7/7] RUN npm run build
+#11 5.886
+#11 5.886 > rapid-backend@1.0.0 build
+#11 5.886 > tsc
+#11 5.886
+#11 DONE 155.7s
+
+#12 exporting to image
+#12 exporting layers
+#12 exporting layers 19.9s done
+#12 writing image sha256:4b81a71ac284a56dd58be13f2d61a357fb0b950bb2383e66899f6eb5334d1ac4 done
+#12 naming to docker.io/library/cdkasset-8721890a0d3da2aec81677da13bf709c249313f5508de2dc90f6711bfa9a1d3b 0.0s done
+#12 DONE 19.9s
+RapidStackTouki: success: Built PrismaMigration/MigrationFunction/AssetImage
+RapidStackTouki: start: Publishing PrismaMigration/MigrationFunction/AssetImage (555599995555-us-east-1-3b3f9ad7)
+RapidStackTouki: start: Building Api/ApiFunction/AssetImage
+The push refers to repository [555599995555.dkr.ecr.us-east-1.amazonaws.com/cdk-hnb659fds-container-assets-555599995555-us-east-1]
+7e1f001f5bd1: Preparing
+8209df1ca3a4: Preparing
+841b075145a9: Preparing
+9a3459b40ac1: Preparing
+3defdef772be: Preparing
+5f70bf18a086: Preparing
+526b8b7760e6: Preparing
+f726c380f5bd: Preparing
+3477b8f9dff5: Preparing
+46cc6ce647e3: Preparing
+00627f53ddc5: Preparing
+caf255c21408: Preparing
+3477b8f9dff5: Waiting
+5f70bf18a086: Waiting
+526b8b7760e6: Waiting
+f726c380f5bd: Waiting
+46cc6ce647e3: Waiting
+00627f53ddc5: Waiting
+caf255c21408: Waiting
+3defdef772be: Layer already exists
+841b075145a9: Layer already exists
+9a3459b40ac1: Layer already exists
+5f70bf18a086: Layer already exists
+f726c380f5bd: Layer already exists
+526b8b7760e6: Layer already exists
+46cc6ce647e3: Layer already exists
+3477b8f9dff5: Layer already exists
+00627f53ddc5: Layer already exists
+caf255c21408: Layer already exists
+7e1f001f5bd1: Pushed
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.20kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for public.ecr.aws/docker/library/node:22
+#2 ...
+
+#3 [internal] load metadata for public.ecr.aws/awsguru/aws-lambda-adapter:0.9.0
+#3 DONE 0.3s
+
+#2 [internal] load metadata for public.ecr.aws/docker/library/node:22
+#2 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 FROM public.ecr.aws/awsguru/aws-lambda-adapter:0.9.0@sha256:1c31bf4102ca63ef2082534d7139c0bc5fbd36ea6648e4756e9b475ef3ed829c
+#5 DONE 0.0s
+
+#6 [stage-0  1/10] FROM public.ecr.aws/docker/library/node:22@sha256:7725a5c2c83eed1d36258c66efae14b1ceccd021db9ed1d9559d3335ed3d68ed
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 130.19MB 5.0s
+#7 transferring context: 232.12MB 10.0s
+#7 transferring context: 252.31MB 10.7s done
+#7 DONE 10.8s
+
+#8 [stage-0  2/10] COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.9.0 /lambda-adapter /opt/extensions/lambda-adapter
+#8 CACHED
+
+#9 [stage-0  3/10] RUN curl -LsSf https://astral.sh/uv/install.sh | sh &&     mv /root/.local/bin/uv /usr/local/bin/ &&     mv /root/.local/bin/uvx /usr/local/bin/
+#9 CACHED
+
+#10 [stage-0  4/10] WORKDIR /var/task
+#10 CACHED
+
+#11 [stage-0  5/10] COPY package*.json ./
+#11 ...
+
+#12 [stage-0  6/10] COPY prisma ./prisma
+#12 ERROR: failed to calculate checksum of ref b2cdb100-3f82-4cc3-8f8e-dfb85fa15f59::31qncoxx5dsdyadetov65fil5: "/prisma": not found
+
+#11 [stage-0  5/10] COPY package*.json ./
+#11 DONE 0.7s
+------
+ > [stage-0  6/10] COPY prisma ./prisma:
+------
+Dockerfile:12
+--------------------
+  10 |     WORKDIR /var/task
+  11 |     COPY package*.json ./
+  12 | >>> COPY prisma ./prisma
+  13 |
+  14 |     RUN npm ci --omit=dev && npm run prisma:generate
+--------------------
+ERROR: failed to solve: failed to compute cache key: failed to calculate checksum of ref b2cdb100-3f82-4cc3-8f8e-dfb85fa15f59::31qncoxx5dsdyadetov65fil5: "/prisma": not found
+RapidStackTouki: fail: docker build --tag cdkasset-d7ba11127c9722d63171ff788bb908d4659a68977b87342f6883b1f8c7079532 --platform linux/arm64 . exited with error code 1: #0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.20kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for public.ecr.aws/docker/library/node:22
+#2 ...
+
+#3 [internal] load metadata for public.ecr.aws/awsguru/aws-lambda-adapter:0.9.0
+#3 DONE 0.3s
+
+#2 [internal] load metadata for public.ecr.aws/docker/library/node:22
+#2 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 FROM public.ecr.aws/awsguru/aws-lambda-adapter:0.9.0@sha256:1c31bf4102ca63ef2082534d7139c0bc5fbd36ea6648e4756e9b475ef3ed829c
+#5 DONE 0.0s
+
+#6 [stage-0  1/10] FROM public.ecr.aws/docker/library/node:22@sha256:7725a5c2c83eed1d36258c66efae14b1ceccd021db9ed1d9559d3335ed3d68ed
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 130.19MB 5.0s
+#7 transferring context: 232.12MB 10.0s
+#7 transferring context: 252.31MB 10.7s done
+#7 DONE 10.8s
+
+#8 [stage-0  2/10] COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.9.0 /lambda-adapter /opt/extensions/lambda-adapter
+#8 CACHED
+
+#9 [stage-0  3/10] RUN curl -LsSf https://astral.sh/uv/install.sh | sh &&     mv /root/.local/bin/uv /usr/local/bin/ &&     mv /root/.local/bin/uvx /usr/local/bin/
+#9 CACHED
+
+#10 [stage-0  4/10] WORKDIR /var/task
+#10 CACHED
+
+#11 [stage-0  5/10] COPY package*.json ./
+#11 ...
+
+#12 [stage-0  6/10] COPY prisma ./prisma
+#12 ERROR: failed to calculate checksum of ref b2cdb100-3f82-4cc3-8f8e-dfb85fa15f59::31qncoxx5dsdyadetov65fil5: "/prisma": not found
+
+#11 [stage-0  5/10] COPY package*.json ./
+#11 DONE 0.7s
+------
+ > [stage-0  6/10] COPY prisma ./prisma:
+------
+Dockerfile:12
+--------------------
+  10 |     WORKDIR /var/task
+  11 |     COPY package*.json ./
+  12 | >>> COPY prisma ./prisma
+  13 |
+  14 |     RUN npm ci --omit=dev && npm run prisma:generate
+--------------------
+ERROR: failed to solve: failed to compute cache key: failed to calculate checksum of ref b2cdb100-3f82-4cc3-8f8e-dfb85fa15f59::31qncoxx5dsdyadetov65fil5: "/prisma": not found
+8209df1ca3a4: Pushed
+8721890a0d3da2aec81677da13bf709c249313f5508de2dc90f6711bfa9a1d3b: digest: sha256:5f35c2ee7234764dcf6e509480557ccc2da2e9df68bdc4f114336b2605e06c75 size: 2843
+RapidStackTouki: success: Published PrismaMigration/MigrationFunction/AssetImage (555599995555-us-east-1-3b3f9ad7)
+Failed to publish asset PrismaMigration/MigrationFunction/AssetImage (555599995555-us-east-1-3b3f9ad7)
