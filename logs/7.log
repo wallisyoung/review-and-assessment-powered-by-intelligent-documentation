@@ -1,0 +1,35 @@
+[ec2-user@ip-172-31-7-81 cdk]$ npx cdk deploy RapidStackTouki --require-approval never
+
+npx ts-node --prefer-ts-exts bin/rapid.ts: Subprocess exited with error null
+[ec2-user@ip-172-31-7-81 cdk]$
+[ec2-user@ip-172-31-7-81 cdk]$ npx cdk synth RapidStackTouki 2>&1 | tail -30
+      Fn::GetAtt:
+        - DatabaseE85E1D09
+        - Endpoint.Address
+  DatabaseSecretArn:
+    Value:
+      Ref: DatabaseSecretAttachmentC7273B7C
+  LatestGitTag:
+    Description: デプロイされたコードの最新Gitタグ
+    Value: no-tag-found
+  TempBucketName:
+    Value:
+      Ref: S3TempStorageTempBucket11BA9F00
+  BedrockRegion:
+    Value: us-east-1
+  DocumentProcessingModelId:
+    Value: global.anthropic.claude-sonnet-4-6
+  ImageReviewModelId:
+    Value: global.anthropic.claude-sonnet-4-6
+  PrismaMigrationLambdaArn:
+    Value:
+      Fn::GetAtt:
+        - PrismaMigrationMigrationFunction6051F8E0
+        - Arn
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+
+21 feature flags are not configured. Run 'cdk flags --unstable=flags' to learn more.
