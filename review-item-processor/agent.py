@@ -436,7 +436,7 @@ def _run_touki_agent(
                         "name": sanitized_name,
                         "source": {"bytes": file_bytes},
                         "format": "pdf",
-                        "citations": {"enabled": model.supports_citation},
+                        "citations": {"enabled": False},
                     }
                 }
             )
