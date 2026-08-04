@@ -38,9 +38,7 @@ const assertChecklistSetOwner = async (params: {
   if (isShared) {
     if (params.operation === "read") return;
     if (params.operation === "write" && params.user.isAdmin) return;
-    throw new ApplicationError(
-      "共有チェックリストは管理者のみ変更可能です"
-    );
+    throw new ApplicationError("共有チェックリストは管理者のみ変更可能です");
   }
 
   // 非共有 → 従来通り所有者チェック

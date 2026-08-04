@@ -77,7 +77,8 @@ export const makePrismaCheckRepository = async (
     ownerUserId: string;
   }): Promise<void> => {
     const { checkListSet, ownerUserId } = params;
-    const { id, name, description, documents, createdAt } = checkListSet;
+    const { id, name, description, documents, declaredDocumentTypes, createdAt } =
+      checkListSet;
 
     await client.checkListSet.create({
       data: {
@@ -85,6 +86,7 @@ export const makePrismaCheckRepository = async (
         name,
         description,
         userId: ownerUserId,
+        declaredDocumentTypes: declaredDocumentTypes ?? undefined,
         createdAt: createdAt,
         documents: {
           create: documents.map((doc: ChecklistDocumentEntity) => ({
@@ -589,6 +591,7 @@ export const makePrismaCheckRepository = async (
           description: item.description,
           parentId: item.parentId,
           checkListSetId: item.setId,
+          requiredDocumentTypes: item.requiredDocumentTypes ?? undefined,
         })),
       });
     } catch (error) {

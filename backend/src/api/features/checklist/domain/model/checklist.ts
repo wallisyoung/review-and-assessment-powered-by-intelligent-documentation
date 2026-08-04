@@ -45,6 +45,7 @@ export interface CheckListSetEntity {
   name: string;
   description: string;
   documents: ChecklistDocumentEntity[];
+  declaredDocumentTypes?: string[];
   createdAt: Date;
 }
 
@@ -145,6 +146,7 @@ export const CheckListSetDomain = {
         uploadDate: new Date(),
         status: CHECK_LIST_STATUS.COMPLETED, // 複製時は完了状態に設定
       })),
+      declaredDocumentTypes: source.declaredDocumentTypes,
       createdAt: new Date(),
     };
   },

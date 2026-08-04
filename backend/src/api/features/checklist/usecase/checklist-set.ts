@@ -169,6 +169,7 @@ export const duplicateChecklistSet = async (params: {
     name: item.name,
     description: item.description || "",
     parentId: item.parentId ? idMapping.get(item.parentId) : undefined,
+    requiredDocumentTypes: item.requiredDocumentTypes,
   }));
 
   // 7. 新しいチェックリスト項目を階層順に保存
