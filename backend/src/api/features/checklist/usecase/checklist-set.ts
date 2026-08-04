@@ -34,10 +34,23 @@ const assertChecklistSetOwner = async (params: {
   repo: CheckRepository;
   api: string;
   resourceId?: string;
+  operation: "read" | "write";
 }): Promise<void> => {
   const checkListSet = await params.repo.findCheckListSetDetailById(
     params.checkListSetId
   );
+
+  // 共有チェックリスト（declaredDocumentTypes 非 null）のアクセス制御
+  const isShared = (checkListSet.declaredDocumentTypes ?? []).length > 0;
+  if (isShared) {
+    if (params.operation === "read") return;
+    if (params.operation === "write" && params.user.isAdmin) return;
+    throw new ApplicationError(
+      "共有チェックリストは管理者のみ変更可能です"
+    );
+  }
+
+  // 非共有 → 従来通り所有者チェック
   const ownerUserId = checkListSet.userId;
   assertHasOwnerAccessOrThrow(params.user, ownerUserId, {
     api: params.api,
@@ -227,11 +240,13 @@ export const removeChecklistSet = async (params: {
   const { checkListSetId } = params;
 
   const checkListSet = await repo.findCheckListSetDetailById(checkListSetId);
-  const ownerUserId = checkListSet.userId;
-  assertHasOwnerAccessOrThrow(params.user, ownerUserId, {
+
+  await assertChecklistSetOwner({
+    user: params.user,
+    checkListSetId,
+    repo,
     api: "removeChecklistSet",
-    resourceId: checkListSetId,
-    logger: console,
+    operation: "write",
   });
 
   await repo.deleteCheckListSetById({
@@ -296,6 +311,7 @@ export const getChecklistItems = async (params: {
     checkListSetId: params.checkListSetId,
     repo,
     api: "getChecklistItems",
+    operation: "read",
   });
 
   const { checkListSetId, parentId, includeAllChildren, ambiguityFilter } =
@@ -320,11 +336,12 @@ export const getChecklistSetById = async (params: {
   const { checkListSetId } = params;
   const checkListSet = await repo.findCheckListSetDetailById(checkListSetId);
 
-  const ownerUserId = checkListSet.userId;
-  assertHasOwnerAccessOrThrow(params.user, ownerUserId, {
+  await assertChecklistSetOwner({
+    user: params.user,
+    checkListSetId,
+    repo,
     api: "getChecklistSetById",
-    resourceId: checkListSetId,
-    logger: console,
+    operation: "read",
   });
 
   return checkListSet;
@@ -348,6 +365,7 @@ export const startAmbiguityDetection = async (params: {
     checkListSetId: params.checkListSetId,
     repo,
     api: "startAmbiguityDetection",
+    operation: "write",
   });
 
   // Update document status to detecting
