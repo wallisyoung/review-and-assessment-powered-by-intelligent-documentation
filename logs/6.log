@@ -40,26 +40,26 @@ RapidFrontendWafStack: deploying... [1/2]
 ✨  Deployment time: 0s
 
 Outputs:
-RapidFrontendWafStack.ExportsOutputFnGetAttWebAclArnEF1FFB35 = arn:aws:wafv2:us-east-1:527083197543:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
-RapidFrontendWafStack.WebAclId = arn:aws:wafv2:us-east-1:527083197543:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
+RapidFrontendWafStack.ExportsOutputFnGetAttWebAclArnEF1FFB35 = arn:aws:wafv2:us-east-1:555599995555:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
+RapidFrontendWafStack.WebAclId = arn:aws:wafv2:us-east-1:555599995555:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
 Stack ARN:
-arn:aws:cloudformation:us-east-1:527083197543:stack/RapidFrontendWafStack/c6b8ed60-529c-11f1-9641-0eb95eda6921
-RapidStack: start: Publishing NodejsBuildCustomResourceHandler25648b212c404f09aa65b6bbb0c44659/Code (527083197543-us-east-1-be678ee4)
-RapidStack: start: Publishing Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend-- (527083197543-us-east-1-7669c69f)
-RapidStack: start: Publishing Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C512MiB/Code (527083197543-us-east-1-bc0f4612)
-RapidStack: start: Publishing AWS679f53fac002430cb0da5b7982bd2287/Code (527083197543-us-east-1-de78ee41)
-RapidStack: start: Publishing RapidStack/Custom::VpcRestrictDefaultSGCustomResourceProvider Code (527083197543-us-east-1-06384b09)
-RapidStack: start: Publishing Frontend/ReactBuild/Deploy/AwsCliLayer/Code (527083197543-us-east-1-6aa6021a)
-RapidStack: start: Publishing ReviewProcessor/InvokeAgentFunction/Code (527083197543-us-east-1-bc860a6f)
-RapidStack: start: Publishing ReviewQueueProcessorConstruct/PythonFunction/Code (527083197543-us-east-1-938bab48)
-RapidStack: success: Published ReviewQueueProcessorConstruct/PythonFunction/Code (527083197543-us-east-1-938bab48)
-RapidStack: start: Publishing RapidStack Template (527083197543-us-east-1-7814cd41)
-RapidStack: success: Published RapidStack/Custom::VpcRestrictDefaultSGCustomResourceProvider Code (527083197543-us-east-1-06384b09)
-RapidStack: success: Published NodejsBuildCustomResourceHandler25648b212c404f09aa65b6bbb0c44659/Code (527083197543-us-east-1-be678ee4)
-RapidStack: success: Published ReviewProcessor/InvokeAgentFunction/Code (527083197543-us-east-1-bc860a6f)
-RapidStack: success: Published AWS679f53fac002430cb0da5b7982bd2287/Code (527083197543-us-east-1-de78ee41)
-RapidStack: success: Published Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C512MiB/Code (527083197543-us-east-1-bc0f4612)
-RapidStack: success: Published RapidStack Template (527083197543-us-east-1-7814cd41)
+arn:aws:cloudformation:us-east-1:555599995555:stack/RapidFrontendWafStack/c6b8ed60-529c-11f1-9641-0eb95eda6921
+RapidStack: start: Publishing NodejsBuildCustomResourceHandler25648b212c404f09aa65b6bbb0c44659/Code (555599995555-us-east-1-be678ee4)
+RapidStack: start: Publishing Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend-- (555599995555-us-east-1-7669c69f)
+RapidStack: start: Publishing Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C512MiB/Code (555599995555-us-east-1-bc0f4612)
+RapidStack: start: Publishing AWS679f53fac002430cb0da5b7982bd2287/Code (555599995555-us-east-1-de78ee41)
+RapidStack: start: Publishing RapidStack/Custom::VpcRestrictDefaultSGCustomResourceProvider Code (555599995555-us-east-1-06384b09)
+RapidStack: start: Publishing Frontend/ReactBuild/Deploy/AwsCliLayer/Code (555599995555-us-east-1-6aa6021a)
+RapidStack: start: Publishing ReviewProcessor/InvokeAgentFunction/Code (555599995555-us-east-1-bc860a6f)
+RapidStack: start: Publishing ReviewQueueProcessorConstruct/PythonFunction/Code (555599995555-us-east-1-938bab48)
+RapidStack: success: Published ReviewQueueProcessorConstruct/PythonFunction/Code (555599995555-us-east-1-938bab48)
+RapidStack: start: Publishing RapidStack Template (555599995555-us-east-1-7814cd41)
+RapidStack: success: Published RapidStack/Custom::VpcRestrictDefaultSGCustomResourceProvider Code (555599995555-us-east-1-06384b09)
+RapidStack: success: Published NodejsBuildCustomResourceHandler25648b212c404f09aa65b6bbb0c44659/Code (555599995555-us-east-1-be678ee4)
+RapidStack: success: Published ReviewProcessor/InvokeAgentFunction/Code (555599995555-us-east-1-bc860a6f)
+RapidStack: success: Published AWS679f53fac002430cb0da5b7982bd2287/Code (555599995555-us-east-1-de78ee41)
+RapidStack: success: Published Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C512MiB/Code (555599995555-us-east-1-bc0f4612)
+RapidStack: success: Published RapidStack Template (555599995555-us-east-1-7814cd41)
 #0 building with "default" instance using docker driver
 
 #1 [internal] load build definition from Dockerfile.prisma.lambda
@@ -68,7 +68,7 @@ RapidStack: success: Published RapidStack Template (527083197543-us-east-1-7814c
 
 #2 [internal] load metadata for public.ecr.aws/lambda/nodejs:22-arm64
 #2 DONE 0.3s
-RapidStack: success: Published Frontend/ReactBuild/Deploy/AwsCliLayer/Code (527083197543-us-east-1-6aa6021a)
+RapidStack: success: Published Frontend/ReactBuild/Deploy/AwsCliLayer/Code (555599995555-us-east-1-6aa6021a)
 
 #3 [internal] load .dockerignore
 #3 transferring context: 2B done
@@ -78,7 +78,7 @@ RapidStack: success: Published Frontend/ReactBuild/Deploy/AwsCliLayer/Code (5270
 #4 DONE 0.0s
 
 #5 [internal] load build context
-RapidStack: success: Published Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend-- (527083197543-us-east-1-7669c69f)
+RapidStack: success: Published Frontend/ReactBuild/Source-home--ec2-user--review-and-assessment-powered-by-intelligent-documentation--frontend-- (555599995555-us-east-1-7669c69f)
 #5 transferring context: 3.59MB 3.6s done
 #5 DONE 3.7s
 
@@ -157,9 +157,9 @@ RapidStack: success: Published Frontend/ReactBuild/Source-home--ec2-user--review
 #12 naming to docker.io/library/cdkasset-a528748c5e9b3e141a36e8c93aa64fb1b93505dcc41ebd0aafdbca6cafd6926a 0.0s done
 #12 DONE 21.3s
 RapidStack: success: Built PrismaMigration/MigrationFunction/AssetImage
-RapidStack: start: Publishing PrismaMigration/MigrationFunction/AssetImage (527083197543-us-east-1-e340005a)
+RapidStack: start: Publishing PrismaMigration/MigrationFunction/AssetImage (555599995555-us-east-1-e340005a)
 RapidStack: start: Building ReviewProcessor/ReviewAgent/Image
-The push refers to repository [527083197543.dkr.ecr.us-east-1.amazonaws.com/cdk-hnb659fds-container-assets-527083197543-us-east-1]
+The push refers to repository [555599995555.dkr.ecr.us-east-1.amazonaws.com/cdk-hnb659fds-container-assets-555599995555-us-east-1]
 216bdd934409: Preparing
 78eaad652674: Preparing
 916b8a6a386d: Preparing
@@ -353,7 +353,7 @@ caf255c21408: Pushed
 #7 55.61 Preparing to unpack .../14-libcurl4_7.88.1-10+deb12u15_arm64.deb ...
 #7 55.62 Unpacking libcurl4:arm64 (7.88.1-10+deb12u15) ...
 a528748c5e9b3e141a36e8c93aa64fb1b93505dcc41ebd0aafdbca6cafd6926a: digest: sha256:006250462f9b49c1e01a8fdb972a62246221aa4c3dfdaf76cb8cfb30c3bdd785 size: 2843
-RapidStack: success: Published PrismaMigration/MigrationFunction/AssetImage (527083197543-us-east-1-e340005a)
+RapidStack: success: Published PrismaMigration/MigrationFunction/AssetImage (555599995555-us-east-1-e340005a)
 #7 56.11 Selecting previously unselected package curl.
 #7 56.11 Preparing to unpack .../15-curl_7.88.1-10+deb12u15_arm64.deb ...
 #7 56.12 Unpacking curl (7.88.1-10+deb12u15) ...
@@ -887,9 +887,9 @@ RapidStack: success: Published PrismaMigration/MigrationFunction/AssetImage (527
 #13 naming to docker.io/library/cdkasset-ec04cf3b1cd9af1fc7225a7fa0ff9111637cd9c63e02cdcc51ef510c3ec9d338 done
 #13 DONE 4.1s
 RapidStack: success: Built ReviewProcessor/ReviewAgent/Image
-RapidStack: start: Publishing ReviewProcessor/ReviewAgent/Image (527083197543-us-east-1-50b11ff0)
+RapidStack: start: Publishing ReviewProcessor/ReviewAgent/Image (555599995555-us-east-1-50b11ff0)
 RapidStack: start: Building Api/ApiFunction/AssetImage
-The push refers to repository [527083197543.dkr.ecr.us-east-1.amazonaws.com/cdk-hnb659fds-container-assets-527083197543-us-east-1]
+The push refers to repository [555599995555.dkr.ecr.us-east-1.amazonaws.com/cdk-hnb659fds-container-assets-555599995555-us-east-1]
 31c69a53d5d6: Preparing
 d3dcdbf17b73: Preparing
 43ac865d8c7d: Preparing
@@ -1062,7 +1062,7 @@ a45e6cc2b1b2: Pushed
 43ac865d8c7d: Pushed
 #7 extracting sha256:445be8da0a7289e4b5d70a5c779ad63d484e76aa14fe2ad45893da9eb077e4e8 26.4s done
 ec04cf3b1cd9af1fc7225a7fa0ff9111637cd9c63e02cdcc51ef510c3ec9d338: digest: sha256:53b1968d0f3fc718f65c3788f4d44b5609d99aeaa0f257a3605cf239ead267a8 size: 2839
-RapidStack: success: Published ReviewProcessor/ReviewAgent/Image (527083197543-us-east-1-50b11ff0)
+RapidStack: success: Published ReviewProcessor/ReviewAgent/Image (555599995555-us-east-1-50b11ff0)
 #7 extracting sha256:bb3bfe7e3c6a92e1bda6d3ddde9de882610239eba4323fd75d10ba1bccee7876
 #7 extracting sha256:bb3bfe7e3c6a92e1bda6d3ddde9de882610239eba4323fd75d10ba1bccee7876 1.4s done
 #7 extracting sha256:5af2d47cd8540f7af1f8ba488289fa82e9a2258d051477163651baf22fc99ea6
@@ -1279,8 +1279,8 @@ RapidStack: success: Published ReviewProcessor/ReviewAgent/Image (527083197543-u
 #17 naming to docker.io/library/cdkasset-f923c115172701c09ee262aec51ec51223e901b08ed4f1943261dc8d6e957a64 done
 #17 DONE 22.6s
 RapidStack: success: Built Api/ApiFunction/AssetImage
-RapidStack: start: Publishing Api/ApiFunction/AssetImage (527083197543-us-east-1-d076e0d5)
-The push refers to repository [527083197543.dkr.ecr.us-east-1.amazonaws.com/cdk-hnb659fds-container-assets-527083197543-us-east-1]
+RapidStack: start: Publishing Api/ApiFunction/AssetImage (555599995555-us-east-1-d076e0d5)
+The push refers to repository [555599995555.dkr.ecr.us-east-1.amazonaws.com/cdk-hnb659fds-container-assets-555599995555-us-east-1]
 0f5f0a53abcc: Preparing
 93ff6a29e953: Preparing
 7d56737f0136: Preparing
@@ -1328,10 +1328,10 @@ e18c028dc018: Pushed
 8cac164f36fd: Pushed
 7d56737f0136: Pushed
 f923c115172701c09ee262aec51ec51223e901b08ed4f1943261dc8d6e957a64: digest: sha256:0f6d5342e1ee0e3164fa2b35df694ead7962c2de1e9ff228dd5e259e82b6c8cd size: 3904
-RapidStack: success: Published Api/ApiFunction/AssetImage (527083197543-us-east-1-d076e0d5)
+RapidStack: success: Published Api/ApiFunction/AssetImage (555599995555-us-east-1-d076e0d5)
 RapidStack
 RapidStack: creating CloudFormation changeset...
-Changeset arn:aws:cloudformation:us-east-1:527083197543:changeSet/cdk-deploy-change-set/411404f5-0df9-4eb3-afc3-f46a37d8e743 created and waiting in review for manual execution (--no-execute)
+Changeset arn:aws:cloudformation:us-east-1:555599995555:changeSet/cdk-deploy-change-set/411404f5-0df9-4eb3-afc3-f46a37d8e743 created and waiting in review for manual execution (--no-execute)
 RapidStack: deploying... [2/2]
 8:53:12 AM | CREATE_FAILED           | AWS::CloudFront::OriginAccessControl        | FrontendDistributi...essControl96CDF506
 Resource handler returned message: "Resource of type 'AWS::CloudFront::OriginAccessControl' with identifier 'RapidStackFrontendDistributiOrigin1S3OriginAccessControlF2A7A224' al

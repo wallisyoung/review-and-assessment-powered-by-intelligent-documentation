@@ -33,8 +33,8 @@ RapidStack: success: Built Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9E
 RapidStack: start: Building RapidStack Template
 RapidStack: success: Built RapidStack Template
 RapidStack: start: Building PrismaMigration/MigrationFunction/AssetImage
-RapidFrontendWafStack: start: Publishing RapidFrontendWafStack Template (527083197543-us-east-1-5c31b40d)
-RapidFrontendWafStack: success: Published RapidFrontendWafStack Template (527083197543-us-east-1-5c31b40d)
+RapidFrontendWafStack: start: Publishing RapidFrontendWafStack Template (555599995555-us-east-1-5c31b40d)
+RapidFrontendWafStack: success: Published RapidFrontendWafStack Template (555599995555-us-east-1-5c31b40d)
 RapidFrontendWafStack
 RapidFrontendWafStack: creating CloudFormation changeset...
 #0 building with "default" instance using docker driver
@@ -127,7 +127,7 @@ Dockerfile.prisma.lambda:7
    9 |     RUN npm run build
 --------------------
 ERROR: failed to solve: process "/bin/sh -c npm ci --omit=dev && npm run prisma:generate" did not complete successfully: exit code: 255
-Changeset arn:aws:cloudformation:us-east-1:527083197543:changeSet/cdk-deploy-change-set/25ad1c17-47d5-4c97-bc48-c94999f1852b created and waiting in review for manual execution (--no-execute)
+Changeset arn:aws:cloudformation:us-east-1:555599995555:changeSet/cdk-deploy-change-set/25ad1c17-47d5-4c97-bc48-c94999f1852b created and waiting in review for manual execution (--no-execute)
 RapidFrontendWafStack: deploying... [1/2]
 
 ⚠️  Some resources failed to delete but were skipped. These resources may still exist and could incur charges. Clean them up manually.
@@ -138,8 +138,8 @@ RapidFrontendWafStack: deploying... [1/2]
 ✨  Deployment time: 212.38s
 
 Outputs:
-RapidFrontendWafStack.ExportsOutputFnGetAttWebAclArnEF1FFB35 = arn:aws:wafv2:us-east-1:527083197543:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
-RapidFrontendWafStack.WebAclId = arn:aws:wafv2:us-east-1:527083197543:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
+RapidFrontendWafStack.ExportsOutputFnGetAttWebAclArnEF1FFB35 = arn:aws:wafv2:us-east-1:555599995555:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
+RapidFrontendWafStack.WebAclId = arn:aws:wafv2:us-east-1:555599995555:global/webacl/RapidFrontendWebAcl/4ed3f324-64e2-4374-b6af-23c18bd21442
 Stack ARN:
-arn:aws:cloudformation:us-east-1:527083197543:stack/RapidFrontendWafStack/c6b8ed60-529c-11f1-9641-0eb95eda6921
+arn:aws:cloudformation:us-east-1:555599995555:stack/RapidFrontendWafStack/c6b8ed60-529c-11f1-9641-0eb95eda6921
 Failed to build asset PrismaMigration/MigrationFunction/AssetImage
