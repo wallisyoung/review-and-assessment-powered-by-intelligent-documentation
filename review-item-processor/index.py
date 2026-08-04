@@ -74,6 +74,27 @@ def handler(event, context):
     document_ids = event.get("documentIds")
 
     if not document_paths:
+        if case_data is not None:
+            # 登記 review: 必要な文書タイプが未アップロード → 判定不能（agent を呼ばずに結果返却）
+            logger.info(
+                f"[TOUKI] No matching documents for rule {check_id} → undeterminable"
+            )
+            result = {
+                "status": "success",
+                "result": "undeterminable",
+                "confidence": 0.0,
+                "explanation": "この審査項目に必要な文書タイプがアップロードされていません。",
+                "shortExplanation": "必要書類不足",
+                "reviewType": "TOUKI",
+                "reviewMeta": {
+                    "model_id": "N/A",
+                    "input_tokens": 0,
+                    "output_tokens": 0,
+                    "total_cost": 0,
+                },
+            }
+            s3_temp = S3TempStorage(TEMP_BUCKET)
+            return s3_temp.store(result)
         raise ValueError("Missing document paths")
 
     logger.info(
