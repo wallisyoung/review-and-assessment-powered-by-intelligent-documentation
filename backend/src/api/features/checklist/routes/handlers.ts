@@ -153,8 +153,8 @@ export const getAllChecklistSetsHandler = async (
   const validSortFields = ["id", "name", "description", "createdAt"];
   const validSortBy = validSortFields.includes(sortBy) ? sortBy : "id";
 
-  // 管理者は全件、それ以外は自分の所有物のみを取得する
-  const ownerUserId = request.user?.isAdmin ? undefined : request.user?.userId;
+  // 通用 checklist: 全ユーザーに全セットを表示（demo 段階）
+  const ownerUserId = undefined;
 
   const result = await getAllChecklistSets({
     status,

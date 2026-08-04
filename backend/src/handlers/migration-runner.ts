@@ -24,7 +24,7 @@ const execAsync = (cmd: string): Promise<number> =>
     exec(cmd, (error, stdout, stderr) => {
       console.log(stdout);
       if (stderr) console.error(stderr);
-      resolve(error ? error.code ?? 1 : 0);
+      resolve(error ? (error.code ?? 1) : 0);
     });
   });
 
