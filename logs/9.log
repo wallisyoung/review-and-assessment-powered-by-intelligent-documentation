@@ -1,0 +1,172 @@
+{
+    "resource": {
+        "attributes": {
+            "telemetry.sdk.language": "python",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.version": "1.33.1",
+            "service.name": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+            "aws.log.group.names": "/aws/bedrock-agentcore/runtimes/RapidStackToukiRessorReviewAgent891ACEA9-Rh0mPD3tex-DEFAULT",
+            "aws.log.stream.names": "otel-rt-logs",
+            "deployment.environment.name": "bedrock-agentcore:default",
+            "cloud.resource_id": "arn:aws:bedrock-agentcore:us-east-1:555599995555:runtime/RapidStackToukiRessorReviewAgent891ACEA9-Rh0mPD3tex/runtime-endpoint/DEFAULT:DEFAULT",
+            "cloud.platform": "aws_bedrock_agentcore",
+            "cloud.provider": "aws",
+            "cloud.region": "us-east-1",
+            "telemetry.auto.version": "0.12.2-aws",
+            "aws.local.service": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+            "aws.service.type": "gen_ai_agent"
+        }
+    },
+    "scope": {
+        "name": "strands.event_loop.event_loop"
+    },
+    "timeUnixNano": 1785833592565491712,
+    "observedTimeUnixNano": 1785833592565515163,
+    "severityNumber": 17,
+    "severityText": "ERROR",
+    "body": "cycle failed",
+    "attributes": {
+        "otelSpanID": "8cdeb2b478acf80c",
+        "otelTraceID": "bc2d0ddfb51a90b6b5fcb50043f825c0",
+        "otelTraceSampled": true,
+        "otelServiceName": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+        "code.file.path": "/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py",
+        "code.function.name": "event_loop_cycle",
+        "code.line.number": 219,
+        "exception.type": "ParamValidationError",
+        "exception.message": "Parameter validation failed:\nMust set one of the following keys for tagged unionstructure messages[3].content[2].citationsContent.citations[0].location: web, documentChar, documentPage, documentChunk.",
+        "exception.stacktrace": "Traceback (most recent call last):\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 189, in event_loop_cycle\n    async for tool_event in tool_events:\n        yield tool_event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 531, in _handle_tool_execution\n    async for event in events:\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 277, in recurse_event_loop\n    async for event in events:\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 152, in event_loop_cycle\n    async for model_event in model_events:\n        if not isinstance(model_event, ModelStopReason):\n            yield model_event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 396, in _handle_model_execution\n    raise e\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 337, in _handle_model_execution\n    async for event in stream_messages(\n    ...<7 lines>...\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/streaming.py\", line 454, in stream_messages\n    async for event in process_stream(chunks, start_time):\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/streaming.py\", line 388, in process_stream\n    async for chunk in chunks:\n    ...<22 lines>...\n            handle_redact_content(chunk[\"redactContent\"], state)\n  File \"/app/.venv/lib/python3.13/site-packages/strands/models/bedrock.py\", line 647, in stream\n    await task\n  File \"/usr/local/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/app/.venv/lib/python3.13/site-packages/opentelemetry/instrumentation/threading/__init__.py\", line 171, in wrapped_func\n    return original_func(*func_args, **func_kwargs)\n  File \"/app/.venv/lib/python3.13/site-packages/strands/models/bedrock.py\", line 717, in _stream\n    response = self.client.converse(**request)\n  File \"/app/.venv/lib/python3.13/site-packages/botocore/client.py\", line 602, in _api_call\n    return self._make_api_call(operation_name, kwargs)\n           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/app/.venv/lib/python3.13/site-packages/amazon/opentelemetry/distro/patches/_botocore_patches.py\", line 510, in patched_api_call\n    result = original_func(*args, **kwargs)\n  File \"/app/.venv/lib/python3.13/site-packages/botocore/context.py\", line 123, in wrapper\n    return func(*args, **kwargs)\n  File \"/app/.venv/lib/python3.13/site-packages/botocore/client.py\", line 1035, in _make_api_call\n    request_dict = self._convert_to_request_dict(\n        api_params=api_params,\n    ...<3 lines>...\n        headers=additional_headers,\n    )\n  File \"/app/.venv/lib/python3.13/site-packages/botocore/client.py\", line 1102, in _convert_to_request_dict\n    request_dict = self._serializer.serialize_to_request(\n        api_params, operation_model\n    )\n  File \"/app/.venv/lib/python3.13/site-packages/botocore/validate.py\", line 381, in serialize_to_request\n    raise ParamValidationError(report=report.generate_report())\nbotocore.exceptions.ParamValidationError: Parameter validation failed:\nMust set one of the following keys for tagged unionstructure messages[3].content[2].citationsContent.citations[0].location: web, documentChar, documentPage, documentChunk.\n"
+    },
+    "flags": 1,
+    "traceId": "bc2d0ddfb51a90b6b5fcb50043f825c0",
+    "spanId": "8cdeb2b478acf80c"
+}
+
+{
+    "resource": {
+        "attributes": {
+            "telemetry.sdk.language": "python",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.version": "1.33.1",
+            "service.name": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+            "aws.log.group.names": "/aws/bedrock-agentcore/runtimes/RapidStackToukiRessorReviewAgent891ACEA9-Rh0mPD3tex-DEFAULT",
+            "aws.log.stream.names": "otel-rt-logs",
+            "deployment.environment.name": "bedrock-agentcore:default",
+            "cloud.resource_id": "arn:aws:bedrock-agentcore:us-east-1:555599995555:runtime/RapidStackToukiRessorReviewAgent891ACEA9-Rh0mPD3tex/runtime-endpoint/DEFAULT:DEFAULT",
+            "cloud.platform": "aws_bedrock_agentcore",
+            "cloud.provider": "aws",
+            "cloud.region": "us-east-1",
+            "telemetry.auto.version": "0.12.2-aws",
+            "aws.local.service": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+            "aws.service.type": "gen_ai_agent"
+        }
+    },
+    "scope": {
+        "name": "bedrock_agentcore.app"
+    },
+    "timeUnixNano": 1785833592619253248,
+    "observedTimeUnixNano": 1785833592619288511,
+    "severityNumber": 17,
+    "severityText": "ERROR",
+    "body": "[Strands MCP] Error processing review item 01KZ5ZDD2EMC28AB792Y59T14B: Parameter validation failed:\nMust set one of the following keys for tagged unionstructure messages[3].content[2].citationsContent.citations[0].location: web, documentChar, documentPage, documentChunk.",
+    "attributes": {
+        "otelSpanID": "fa8a76fb1696e08f",
+        "otelTraceID": "bc2d0ddfb51a90b6b5fcb50043f825c0",
+        "otelTraceSampled": true,
+        "otelServiceName": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+        "request_id": "",
+        "code.file.path": "/app/index.py",
+        "code.function.name": "handler",
+        "code.line.number": 169
+    },
+    "flags": 1,
+    "traceId": "bc2d0ddfb51a90b6b5fcb50043f825c0",
+    "spanId": "fa8a76fb1696e08f"
+}
+
+{
+    "resource": {
+        "attributes": {
+            "telemetry.sdk.language": "python",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.version": "1.33.1",
+            "service.name": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+            "aws.log.group.names": "/aws/bedrock-agentcore/runtimes/RapidStackToukiRessorReviewAgent891ACEA9-Rh0mPD3tex-DEFAULT",
+            "aws.log.stream.names": "otel-rt-logs",
+            "deployment.environment.name": "bedrock-agentcore:default",
+            "cloud.resource_id": "arn:aws:bedrock-agentcore:us-east-1:555599995555:runtime/RapidStackToukiRessorReviewAgent891ACEA9-Rh0mPD3tex/runtime-endpoint/DEFAULT:DEFAULT",
+            "cloud.platform": "aws_bedrock_agentcore",
+            "cloud.provider": "aws",
+            "cloud.region": "us-east-1",
+            "telemetry.auto.version": "0.12.2-aws",
+            "aws.local.service": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+            "aws.service.type": "gen_ai_agent"
+        }
+    },
+    "scope": {
+        "name": "bedrock_agentcore.app"
+    },
+    "timeUnixNano": 1785833592619460352,
+    "observedTimeUnixNano": 1785833592619511508,
+    "severityNumber": 17,
+    "severityText": "ERROR",
+    "body": "Handler 'handler' execution failed: EventLoopException: Parameter validation failed:\nMust set one of the following keys for tagged unionstructure messages[3].content[2].citationsContent.citations[0].location: web, documentChar, documentPage, documentChunk.",
+    "attributes": {
+        "otelSpanID": "fa8a76fb1696e08f",
+        "otelTraceID": "bc2d0ddfb51a90b6b5fcb50043f825c0",
+        "otelTraceSampled": true,
+        "otelServiceName": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+        "request_id": "[a52e02c1] ",
+        "code.file.path": "/app/.venv/lib/python3.13/site-packages/bedrock_agentcore/runtime/app.py",
+        "code.function.name": "_invoke_handler",
+        "code.line.number": 360
+    },
+    "flags": 1,
+    "traceId": "bc2d0ddfb51a90b6b5fcb50043f825c0",
+    "spanId": "fa8a76fb1696e08f"
+}
+
+{
+    "resource": {
+        "attributes": {
+            "telemetry.sdk.language": "python",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.version": "1.33.1",
+            "service.name": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+            "aws.log.group.names": "/aws/bedrock-agentcore/runtimes/RapidStackToukiRessorReviewAgent891ACEA9-Rh0mPD3tex-DEFAULT",
+            "aws.log.stream.names": "otel-rt-logs",
+            "deployment.environment.name": "bedrock-agentcore:default",
+            "cloud.resource_id": "arn:aws:bedrock-agentcore:us-east-1:555599995555:runtime/RapidStackToukiRessorReviewAgent891ACEA9-Rh0mPD3tex/runtime-endpoint/DEFAULT:DEFAULT",
+            "cloud.platform": "aws_bedrock_agentcore",
+            "cloud.provider": "aws",
+            "cloud.region": "us-east-1",
+            "telemetry.auto.version": "0.12.2-aws",
+            "aws.local.service": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+            "aws.service.type": "gen_ai_agent"
+        }
+    },
+    "scope": {
+        "name": "bedrock_agentcore.app"
+    },
+    "timeUnixNano": 1785833592619604224,
+    "observedTimeUnixNano": 1785833592625719617,
+    "severityNumber": 17,
+    "severityText": "ERROR",
+    "body": "Invocation failed (23.834s)",
+    "attributes": {
+        "otelSpanID": "fa8a76fb1696e08f",
+        "otelTraceID": "bc2d0ddfb51a90b6b5fcb50043f825c0",
+        "otelTraceSampled": true,
+        "otelServiceName": "RapidStackToukiRessorReviewAgent891ACEA9.DEFAULT",
+        "request_id": "[a52e02c1] ",
+        "code.file.path": "/app/.venv/lib/python3.13/site-packages/bedrock_agentcore/runtime/app.py",
+        "code.function.name": "_handle_invocation",
+        "code.line.number": 316,
+        "exception.type": "EventLoopException",
+        "exception.message": "Parameter validation failed:\nMust set one of the following keys for tagged unionstructure messages[3].content[2].citationsContent.citations[0].location: web, documentChar, documentPage, documentChunk.",
+        "exception.stacktrace": "Traceback (most recent call last):\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 189, in event_loop_cycle\n    async for tool_event in tool_events:\n        yield tool_event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 531, in _handle_tool_execution\n    async for event in events:\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 277, in recurse_event_loop\n    async for event in events:\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 152, in event_loop_cycle\n    async for model_event in model_events:\n        if not isinstance(model_event, ModelStopReason):\n            yield model_event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 396, in _handle_model_execution\n    raise e\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 337, in _handle_model_execution\n    async for event in stream_messages(\n    ...<7 lines>...\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/streaming.py\", line 454, in stream_messages\n    async for event in process_stream(chunks, start_time):\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/streaming.py\", line 388, in process_stream\n    async for chunk in chunks:\n    ...<22 lines>...\n            handle_redact_content(chunk[\"redactContent\"], state)\n  File \"/app/.venv/lib/python3.13/site-packages/strands/models/bedrock.py\", line 647, in stream\n    await task\n  File \"/usr/local/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/app/.venv/lib/python3.13/site-packages/opentelemetry/instrumentation/threading/__init__.py\", line 171, in wrapped_func\n    return original_func(*func_args, **func_kwargs)\n  File \"/app/.venv/lib/python3.13/site-packages/strands/models/bedrock.py\", line 717, in _stream\n    response = self.client.converse(**request)\n  File \"/app/.venv/lib/python3.13/site-packages/botocore/client.py\", line 602, in _api_call\n    return self._make_api_call(operation_name, kwargs)\n           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/app/.venv/lib/python3.13/site-packages/amazon/opentelemetry/distro/patches/_botocore_patches.py\", line 510, in patched_api_call\n    result = original_func(*args, **kwargs)\n  File \"/app/.venv/lib/python3.13/site-packages/botocore/context.py\", line 123, in wrapper\n    return func(*args, **kwargs)\n  File \"/app/.venv/lib/python3.13/site-packages/botocore/client.py\", line 1035, in _make_api_call\n    request_dict = self._convert_to_request_dict(\n        api_params=api_params,\n    ...<3 lines>...\n        headers=additional_headers,\n    )\n  File \"/app/.venv/lib/python3.13/site-packages/botocore/client.py\", line 1102, in _convert_to_request_dict\n    request_dict = self._serializer.serialize_to_request(\n        api_params, operation_model\n    )\n  File \"/app/.venv/lib/python3.13/site-packages/botocore/validate.py\", line 381, in serialize_to_request\n    raise ParamValidationError(report=report.generate_report())\nbotocore.exceptions.ParamValidationError: Parameter validation failed:\nMust set one of the following keys for tagged unionstructure messages[3].content[2].citationsContent.citations[0].location: web, documentChar, documentPage, documentChunk.\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/app/.venv/lib/python3.13/site-packages/bedrock_agentcore/runtime/app.py\", line 297, in _handle_invocation\n    result = await self._invoke_handler(handler, request_context, takes_context, payload)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/app/.venv/lib/python3.13/site-packages/bedrock_agentcore/runtime/app.py\", line 357, in _invoke_handler\n    return await loop.run_in_executor(self._invocation_executor, handler, *args)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/app/.venv/lib/python3.13/site-packages/opentelemetry/instrumentation/threading/__init__.py\", line 171, in wrapped_func\n    return original_func(*func_args, **func_kwargs)\n  File \"/app/index.py\", line 170, in handler\n    raise e\n  File \"/app/index.py\", line 119, in handler\n    review_data = process_review(\n        document_bucket=DOCUMENT_BUCKET,\n    ...<9 lines>...\n        document_ids=document_ids,\n    )\n  File \"/app/agent.py\", line 1453, in process_review\n    return process_review_from_s3(\n        document_bucket=document_bucket,\n    ...<9 lines>...\n        document_ids=document_ids,\n    )\n  File \"/app/agent.py\", line 1328, in process_review_from_s3\n    result = _execute_review_core(\n        file_paths=local_file_paths,\n    ...<9 lines>...\n        document_ids=document_ids,\n    )\n  File \"/app/agent.py\", line 291, in _execute_review_core\n    return _execute_touki_review(\n        file_paths=file_paths,\n    ...<8 lines>...\n        document_ids=document_ids,\n    )\n  File \"/app/agent.py\", line 518, in _execute_touki_review\n    touki = run_touki_review(\n        rule_name=check_name,\n    ...<4 lines>...\n        language_name=language_name,\n    )\n  File \"/app/touki/agent_runner.py\", line 48, in run_touki_review\n    raw_message = model_fn(prompt, documents)\n  File \"/app/agent.py\", line 506, in model_fn\n    response, meta_tracker, history = _run_touki_agent(\n                                      ~~~~~~~~~~~~~~~~^\n        file_paths=file_paths,\n        ^^^^^^^^^^^^^^^^^^^^^^\n    ...<4 lines>...\n        toolConfiguration=toolConfiguration,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/app/agent.py\", line 452, in _run_touki_agent\n    response = agent(content)\n  File \"/app/.venv/lib/python3.13/site-packages/strands/agent/agent.py\", line 430, in __call__\n    return run_async(\n        lambda: self.invoke_async(\n            prompt, invocation_state=invocation_state, structured_output_model=structured_output_model, **kwargs\n        )\n    )\n  File \"/app/.venv/lib/python3.13/site-packages/strands/_async.py\", line 31, in run_async\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.13/concurrent/futures/_base.py\", line 456, in result\n    return self.__get_result()\n           ~~~~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.13/concurrent/futures/_base.py\", line 401, in __get_result\n    raise self._exception\n  File \"/usr/local/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/app/.venv/lib/python3.13/site-packages/opentelemetry/instrumentation/threading/__init__.py\", line 171, in wrapped_func\n    return original_func(*func_args, **func_kwargs)\n  File \"/app/.venv/lib/python3.13/site-packages/strands/_async.py\", line 27, in execute\n    return asyncio.run(execute_async())\n           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.13/asyncio/runners.py\", line 195, in run\n    return runner.run(main)\n           ~~~~~~~~~~^^^^^^\n  File \"/usr/local/lib/python3.13/asyncio/runners.py\", line 118, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/usr/local/lib/python3.13/asyncio/base_events.py\", line 725, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/app/.venv/lib/python3.13/site-packages/strands/_async.py\", line 24, in execute_async\n    return await async_func()\n           ^^^^^^^^^^^^^^^^^^\n  File \"/app/.venv/lib/python3.13/site-packages/strands/agent/agent.py\", line 473, in invoke_async\n    async for event in events:\n        _ = event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/agent/agent.py\", line 669, in stream_async\n    async for event in events:\n    ...<5 lines>...\n            yield as_dict\n  File \"/app/.venv/lib/python3.13/site-packages/strands/agent/agent.py\", line 749, in _run_loop\n    async for event in events:\n    ...<13 lines>...\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/agent/agent.py\", line 797, in _execute_event_loop_cycle\n    async for event in events:\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 189, in event_loop_cycle\n    async for tool_event in tool_events:\n        yield tool_event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 531, in _handle_tool_execution\n    async for event in events:\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 277, in recurse_event_loop\n    async for event in events:\n        yield event\n  File \"/app/.venv/lib/python3.13/site-packages/strands/event_loop/event_loop.py\", line 220, in event_loop_cycle\n    raise EventLoopException(e, invocation_state[\"request_state\"]) from e\nstrands.types.exceptions.EventLoopException: Parameter validation failed:\nMust set one of the following keys for tagged unionstructure messages[3].content[2].citationsContent.citations[0].location: web, documentChar, documentPage, documentChunk.\n"
+    },
+    "flags": 1,
+    "traceId": "bc2d0ddfb51a90b6b5fcb50043f825c0",
+    "spanId": "fa8a76fb1696e08f"
+}
