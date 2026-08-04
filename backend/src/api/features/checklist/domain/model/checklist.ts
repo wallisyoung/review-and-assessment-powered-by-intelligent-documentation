@@ -136,8 +136,7 @@ export const CheckListSetDomain = {
     return {
       id: ulid(),
       name: newName || `${source.name} (コピー)`,
-      description:
-        newDescription !== undefined ? newDescription : source.description,
+      description: newDescription || source.description,
       documents: source.documents.map((doc) => ({
         id: ulid(),
         filename: doc.filename,
