@@ -17,8 +17,8 @@ export default function ReviewDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Start with showing fail items
-  const [filter, setFilter] = useState<FilterType>("fail");
+  // デフォルトは「全て」タブ（結果がすぐ見える）
+  const [filter, setFilter] = useState<FilterType>("all");
   const [confidenceThreshold, setConfidenceThreshold] = useState<number>(0.7);
 
   // Get review job details

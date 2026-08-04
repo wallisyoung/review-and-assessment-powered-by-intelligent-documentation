@@ -3,7 +3,7 @@
  */
 import { useTranslation } from "react-i18next";
 import SegmentedControl from "../../../components/SegmentedControl";
-import { HiCheck, HiX, HiViewList } from "react-icons/hi";
+import { HiCheck, HiX, HiViewList, HiExclamation } from "react-icons/hi";
 import { FilterType } from "../hooks/useReviewResultQueries";
 
 interface ReviewResultFilterProps {
@@ -21,6 +21,7 @@ export default function ReviewResultFilter({
     all: t("review.filterAll", "All"),
     fail: t("review.fail"),
     pass: t("review.pass"),
+    undeterminable: t("review.undeterminable", "判定不能"),
     processing: t("status.processing"),
   };
 
@@ -39,6 +40,11 @@ export default function ReviewResultFilter({
       value: "pass" as FilterType,
       label: filterLabels["pass"],
       icon: <HiCheck className="h-4 w-4 text-green-500" />,
+    },
+    {
+      value: "undeterminable" as FilterType,
+      label: filterLabels["undeterminable"],
+      icon: <HiExclamation className="h-4 w-4 text-yellow-500" />,
     },
   ];
 

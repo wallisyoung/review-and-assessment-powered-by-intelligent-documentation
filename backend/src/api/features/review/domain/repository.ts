@@ -422,9 +422,12 @@ export const makePrismaReviewResultRepository = async (
     }
 
     // フィルター条件を追加
+    // root（parentId なし）では result フィルタをスキップ → ツリー構造の親が常に表示される
     if (filter) {
       whereCondition.status = REVIEW_RESULT_STATUS.COMPLETED;
-      whereCondition.result = filter;
+      if (parentId) {
+        whereCondition.result = filter;
+      }
     }
 
     // 審査結果を取得
