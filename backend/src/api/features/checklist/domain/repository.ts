@@ -77,8 +77,14 @@ export const makePrismaCheckRepository = async (
     ownerUserId: string;
   }): Promise<void> => {
     const { checkListSet, ownerUserId } = params;
-    const { id, name, description, documents, declaredDocumentTypes, createdAt } =
-      checkListSet;
+    const {
+      id,
+      name,
+      description,
+      documents,
+      declaredDocumentTypes,
+      createdAt,
+    } = checkListSet;
 
     await client.checkListSet.create({
       data: {
