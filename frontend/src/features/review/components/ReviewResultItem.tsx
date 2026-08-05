@@ -24,6 +24,7 @@ import DocumentPreview from "../../../components/DocumentPreview";
 import ImagePreview from "../../../components/ImagePreview";
 import ReviewItemCostBadge from "./ReviewItemCostBadge";
 import { useReviewItemCost } from "../hooks/useReviewItemCost";
+import { useAuth } from "../../../contexts/AuthContext";
 import ResultCard, { ResultCardVariant } from "../../../components/ResultCard";
 import ExternalSourceItem from "./ExternalSourceItem";
 
@@ -52,6 +53,7 @@ export default function ReviewResultItem({
   documents,
 }: ReviewResultItemProps) {
   const { t } = useTranslation();
+  const { isAdmin } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visibleReferencesCount, setVisibleReferencesCount] = useState(5); // 初期表示数
   const [showDetails, setShowDetails] = useState(false); // いかなる場合も詳細を最初は隠した状態に設定
@@ -234,7 +236,7 @@ export default function ReviewResultItem({
                 {!hasChildren && renderConfidenceScore() && (
                   <div className="ml-3 flex items-center space-x-2">
                     {renderConfidenceScore()}
-                    {costInfo.hasCost && (
+                    {costInfo.hasCost && isAdmin && (
                       <ReviewItemCostBadge
                         formattedCost={costInfo.formattedCost}
                         size="sm"

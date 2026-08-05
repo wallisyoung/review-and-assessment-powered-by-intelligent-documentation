@@ -11,9 +11,11 @@ import { DetailSkeleton } from "../../../components/Skeleton";
 import { REVIEW_JOB_STATUS } from "../types";
 import Breadcrumb from "../../../components/Breadcrumb";
 import TotalReviewCostSummary from "../components/TotalReviewCostSummary";
+import { useAuth } from "../../../contexts/AuthContext";
 
 export default function ReviewDetailPage() {
   const { t } = useTranslation();
+  const { isAdmin } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -87,8 +89,8 @@ export default function ReviewDetailPage() {
             </h1>
           </div>
           <div className="mt-3 flex items-center justify-between">
-            {/* 合計料金表示 */}
-            {job.totalCost && (
+            {/* 合計料金表示（管理者のみ） */}
+            {job.totalCost && isAdmin && (
               <TotalReviewCostSummary
                 formattedTotalCost={`$${job.totalCost.toFixed(4)}`}
                 summary={{
