@@ -1,0 +1,10 @@
+# 行末は LF をリポジトリ標準とする。
+# core.autocrlf=true (Windows) と prettier (既定 endOfLine=lf) の衝突による
+# 「LF will be replaced by CRLF」の幻影変更を抑止するため、.gitattributes で
+# 強制的に LF を正とする（.gitattributes は個人の autocrlf より優先される）。
+* text=auto eol=lf
+
+# Windows 専用スクリプトは cmd.exe / レジストリ import の信頼性のため CRLF を維持。
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.reg text eol=crlf
