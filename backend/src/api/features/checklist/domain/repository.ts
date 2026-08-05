@@ -580,6 +580,7 @@ export const makePrismaCheckRepository = async (
         description,
         checkListSetId: setId,
         parentId: parentId,
+        requiredDocumentTypes: item.requiredDocumentTypes ?? undefined,
       },
     });
   };
@@ -680,6 +681,7 @@ export const makePrismaCheckRepository = async (
       data: {
         name: prismaData.name,
         description: prismaData.description,
+        requiredDocumentTypes: newItem.requiredDocumentTypes ?? undefined,
         ambiguityReview: prismaData.ambiguityReview as any,
       },
     });

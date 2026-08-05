@@ -313,6 +313,7 @@ export interface CreateChecklistItemRequest {
     name: string;
     description?: string;
     parentId?: string;
+    requiredDocumentTypes?: string[];
   };
 }
 
@@ -343,6 +344,7 @@ export interface UpdateChecklistItemRequest {
     name: string;
     description: string;
     resolveAmbiguity: boolean;
+    requiredDocumentTypes?: string[];
   };
 }
 

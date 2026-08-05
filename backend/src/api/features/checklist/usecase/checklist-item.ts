@@ -149,6 +149,7 @@ export const modifyCheckListItem = async (params: {
     name: params.req.Body.name,
     description: params.req.Body.description,
     resolveAmbiguity: params.req.Body.resolveAmbiguity,
+    requiredDocumentTypes: params.req.Body.requiredDocumentTypes,
   });
   if (currentItem.setId !== newItem.setId) {
     throw new ValidationError("Invalid setId");

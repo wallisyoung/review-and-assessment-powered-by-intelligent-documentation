@@ -162,26 +162,28 @@ export const CheckListItemDomain = {
       name,
       description: description || "",
       parentId: parentId || undefined,
+      requiredDocumentTypes: Body.requiredDocumentTypes,
     };
   },
 
   createUpdatedItem: (
     existingItem: CheckListItemEntity,
-    updates: { name: string; description: string; resolveAmbiguity: boolean }
+    updates: {
+      name: string;
+      description: string;
+      resolveAmbiguity: boolean;
+      requiredDocumentTypes?: string[];
+    }
   ): CheckListItemEntity => {
     const newAmbiguityReview = updates.resolveAmbiguity
       ? undefined
       : existingItem.ambiguityReview;
 
-    console.log(
-      "[DEBUG] createUpdatedItem - newAmbiguityReview:",
-      newAmbiguityReview
-    );
-
     return {
       ...existingItem,
       name: updates.name,
       description: updates.description || "",
+      requiredDocumentTypes: updates.requiredDocumentTypes,
       ambiguityReview: newAmbiguityReview,
     };
   },

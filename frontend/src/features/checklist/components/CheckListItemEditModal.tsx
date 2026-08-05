@@ -5,6 +5,7 @@ import Button from "../../../components/Button";
 import InfoAlert from "../../../components/InfoAlert";
 import { CheckListItemEntity } from "../types";
 import { useUpdateCheckListItem } from "../hooks/useCheckListItemMutations";
+import { useChecklistSetDetail } from "../hooks/useCheckListSetQueries";
 import { useToast } from "../../../contexts/ToastContext";
 
 type CheckListItemEditModalProps = {
@@ -15,9 +16,6 @@ type CheckListItemEditModalProps = {
   onSuccess: () => void;
 };
 
-/**
- * チェックリスト項目編集モーダル
- */
 export default function CheckListItemEditModal({
   isOpen,
   onClose,
@@ -31,16 +29,22 @@ export default function CheckListItemEditModal({
     description: item.description || "",
   });
   const [resolveAmbiguity, setResolveAmbiguity] = useState(false);
+  const [selectedDocTypes, setSelectedDocTypes] = useState<string[]>(
+    item.requiredDocumentTypes || []
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const { addToast } = useToast();
 
-  // コンポーネントのトップレベルでフックを呼び出す
   const {
     updateCheckListItem,
     status: updateStatus,
     error: updateError,
   } = useUpdateCheckListItem(checkListSetId);
+
+  const { checklistSet } = useChecklistSetDetail(checkListSetId);
+  const declaredDocumentTypes: string[] =
+    (checklistSet as any)?.declaredDocumentTypes ?? [];
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -50,6 +54,14 @@ export default function CheckListItemEditModal({
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleDocTypeToggle = (docType: string) => {
+    setSelectedDocTypes((prev) =>
+      prev.includes(docType)
+        ? prev.filter((t) => t !== docType)
+        : [...prev, docType]
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,6 +79,7 @@ export default function CheckListItemEditModal({
         name: formData.name,
         description: formData.description,
         resolveAmbiguity: resolveAmbiguity,
+        requiredDocumentTypes: selectedDocTypes,
       };
       await updateCheckListItem(item.id, requestData);
       addToast(t("checklist.editItemUpdateSuccess"), "success");
@@ -94,7 +107,6 @@ export default function CheckListItemEditModal({
           </div>
         )}
 
-        {/* 指摘事項表示 */}
         {item.ambiguityReview && (
           <div className="mb-4">
             <InfoAlert
@@ -158,7 +170,39 @@ export default function CheckListItemEditModal({
           />
         </div>
 
-        {/* 指摘解消チェックボックス */}
+        {declaredDocumentTypes.length > 0 && (
+          <div className="mb-6">
+            <label className="mb-2 block font-medium text-aws-squid-ink-light">
+              {t("checklist.requiredDocumentTypes", "必要な文書タイプ")}
+            </label>
+            <p className="mb-2 text-xs text-aws-font-color-gray">
+              {t(
+                "checklist.requiredDocumentTypesHint",
+                "未選択の場合は全書類を投入します"
+              )}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {declaredDocumentTypes.map((docType) => (
+                <label
+                  key={docType}
+                  className={`cursor-pointer rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                    selectedDocTypes.includes(docType)
+                      ? "border-aws-sea-blue-light bg-aws-sea-blue-light bg-opacity-10 text-aws-sea-blue-light"
+                      : "border-light-gray text-aws-font-color-gray hover:border-aws-sea-blue-light"
+                  }`}>
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={selectedDocTypes.includes(docType)}
+                    onChange={() => handleDocTypeToggle(docType)}
+                  />
+                  {docType}
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
         {item.ambiguityReview && (
           <div className="mb-4 flex justify-end">
             <label className="flex items-center">

@@ -70,6 +70,7 @@ export interface CreateChecklistItemRequest {
   name: string;
   description?: string;
   parentId?: string;
+  requiredDocumentTypes?: string[];
 }
 
 /**
@@ -80,6 +81,7 @@ export interface UpdateChecklistItemRequest {
   name: string;
   description: string;
   resolveAmbiguity: boolean;
+  requiredDocumentTypes?: string[];
 }
 
 // Response types
@@ -227,6 +229,7 @@ export interface CheckListItemEntity {
   name: string;
   description?: string;
   ambiguityReview?: AmbiguityDetectionResult;
+  requiredDocumentTypes?: string[];
 }
 
 /**
@@ -272,6 +275,7 @@ export interface CheckListSetDetailModel {
   name: string;
   description: string;
   documents: ChecklistDocumentEntity[];
+  declaredDocumentTypes?: string[];
   processingStatus: CHECK_LIST_STATUS;
   isEditable: boolean;
   errorSummary?: string;

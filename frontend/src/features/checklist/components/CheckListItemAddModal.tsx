@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useCreateCheckListItem } from "../hooks/useCheckListItemMutations";
+import { useChecklistSetDetail } from "../hooks/useCheckListSetQueries";
 import { useToast } from "../../../contexts/ToastContext";
 import Button from "../../../components/Button";
 import { HiX } from "react-icons/hi";
@@ -25,6 +26,7 @@ export default function CheckListItemAddModal({
     description: "",
     parentId: parentId || "",
   });
+  const [selectedDocTypes, setSelectedDocTypes] = useState<string[]>([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({
@@ -34,14 +36,16 @@ export default function CheckListItemAddModal({
   const { t } = useTranslation();
   const { addToast } = useToast();
 
-  // コンポーネントのトップレベルでフックを呼び出す
   const {
     createCheckListItem,
     status: submitStatus,
     error: submitError,
   } = useCreateCheckListItem(checkListSetId);
 
-  // 入力値の変更ハンドラ
+  const { checklistSet } = useChecklistSetDetail(checkListSetId);
+  const declaredDocumentTypes: string[] =
+    (checklistSet as any)?.declaredDocumentTypes ?? [];
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -53,13 +57,19 @@ export default function CheckListItemAddModal({
       [name]: value,
     }));
 
-    // エラークリア
     if (name === "name" && errors.name) {
       setErrors((prev) => ({ ...prev, name: "" }));
     }
   };
 
-  // バリデーション
+  const handleDocTypeToggle = (docType: string) => {
+    setSelectedDocTypes((prev) =>
+      prev.includes(docType)
+        ? prev.filter((t) => t !== docType)
+        : [...prev, docType]
+    );
+  };
+
   const validate = () => {
     const newErrors = {
       name: "",
@@ -73,7 +83,6 @@ export default function CheckListItemAddModal({
     return !Object.values(newErrors).some((error) => error);
   };
 
-  // フォーム送信ハンドラ
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -82,10 +91,10 @@ export default function CheckListItemAddModal({
     setIsSubmitting(true);
 
     try {
-      // parentIdが指定されている場合は、formDataのparentIdを上書きして確実に使用する
       const dataToSubmit = {
         ...formData,
         parentId: parentId !== undefined ? parentId : formData.parentId,
+        requiredDocumentTypes: selectedDocTypes,
       };
 
       await createCheckListItem(dataToSubmit);
@@ -94,7 +103,6 @@ export default function CheckListItemAddModal({
     } catch (error) {
       console.error("保存に失敗しました", error);
 
-      // エラーメッセージの処理
       if (
         error instanceof Error &&
         error.message.includes("LINKED_REVIEW_JOBS")
@@ -174,6 +182,39 @@ export default function CheckListItemAddModal({
               )}
             />
           </div>
+
+          {declaredDocumentTypes.length > 0 && (
+            <div className="mb-4">
+              <label className="mb-2 block font-medium text-aws-squid-ink-light">
+                {t("checklist.requiredDocumentTypes", "必要な文書タイプ")}
+              </label>
+              <p className="mb-2 text-xs text-aws-font-color-gray">
+                {t(
+                  "checklist.requiredDocumentTypesHint",
+                  "未選択の場合は全書類を投入します"
+                )}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {declaredDocumentTypes.map((docType) => (
+                  <label
+                    key={docType}
+                    className={`cursor-pointer rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                      selectedDocTypes.includes(docType)
+                        ? "border-aws-sea-blue-light bg-aws-sea-blue-light bg-opacity-10 text-aws-sea-blue-light"
+                        : "border-light-gray text-aws-font-color-gray hover:border-aws-sea-blue-light"
+                    }`}>
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={selectedDocTypes.includes(docType)}
+                      onChange={() => handleDocTypeToggle(docType)}
+                    />
+                    {docType}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="mt-6 flex justify-end space-x-3">
             <Button outline onClick={onClose}>
