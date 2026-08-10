@@ -2,13 +2,17 @@
  * 登記書類整合性審査（抵当権設定）用 seed スクリプト
  *
  * デモで使う登記審査 CheckListSet を投入する:
- * - 4 種の 文書タイプ を宣言した CheckListSet (declaredDocumentTypes)
+ * - 7 種の 文書タイプ を宣言した CheckListSet (declaredDocumentTypes)
  * - 「総合審査」親項目（cascade で 総合判定 を担う）
  * - 17 件の 比較ルール を表す葉項目（各々 requiredDocumentTypes を持つ）
  *
  * 実行: cd backend && npm run db:seed:touki
  * ※ 事前にスキーマ反映（prisma migrate / generate）済みであること。
- * 冪等: upsert + delete & re-insert（毎デプロイで最新ルールに更新される）。CDK デプロイの Prisma マイグレーション Lambda から自動実行される。
+ * 冪等: セットが未存在なら作成（セット+親項目+17ルール）。セット既存時は審査結果とルールを
+ * 保護し、declaredDocumentTypes に新しい 文書タイプがあればマージ追加のみ行う（削除しない＝安全）。
+ * ルール本文/requiredDocumentTypes のリネームや削除は保護対象のため seed では行わず、
+ * 専用の Prisma マイグレーションで実施すること。
+ * CDK デプロイの Prisma マイグレーション Lambda から自動実行される。
  */
 
 import { PrismaClient } from "../api/core/db";
@@ -27,7 +31,10 @@ const TOUKI_DOCUMENT_TYPES = [
   "抵当権設定契約証書",
   "登記完了証",
   "登記情報識別通知",
-  "登記簿謄本",
+  "建物登記簿謄本",
+  "本地登記簿謄本",
+  "道路登記簿謄本",
+  "隣地登記簿謄本",
 ] as const;
 
 type DocType = (typeof TOUKI_DOCUMENT_TYPES)[number];
@@ -84,7 +91,7 @@ const COMPARISON_RULES: ComparisonRule[] = [
     name: "契約日と乙区の原因日付の一致",
     description:
       "「抵当権設定契約証書：表面」の「ご契約日」と「登記簿謄本：乙区」の「登記順位」が最大のレコードの「権力者その他の事項」の原因に記述された日付が一致すること。正規化：和暦と西暦が混在する場合は変換して比較。",
-    requiredDocumentTypes: ["抵当権設定契約証書", "登記簿謄本"],
+    requiredDocumentTypes: ["抵当権設定契約証書", "建物登記簿謄本"],
   },
   {
     name: "契約証書裏面住所と物件情報住所の同一性",
@@ -114,36 +121,36 @@ const COMPARISON_RULES: ComparisonRule[] = [
     name: "表題部住所と物件情報住所の同一性",
     description:
       "「登記簿謄本：表題部」の「所在」「番地」の住所情報と「案件情報」の「物件情報」の住所（登記簿住所/マンション名/号棟/部屋番号）が同じ住所であること。",
-    requiredDocumentTypes: ["登記簿謄本"],
+    requiredDocumentTypes: ["建物登記簿謄本"],
   },
   {
     name: "表題部の地目",
     description: "「登記簿謄本：表題部」の「地目」が「宅地」であること。",
-    requiredDocumentTypes: ["登記簿謄本"],
+    requiredDocumentTypes: ["建物登記簿謄本"],
   },
   {
     name: "表題部地積と土地面積の一致",
     description:
       "「登記簿謄本：表題部」の「地積」の値と「案件情報」の「物件情報：土地面積」の値が一致すること。",
-    requiredDocumentTypes: ["登記簿謄本"],
+    requiredDocumentTypes: ["建物登記簿謄本"],
   },
   {
     name: "表題部床面積合計と延床面積の一致",
     description:
       "「登記簿謄本：表題部」の「床面積」の合計値と「案件情報」の「物件情報：延床面積」の値が一致すること。",
-    requiredDocumentTypes: ["登記簿謄本"],
+    requiredDocumentTypes: ["建物登記簿謄本"],
   },
   {
     name: "表題部原因日付が融資実行予定日以降でないこと",
     description:
       "「登記簿謄本：表題部」の「原因及びその日付」中の日付は「案件情報」の「借入情報：融資実行予定日」以降ではないこと。",
-    requiredDocumentTypes: ["登記簿謄本"],
+    requiredDocumentTypes: ["建物登記簿謄本"],
   },
   {
     name: "乙区の抵当権設定/抹消のペアリング",
     description:
       "「登記簿謄本：乙区」の「登記順位」が最大のレコード以外について、各「抵当権設定」のレコードに対して「抵当権抹消」のレコードが存在すること。",
-    requiredDocumentTypes: ["登記簿謄本"],
+    requiredDocumentTypes: ["建物登記簿謄本"],
   },
 ];
 
@@ -152,13 +159,31 @@ async function main(): Promise<void> {
 
   const setId = TOUKI_SET_ID;
 
-  // 既に存在する場合は完全スキップ（審査結果を保護）
+  // 既に存在する場合: 審査結果・ルールを保護しつつ、declaredDocumentTypes に
+  // 新しい 文書タイプがあればマージ追加する（削除はしない＝安全）。
+  // ※ ルール本文/requiredDocumentTypes のリネーム・削除は保護対象のためここでは触れない。
+  //    型のリネーム/削除が必要な場合は Prisma マイグレーション等で別途行うこと。
   const existing = await prisma.checkListSet.findUnique({
     where: { id: setId },
   });
   if (existing) {
+    const existingTypes =
+      (existing.declaredDocumentTypes as string[] | undefined) ?? [];
+    const merged = Array.from(
+      new Set([...existingTypes, ...TOUKI_DOCUMENT_TYPES])
+    );
+    if (merged.length === existingTypes.length) {
+      console.log(
+        `登記セット既存（id=${setId}）→ declaredDocumentTypes に変更なし、seed スキップ。`
+      );
+      return;
+    }
+    await prisma.checkListSet.update({
+      where: { id: setId },
+      data: { declaredDocumentTypes: merged },
+    });
     console.log(
-      `登記セット既存（id=${setId}）→ seed スキップ（審査結果保護）。ルール変更は duplicateChecklistSet で複製後に行うこと。`
+      `登記セット既存（id=${setId}）→ declaredDocumentTypes に新タイプをマージ: ${merged.join(", ")}`
     );
     return;
   }
