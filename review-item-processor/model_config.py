@@ -316,6 +316,57 @@ _MODEL_REGISTRY = {
         supports_citation=False,
         supports_caching=True,
     ),
+
+    # Claude Haiku 4.5 ($1/$5 per 1M tokens; 跨区域 inference profile +10% surcharge)
+    "global.anthropic.claude-haiku-4-5-20251001-v1:0": ModelConfig(
+        model_id="global.anthropic.claude-haiku-4-5-20251001-v1:0",
+        display_name="Claude Haiku 4.5 (Global)",
+        input_per_1k=0.001,
+        output_per_1k=0.005,
+        supports_document_block=True,
+        supports_citation=False,
+        supports_caching=True,
+    ),
+
+    "us.anthropic.claude-haiku-4-5-20251001-v1:0": ModelConfig(
+        model_id="us.anthropic.claude-haiku-4-5-20251001-v1:0",
+        display_name="Claude Haiku 4.5 (US)",
+        input_per_1k=0.0011,
+        output_per_1k=0.0055,
+        supports_document_block=True,
+        supports_citation=False,
+        supports_caching=True,
+    ),
+
+    "eu.anthropic.claude-haiku-4-5-20251001-v1:0": ModelConfig(
+        model_id="eu.anthropic.claude-haiku-4-5-20251001-v1:0",
+        display_name="Claude Haiku 4.5 (EU)",
+        input_per_1k=0.0011,
+        output_per_1k=0.0055,
+        supports_document_block=True,
+        supports_citation=False,
+        supports_caching=True,
+    ),
+
+    "apac.anthropic.claude-haiku-4-5-20251001-v1:0": ModelConfig(
+        model_id="apac.anthropic.claude-haiku-4-5-20251001-v1:0",
+        display_name="Claude Haiku 4.5 (APAC)",
+        input_per_1k=0.0011,
+        output_per_1k=0.0055,
+        supports_document_block=True,
+        supports_citation=False,
+        supports_caching=True,
+    ),
+
+    "anthropic.claude-haiku-4-5-20251001-v1:0": ModelConfig(
+        model_id="anthropic.claude-haiku-4-5-20251001-v1:0",
+        display_name="Claude Haiku 4.5",
+        input_per_1k=0.001,
+        output_per_1k=0.005,
+        supports_document_block=True,
+        supports_citation=False,
+        supports_caching=True,
+    ),
     
     # Claude 3 Opus
     "anthropic.claude-3-opus-20240229-v1:0": ModelConfig(
