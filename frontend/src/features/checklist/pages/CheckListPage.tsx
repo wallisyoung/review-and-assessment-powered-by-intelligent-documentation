@@ -10,6 +10,7 @@ import { useToast } from "../../../contexts/ToastContext";
 import CheckListSetList from "../components/CheckListSetList";
 import CreateChecklistButton from "../components/CreateChecklistButton";
 import DuplicateChecklistModal from "../components/DuplicateChecklistModal";
+import CheckListSetEditModal from "../components/CheckListSetEditModal";
 import Pagination from "../../../components/Pagination";
 import { HiCheck } from "react-icons/hi";
 import { mutate } from "swr";
@@ -37,6 +38,10 @@ export function CheckListPage() {
     useState<string>("");
   const [newName, setNewName] = useState("");
   const [newDescription, setNewDescription] = useState("");
+
+  // 編集モーダル用の状態
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editSetId, setEditSetId] = useState<string | null>(null);
 
   // オンボーディングモーダル用の状態
   const [onboardingCompleted, setOnboardingCompleted] = useLocalStorage<boolean>(
@@ -111,6 +116,12 @@ export function CheckListPage() {
     setIsDuplicateModalOpen(true);
   };
 
+  // 編集モーダルを開く処理
+  const handleEditClick = (id: string) => {
+    setEditSetId(id);
+    setIsEditModalOpen(true);
+  };
+
   // 複製確認処理
   const handleDuplicateConfirm = async (name: string, description: string) => {
     if (!selectedChecklistId) return;
@@ -181,6 +192,7 @@ export function CheckListPage() {
         error={error}
         onDelete={handleDelete}
         onDuplicate={handleDuplicateClick} // 複製ハンドラーを渡す
+        onEdit={handleEditClick}
       />
 
       {/* ページネーション */}
@@ -202,6 +214,19 @@ export function CheckListPage() {
           initialName={newName}
           initialDescription={newDescription}
           isLoading={duplicateStatus === "loading"}
+        />
+      )}
+
+      {/* 編集ダイアログ */}
+      {isEditModalOpen && editSetId && (
+        <CheckListSetEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          checkListSetId={editSetId}
+          onSuccess={() => {
+            mutate(getChecklistSetsKey(currentPage, itemsPerPage));
+            refetch();
+          }}
         />
       )}
 

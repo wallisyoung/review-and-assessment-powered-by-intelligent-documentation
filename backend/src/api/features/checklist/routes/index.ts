@@ -5,6 +5,7 @@ import { FastifyInstance } from "fastify";
 import {
   createChecklistItemHandler,
   createChecklistSetHandler,
+  updateChecklistSetHandler,
   deleteChecklistDocumentHandler,
   deleteChecklistItemHandler,
   deleteChecklistSetHandler,
@@ -39,6 +40,11 @@ export function registerChecklistRoutes(fastify: FastifyInstance): void {
   // チェックリストセット作成エンドポイント
   fastify.post("/checklist-sets", {
     handler: createChecklistSetHandler,
+  });
+
+  // チェックリストセット更新エンドポイント
+  fastify.put("/checklist-sets/:setId", {
+    handler: updateChecklistSetHandler,
   });
 
   // チェックリストセット削除エンドポイント

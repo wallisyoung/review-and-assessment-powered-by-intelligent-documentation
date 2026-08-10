@@ -36,6 +36,12 @@ export interface CheckRepository {
     ambiguityFilter?: AmbiguityFilter
   ): Promise<CheckListItemDetail[]>;
   findCheckListSetDetailById(setId: string): Promise<CheckListSetDetailModel>;
+  updateCheckListSet(params: {
+    setId: string;
+    name?: string;
+    description?: string;
+    declaredDocumentTypes?: string[];
+  }): Promise<void>;
   storeCheckListItem(params: { item: CheckListItemEntity }): Promise<void>;
   bulkStoreCheckListItems(params: {
     items: CheckListItemEntity[];
@@ -108,6 +114,29 @@ export const makePrismaCheckRepository = async (
           })),
         },
       },
+    });
+  };
+
+  const updateCheckListSet = async (params: {
+    setId: string;
+    name?: string;
+    description?: string;
+    declaredDocumentTypes?: string[];
+  }): Promise<void> => {
+    const { setId, name, description, declaredDocumentTypes } = params;
+    const data: {
+      name?: string;
+      description?: string;
+      declaredDocumentTypes?: string[];
+    } = {};
+    if (name !== undefined) data.name = name;
+    if (description !== undefined) data.description = description;
+    if (declaredDocumentTypes !== undefined)
+      data.declaredDocumentTypes = declaredDocumentTypes;
+
+    await client.checkListSet.update({
+      where: { id: setId },
+      data,
     });
   };
 
@@ -766,6 +795,7 @@ export const makePrismaCheckRepository = async (
 
   return {
     storeCheckListSet,
+    updateCheckListSet,
     deleteCheckListSetById,
     findAllCheckListSets,
     findCheckListItems,

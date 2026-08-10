@@ -1,6 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import {
   createChecklistSet,
+  updateChecklistSet,
   removeChecklistSet,
   getAllChecklistSets,
   getCheckListDocumentPresignedUrl,
@@ -71,6 +72,41 @@ export const createChecklistSetHandler = async (
   await createChecklistSet({
     req: request.body,
     userId: request.user!.userId,
+  });
+
+  reply.code(200).send({
+    success: true,
+    data: {},
+  });
+};
+
+/**
+ * チェックリストセット更新リクエストの型定義
+ */
+export interface UpdateChecklistSetRequest {
+  Params: {
+    setId: string;
+  };
+  Body: {
+    name?: string;
+    description?: string;
+    declaredDocumentTypes?: string[];
+  };
+}
+
+/**
+ * チェックリストセット更新ハンドラー
+ */
+export const updateChecklistSetHandler = async (
+  request: FastifyRequest<UpdateChecklistSetRequest>,
+  reply: FastifyReply
+): Promise<void> => {
+  await updateChecklistSet({
+    req: {
+      Params: { setId: request.params.setId },
+      Body: request.body,
+    },
+    user: request.user!,
   });
 
   reply.code(200).send({

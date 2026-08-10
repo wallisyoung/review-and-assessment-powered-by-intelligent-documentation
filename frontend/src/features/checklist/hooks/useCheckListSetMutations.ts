@@ -5,6 +5,7 @@ import type {
   CreateChecklistSetResponse,
   DuplicateChecklistSetRequest,
   DuplicateChecklistSetResponse,
+  UpdateChecklistSetRequest,
   DetectAmbiguityResponse,
 } from "../types";
 
@@ -20,13 +21,10 @@ export function useCreateChecklistSet() {
 export function useUpdateChecklistSet() {
   const { mutateAsync, status, error } = useApiClient().useMutation<
     CreateChecklistSetResponse,
-    Omit<CreateChecklistSetRequest, "documents">
+    UpdateChecklistSetRequest
   >("put", "/checklist-sets");
 
-  function updateChecklistSet(
-    id: string,
-    body: Omit<CreateChecklistSetRequest, "documents">
-  ) {
+  function updateChecklistSet(id: string, body: UpdateChecklistSetRequest) {
     return mutateAsync(body, `/checklist-sets/${id}`);
   }
 

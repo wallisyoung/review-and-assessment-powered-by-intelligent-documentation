@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../../../hooks/useAlert";
 import { useTranslation } from "react-i18next";
-import { HiEye, HiTrash, HiLockClosed, HiDuplicate } from "react-icons/hi";
+import { HiEye, HiTrash, HiLockClosed, HiDuplicate, HiPencil } from "react-icons/hi";
 import { CHECK_LIST_STATUS, CheckListSetSummary } from "../types";
 import Table, { TableColumn, TableAction } from "../../../components/Table";
 import StatusBadge from "../../../components/StatusBadge";
@@ -20,6 +20,7 @@ type CheckListSetListProps = {
   error: string | null;
   onDelete: (id: string, name: string) => Promise<void>;
   onDuplicate: (id: string, name: string) => void;
+  onEdit: (id: string) => void;
 };
 
 /**
@@ -31,6 +32,7 @@ export default function CheckListSetList({
   error,
   onDelete,
   onDuplicate,
+  onEdit,
 }: CheckListSetListProps) {
   const { t } = useTranslation();
 
@@ -179,6 +181,15 @@ export default function CheckListSetList({
       icon: <HiDuplicate className="mr-1 h-4 w-4" />,
       label: t("common.duplicate"),
       onClick: (item) => onDuplicate(item.id, item.name),
+      variant: "secondary",
+      outline: true,
+      className: "transition-all duration-200",
+    },
+    {
+      icon: <HiPencil className="mr-1 h-4 w-4" />,
+      label: t("common.edit", "編集"),
+      onClick: (item) => onEdit(item.id),
+      disabled: (item) => !item.isEditable,
       variant: "secondary",
       outline: true,
       className: "transition-all duration-200",

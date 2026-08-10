@@ -45,6 +45,15 @@ export interface CreateChecklistSetRequest {
 }
 
 /**
+ * チェックリストセット更新リクエスト
+ */
+export interface UpdateChecklistSetRequest {
+  name?: string;
+  description?: string;
+  declaredDocumentTypes?: string[];
+}
+
+/**
  * Request type for duplicating a checklist set
  * POST /checklist-sets/:checklistSetId/duplicate
  */

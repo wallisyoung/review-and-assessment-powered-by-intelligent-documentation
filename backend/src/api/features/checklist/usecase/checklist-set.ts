@@ -19,6 +19,7 @@ import {
   ApplicationError,
   FileSizeExceededError,
 } from "../../../core/errors/application-errors";
+import { ValidationError } from "../../../core/errors";
 import { startStateMachineExecution } from "../../../core/sfn";
 import { sendMessage } from "../../../core/sqs";
 import { validateFileSize } from "../../../core/file-validation";
@@ -112,6 +113,81 @@ export const createChecklistSet = async (params: {
     fileName: doc.filename,
     checkListSetId: checkListSet.id,
     userId: params.userId,
+  });
+};
+
+export const updateChecklistSet = async (params: {
+  req: {
+    Params: { setId: string };
+    Body: {
+      name?: string;
+      description?: string;
+      declaredDocumentTypes?: string[];
+    };
+  };
+  user: RequestUser;
+  deps?: {
+    repo?: CheckRepository;
+  };
+}): Promise<void> => {
+  const repo = params.deps?.repo || (await makePrismaCheckRepository());
+  const { setId } = params.req.Params;
+  const { name, description, declaredDocumentTypes } = params.req.Body;
+
+  await assertChecklistSetOwner({
+    user: params.user,
+    checkListSetId: setId,
+    repo,
+    api: "updateChecklistSet",
+    operation: "write",
+  });
+
+  // 使用済み（レビュージョブ存在）のセットは編集不可
+  const isEditable = await repo.checkSetEditable({ setId });
+  if (!isEditable) {
+    throw new ValidationError(
+      "使用済み（レビュージョブが存在する）チェックリストセットは編集できません"
+    );
+  }
+
+  // declaredDocumentTypes からタイプを削除する場合、そのタイプを requiredDocumentTypes で
+  // 参照しているルールがないか検証（あれば削除を拒否）。
+  if (declaredDocumentTypes !== undefined) {
+    const current = await repo.findCheckListSetDetailById(setId);
+    const currentTypes = current.declaredDocumentTypes ?? [];
+    const removed = currentTypes.filter(
+      (t) => !declaredDocumentTypes.includes(t)
+    );
+    if (removed.length > 0) {
+      const items = await repo.findCheckListItems(setId, undefined, true);
+      const blockers = items
+        .filter(
+          (it) =>
+            it.requiredDocumentTypes &&
+            it.requiredDocumentTypes.some((t) => removed.includes(t))
+        )
+        .map((it) => ({
+          name: it.name,
+          types: (it.requiredDocumentTypes ?? []).filter((t) =>
+            removed.includes(t)
+          ),
+        }));
+      if (blockers.length > 0) {
+        const detail = blockers
+          .map((b) => `「${b.name}」(参照: ${b.types.join(", ")})`)
+          .join("; ");
+        throw new ValidationError(
+          `削除対象の文書タイプはルールで使用中のため削除できません。先に該当ルールの requiredDocumentTypes から解除してください: ${detail}`
+        );
+      }
+    }
+  }
+
+  await repo.updateCheckListSet({
+    setId,
+    name,
+    description,
+    declaredDocumentTypes,
   });
 };
 
