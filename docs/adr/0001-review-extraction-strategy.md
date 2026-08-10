@@ -13,3 +13,16 @@
 - `書類OCRデータ` は本プロジェクトのモデルに登場しない（概念を廃止）。
 - `review-item-processor` の既存 `code_interpreter` ツール（`tools/code_interpreter.py`）と `ToolConfiguration.codeInterpreter` を正規化用途で有効化する方向で検討する。
 - 正規化ヘルパーの対象範囲（全規則 vs 正規化重視規則のみ）・比較をコードで行うか LLM で行うかは、後続の設計で確定する。
+
+## 改訂（2026-08-10）：登記パスの画像は直接埋め込みに変更
+
+当初の「PDF=document block / 画像=image_reader」という分離は、**画像の読み込みを model のツール呼び出し（自由裁量）に依存**していた。このため複数書類を跨ぐ比較ルールで「model が image_reader を1回しか呼ばず、2枚目の画像が永遠に context に入らない」事象が発生した（正解率ではなくデータ到達性の欠陥）。
+
+**変更**（登記 `touki` パスのみ、`_run_touki_agent`）:
+
+- 必要なスキャンは**すべて content block として直接埋め込む**。PDF は従来通り `document` block、画像は `image` block（`{"image": {"format": ..., "source": {"bytes": ...}}}`）で同じ content リストに並べ、末尾に prompt text を置く。混合アップロード（PDF + 画像）も1リストで処理できる。
+- 各ブロック直前に `[添付i・画像・文書タイプ「…」]` / `[添付i・PDF・文書タイプ「…」]` ラベルを挟み、model が各スキャンを確実に識別できるようにする（`file_paths[i]` ↔ `documents[i].document_type` の整列を前提）。
+- `file_read` / `image_reader` は touki パスの tools から**除外**（不要）。model が呼べるのは正規化ツール（+ custom tools）のみ。
+- `build_touki_review_prompt` の「関連文書のみ読取」指示を撤回し、「添付書類はすべて本ルールに必要、すべて確認せよ」に変更（pre-review-item.ts が `requiredDocumentTypes` で部分投入済みのため、ここに来る文書はすべて関連する）。
+
+**適用範囲**: 登記（複合レビュー）パスのみ。汎用の単一画像レビュー（`_run_agent_with_file_read_tool` + `get_image_review_prompt`、Nova + bbox 想定）は従来通り `image_reader` を維持する。

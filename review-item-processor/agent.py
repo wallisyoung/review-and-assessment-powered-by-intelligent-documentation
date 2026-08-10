@@ -389,7 +389,7 @@ def _execute_review_core(
 
 def _run_touki_agent(
     file_paths: list[str],
-    has_images: bool,
+    documents: list[ToukiDocument],
     model_id: str,
     system_prompt: str,
     prompt: str,
@@ -397,8 +397,10 @@ def _run_touki_agent(
 ):
     """登記審査用に Strands Agent を構築して実行し、(response, meta_tracker, history) を返す。
 
-    既存の _run_agent_with_document_block / _run_agent_with_file_read_tool と同じ構築パターンだが、
-    それらを変更せず新設する（既存 PDF/IMAGE パスへの回帰リスクを避けるため）。
+    ADR-0001 (改訂): 必要なファイルはすべて content block として直接埋め込む
+    （PDF→document block、画像→image block）。image_reader/file_read には頼らない。
+    ``file_paths[i]`` と ``documents[i].document_type`` は同じ順序で対応する前提
+    （呼び出し元の ``_execute_touki_review`` で index 整列を保証）。
     """
     model = ModelConfig.create(model_id)
     meta_tracker = ReviewMetaTracker(model_id)
@@ -417,19 +419,45 @@ def _run_touki_agent(
         bedrock_config["cache_prompt"] = "default"
         bedrock_config["cache_tools"] = "default"
 
-    use_document_block = _should_use_document_block(file_paths, model_id, has_images)
+    # ADR-0001 (改訂): 全ファイルを content block として直接埋め込む。
+    # pre-review-item.ts が requiredDocumentTypes で既に部分投入済みなので、
+    # ここに来るファイルはすべて本ルールに関連する。よって model に「関連文書だけ
+    # 読め」と委ねる必要はなく、全件を確実に上下文へ載せる。
+    # 各ブロック直前に文書タイプラベルを挟み、LLM が各スキャンを識別できるようにする。
+    image_exts = {e.lstrip(".").lower() for e in IMAGE_FILE_EXTENSIONS}
+    supported_image_formats = {"png", "jpeg", "gif", "webp"}  # Bedrock Converse 受付フォーマット
 
-    if use_document_block:
-        # PDF を document block として埋め込み
-        content = []
-        for file_path in file_paths:
-            try:
-                with open(file_path, "rb") as f:
-                    file_bytes = f.read()
-            except Exception as e:
-                logger.error(f"[TOUKI] Failed to read file {file_path}: {e}")
-                continue
-            sanitized_name = sanitize_file_name(os.path.basename(file_path))
+    content: list[dict[str, Any]] = []
+    for i, file_path in enumerate(file_paths):
+        try:
+            with open(file_path, "rb") as f:
+                file_bytes = f.read()
+        except Exception as e:
+            logger.error(f"[TOUKI] Failed to read file {file_path}: {e}")
+            continue
+
+        doc_type = documents[i].document_type if i < len(documents) else "(不明)"
+        ext = os.path.splitext(file_path)[1].lower().lstrip(".")
+        base_name = os.path.basename(file_path)
+
+        if ext in image_exts:
+            # 画像 → image block（jpg は jpeg に正規化）
+            image_format = "jpeg" if ext == "jpg" else ext
+            if image_format not in supported_image_formats:
+                logger.warning(
+                    f"[TOUKI] Image format '{ext}' ({base_name}) may be unsupported "
+                    f"by Bedrock Converse (supported: {sorted(supported_image_formats)})"
+                )
+            content.append({"text": f"[添付{i + 1}・画像・文書タイプ「{doc_type}」]"})
+            content.append(
+                {"image": {"format": image_format, "source": {"bytes": file_bytes}}}
+            )
+        else:
+            # PDF 等 → document block（citations は touki では無効）
+            sanitized_name = sanitize_file_name(base_name)
+            content.append(
+                {"text": f"[添付{i + 1}・PDF・文書タイプ「{doc_type}」・ファイル {base_name}]"}
+            )
             content.append(
                 {
                     "document": {
@@ -440,30 +468,22 @@ def _run_touki_agent(
                     }
                 }
             )
-        content.append({"text": prompt})
-        tools = custom_tools + norm_tools
-        agent = Agent(
-            model=BedrockModel(**bedrock_config),
-            tools=tools,
-            system_prompt=system_prompt,
-            hooks=[history_collector],
-        )
-        logger.debug("[TOUKI] Executing agent with document block")
-        response = agent(content)
-    else:
-        # file_read / image_reader ツールで読取
-        base_tools = ([file_read, image_reader] if has_images else [file_read])
-        tools = base_tools + custom_tools + norm_tools
-        files_prompt = "\n".join([f"- '{fp}'" for fp in file_paths])
-        full_prompt = f"{prompt}\n\nPlease analyze the following files:\n{files_prompt}"
-        agent = Agent(
-            model=BedrockModel(**bedrock_config),
-            tools=tools,
-            system_prompt=system_prompt,
-            hooks=[history_collector],
-        )
-        logger.debug("[TOUKI] Executing agent with file_read/image_reader tools")
-        response = agent(full_prompt)
+
+    content.append({"text": prompt})
+
+    # ファイルは埋め込み済みなので file_read/image_reader は不要。
+    # LLM が呼べるのは正規化ツール（+ custom tools）のみ。
+    tools = custom_tools + norm_tools
+    agent = Agent(
+        model=BedrockModel(**bedrock_config),
+        tools=tools,
+        system_prompt=system_prompt,
+        hooks=[history_collector],
+    )
+    logger.debug(
+        f"[TOUKI] Executing agent with {len(file_paths)} file(s) embedded as content blocks"
+    )
+    response = agent(content)
 
     return response, meta_tracker, history_collector
 
@@ -505,7 +525,7 @@ def _execute_touki_review(
     def model_fn(prompt: str, _docs) -> Any:
         response, meta_tracker, history = _run_touki_agent(
             file_paths=file_paths,
-            has_images=has_images,
+            documents=docs,
             model_id=model_id,
             system_prompt=system_prompt,
             prompt=prompt,

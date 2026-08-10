@@ -58,7 +58,7 @@ You judge ONE 比較ルール (comparison rule) at a time, comparing fields acro
 
 ## スキャン書類（文書タイプ別・添付ファイル）
 {docs_section}
-読み取りは本ルールに関連する文書のみを対象とすること（PDF は document block、画像は image_reader を使用）。
+投入されたスキャン書類はすべて本メッセージ内に content block として添付済み（PDF=document block、画像=image block）。各ブロック直前の「文書タイプ」ラベルで識別できる。追加の読取ツール（file_read / image_reader）は不要・使用不可。本ルールの判定に必要な書類はすべて添付されているため、**添付された各書類を必ずすべて確認すること**（対象外の書類は投入されていない）。
 
 ## 案件情報（システム抽出データ）
 {case_section}
