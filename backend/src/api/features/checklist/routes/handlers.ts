@@ -353,12 +353,13 @@ export const updateChecklistItemHandler = async (
   reply: FastifyReply
 ): Promise<void> => {
   const { setId, itemId } = request.params;
-  const { name, description, resolveAmbiguity } = request.body;
+  const { name, description, resolveAmbiguity, requiredDocumentTypes } =
+    request.body;
 
   await modifyCheckListItem({
     req: {
       Params: { setId, itemId },
-      Body: { name, description, resolveAmbiguity },
+      Body: { name, description, resolveAmbiguity, requiredDocumentTypes },
     },
     user: request.user!,
   });
