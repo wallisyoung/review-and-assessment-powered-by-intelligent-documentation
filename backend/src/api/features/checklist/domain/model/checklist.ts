@@ -265,6 +265,7 @@ export const CheckListItemDomain = {
       description: prismaItem.description ?? undefined,
       parentId: prismaItem.parentId ?? undefined,
       modelId: prismaItem.modelId ?? undefined,
+      toolConfigurationId: prismaItem.toolConfigurationId ?? undefined,
       requiredDocumentTypes:
         (prismaItem.requiredDocumentTypes as string[] | undefined) ?? undefined,
       feedbackSummary: prismaItem.feedbackSummary ?? undefined,
