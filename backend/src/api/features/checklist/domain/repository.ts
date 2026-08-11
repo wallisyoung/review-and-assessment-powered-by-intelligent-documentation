@@ -628,6 +628,8 @@ export const makePrismaCheckRepository = async (
           parentId: item.parentId,
           checkListSetId: item.setId,
           requiredDocumentTypes: item.requiredDocumentTypes ?? undefined,
+          modelId: item.modelId,
+          toolConfigurationId: item.toolConfigurationId,
         })),
       });
     } catch (error) {
