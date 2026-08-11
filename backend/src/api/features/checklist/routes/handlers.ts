@@ -8,6 +8,8 @@ import {
   getChecklistItems,
   getChecklistSetById,
   duplicateChecklistSet,
+  exportChecklistSet,
+  importChecklistSet,
   startAmbiguityDetection,
 } from "../usecase/checklist-set";
 import { deleteS3Object } from "../../../core/s3";
@@ -112,6 +114,49 @@ export const updateChecklistSetHandler = async (
   reply.code(200).send({
     success: true,
     data: {},
+  });
+};
+
+/**
+ * チェックリストセット エクスポートハンドラー
+ */
+export const exportChecklistSetHandler = async (
+  request: FastifyRequest<{ Params: { setId: string } }>,
+  reply: FastifyReply
+): Promise<void> => {
+  const data = await exportChecklistSet({
+    setId: request.params.setId,
+    user: request.user!,
+  });
+
+  reply.code(200).send({
+    success: true,
+    data,
+  });
+};
+
+/**
+ * チェックリストセット インポートリクエストの型定義
+ */
+export interface ImportChecklistSetRequest {
+  Body: unknown;
+}
+
+/**
+ * チェックリストセット インポートハンドラー
+ */
+export const importChecklistSetHandler = async (
+  request: FastifyRequest<ImportChecklistSetRequest>,
+  reply: FastifyReply
+): Promise<void> => {
+  const { setId } = await importChecklistSet({
+    data: request.body,
+    user: request.user!,
+  });
+
+  reply.code(200).send({
+    success: true,
+    data: { setId },
   });
 };
 

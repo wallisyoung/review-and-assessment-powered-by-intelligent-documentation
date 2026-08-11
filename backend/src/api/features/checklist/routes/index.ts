@@ -16,6 +16,8 @@ import {
   updateChecklistItemHandler,
   getAllChecklistSetsHandler,
   duplicateChecklistSetHandler,
+  exportChecklistSetHandler,
+  importChecklistSetHandler,
   detectAmbiguityHandler,
   bulkAssignToolConfigurationHandler,
   getAvailableModelsHandler,
@@ -55,6 +57,16 @@ export function registerChecklistRoutes(fastify: FastifyInstance): void {
   // チェックリストセット複製エンドポイント
   fastify.post("/checklist-sets/:checklistSetId/duplicate", {
     handler: duplicateChecklistSetHandler,
+  });
+
+  // チェックリストセット エクスポートエンドポイント
+  fastify.get("/checklist-sets/:setId/export", {
+    handler: exportChecklistSetHandler,
+  });
+
+  // チェックリストセット インポートエンドポイント
+  fastify.post("/checklist-sets/import", {
+    handler: importChecklistSetHandler,
   });
 
   // チェックリストドキュメントpresigned-url取得エンドポイント

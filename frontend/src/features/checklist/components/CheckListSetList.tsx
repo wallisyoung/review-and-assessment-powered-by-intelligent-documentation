@@ -2,7 +2,14 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAlert } from "../../../hooks/useAlert";
 import { useTranslation } from "react-i18next";
-import { HiEye, HiTrash, HiLockClosed, HiDuplicate, HiPencil } from "react-icons/hi";
+import {
+  HiEye,
+  HiTrash,
+  HiLockClosed,
+  HiDuplicate,
+  HiPencil,
+  HiDownload,
+} from "react-icons/hi";
 import { CHECK_LIST_STATUS, CheckListSetSummary } from "../types";
 import Table, { TableColumn, TableAction } from "../../../components/Table";
 import StatusBadge from "../../../components/StatusBadge";
@@ -21,6 +28,7 @@ type CheckListSetListProps = {
   onDelete: (id: string, name: string) => Promise<void>;
   onDuplicate: (id: string, name: string) => void;
   onEdit: (id: string) => void;
+  onExport: (id: string, name: string) => void;
 };
 
 /**
@@ -33,6 +41,7 @@ export default function CheckListSetList({
   onDelete,
   onDuplicate,
   onEdit,
+  onExport,
 }: CheckListSetListProps) {
   const { t } = useTranslation();
 
@@ -181,6 +190,14 @@ export default function CheckListSetList({
       icon: <HiDuplicate className="mr-1 h-4 w-4" />,
       label: t("common.duplicate"),
       onClick: (item) => onDuplicate(item.id, item.name),
+      variant: "secondary",
+      outline: true,
+      className: "transition-all duration-200",
+    },
+    {
+      icon: <HiDownload className="mr-1 h-4 w-4" />,
+      label: t("checklist.export", "エクスポート"),
+      onClick: (item) => onExport(item.id, item.name),
       variant: "secondary",
       outline: true,
       className: "transition-all duration-200",

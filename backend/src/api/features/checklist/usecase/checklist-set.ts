@@ -5,6 +5,8 @@ import {
 } from "../domain/repository";
 import {
   CheckListSetDomain,
+  CheckListSetEntity,
+  CheckListItemEntity,
   CheckListItemDetail,
   CheckListSetSummary,
   CheckListSetDetailModel,
@@ -13,6 +15,9 @@ import {
 } from "../domain/model/checklist";
 import { PaginatedResponse } from "../../../common/types";
 import { ulid } from "ulid";
+import { z } from "zod";
+import { makePrismaToolConfigurationRepository } from "../../tool-configuration/domain/repository";
+import { getAvailableModels as getAvailableModelsFromEnv } from "../domain/model/available-models";
 import { getPresignedUrl, getS3ObjectSize } from "../../../core/s3";
 import { getChecklistOriginalKey } from "../../../../checklist-workflow/common/storage-paths";
 import {
@@ -191,6 +196,51 @@ export const updateChecklistSet = async (params: {
   });
 };
 
+/**
+ * チェックリスト項目を階層順（親→子）で一括保存する。
+ * 親IDのFK制約上、親が先に存在する必要があるためレベルごとに挿入する。
+ * duplicate / import で共有。
+ */
+const persistItemsInHierarchy = async (
+  repo: CheckRepository,
+  items: CheckListItemEntity[]
+): Promise<void> => {
+  if (items.length === 0) return;
+
+  const itemsByLevel = new Map<number, CheckListItemEntity[]>();
+  const rootItems = items.filter((item) => !item.parentId);
+  itemsByLevel.set(0, rootItems);
+
+  const processedIds = new Set(rootItems.map((item) => item.id));
+  let remainingItems = items.filter((item) => item.parentId);
+  let currentLevel = 0;
+
+  while (remainingItems.length > 0) {
+    currentLevel++;
+    const currentLevelItems = remainingItems.filter(
+      (item) => item.parentId && processedIds.has(item.parentId)
+    );
+    if (currentLevelItems.length === 0) {
+      console.error(
+        `[Warning] Possible circular reference detected in checklist items. Unable to process ${remainingItems.length} items with parent references.`
+      );
+      break;
+    }
+    itemsByLevel.set(currentLevel, currentLevelItems);
+    currentLevelItems.forEach((item) => processedIds.add(item.id));
+    remainingItems = remainingItems.filter(
+      (item) => !currentLevelItems.includes(item)
+    );
+  }
+
+  for (let level = 0; level <= currentLevel; level++) {
+    const levelItems = itemsByLevel.get(level) || [];
+    if (levelItems.length > 0) {
+      await repo.bulkStoreCheckListItems({ items: levelItems });
+    }
+  }
+};
+
 export const duplicateChecklistSet = async (params: {
   sourceCheckListSetId: string;
   newName?: string;
@@ -250,59 +300,167 @@ export const duplicateChecklistSet = async (params: {
     toolConfigurationId: item.toolConfigurationId,
   }));
 
-  // 7. 新しいチェックリスト項目を階層順に保存
-  if (newItems.length > 0) {
-    // 階層レベルごとにグループ化
-    const itemsByLevel = new Map<number, (typeof newItems)[0][]>();
+  // 7. 新しいチェックリスト項目を階層順に保存（親→子）
+  await persistItemsInHierarchy(repo, newItems);
+};
 
-    // 最初に親IDがnullのアイテム（最上位）を設定
-    const rootItems = newItems.filter((item) => !item.parentId);
-    itemsByLevel.set(0, rootItems);
+// =========================================================================
+// Export / Import（reviewset 設定の持ち出し・取り込み）
+// =========================================================================
 
-    // 処理済みの親IDを追跡
-    const processedIds = new Set(rootItems.map((item) => item.id));
+export type ExportedChecklistSet = {
+  format: string;
+  version: number;
+  set: {
+    name: string;
+    description: string;
+    declaredDocumentTypes?: string[];
+  };
+  items: Array<{
+    id: string;
+    parentId: string | null;
+    name: string;
+    description: string;
+    requiredDocumentTypes?: string[];
+    modelId?: string;
+    toolConfigurationId?: string;
+  }>;
+};
 
-    // 残りのアイテム
-    let remainingItems = newItems.filter((item) => item.parentId);
-    let currentLevel = 0;
+/**
+ * チェックリストセットの設定（set メタデータ + items ツリー + 逐項設定）を
+ * エクスポート用 JSON として直列化する。ドキュメント/審査結果は含まない。
+ */
+export const exportChecklistSet = async (params: {
+  setId: string;
+  user: RequestUser;
+  deps?: { repo?: CheckRepository };
+}): Promise<ExportedChecklistSet> => {
+  const repo = params.deps?.repo || (await makePrismaCheckRepository());
+  const { setId } = params;
 
-    // 残りのアイテムがなくなるか、処理できなくなるまで繰り返し
-    while (remainingItems.length > 0) {
-      currentLevel++;
+  await assertChecklistSetOwner({
+    user: params.user,
+    checkListSetId: setId,
+    repo,
+    api: "exportChecklistSet",
+    operation: "read",
+  });
 
-      // 親IDが既に処理されたアイテムだけを選択
-      const currentLevelItems = remainingItems.filter(
-        (item) => item.parentId && processedIds.has(item.parentId)
-      );
+  const setDetail = await repo.findCheckListSetDetailById(setId);
+  const items = await repo.findCheckListItems(setId, undefined, true);
 
-      // 処理できるアイテムがなくなったら中断
-      if (currentLevelItems.length === 0) {
-        console.error(`[Warning] Possible circular reference detected in checklist items.
-          Unable to process ${remainingItems.length} items with parent references.`);
-        break;
-      }
+  return {
+    format: "rapid-checklist-set",
+    version: 1,
+    set: {
+      name: setDetail.name,
+      description: setDetail.description || "",
+      declaredDocumentTypes: setDetail.declaredDocumentTypes,
+    },
+    items: items.map((it) => ({
+      id: it.id,
+      parentId: it.parentId ?? null,
+      name: it.name,
+      description: it.description || "",
+      requiredDocumentTypes: it.requiredDocumentTypes,
+      modelId: it.modelId,
+      toolConfigurationId: it.toolConfigurationId,
+    })),
+  };
+};
 
-      // このレベルのアイテムを設定
-      itemsByLevel.set(currentLevel, currentLevelItems);
+const ImportChecklistSetSchema = z.object({
+  format: z.string(),
+  version: z.number(),
+  set: z.object({
+    name: z.string().min(1),
+    description: z.string().optional().default(""),
+    declaredDocumentTypes: z.array(z.string()).optional(),
+  }),
+  items: z.array(
+    z.object({
+      id: z.string(),
+      parentId: z.string().nullable().optional(),
+      name: z.string().min(1),
+      description: z.string().optional().default(""),
+      requiredDocumentTypes: z.array(z.string()).optional(),
+      modelId: z.string().optional(),
+      toolConfigurationId: z.string().optional(),
+    })
+  ),
+});
 
-      // 処理済みIDを更新
-      currentLevelItems.forEach((item) => processedIds.add(item.id));
+/**
+ * エクスポート済み JSON から新しいチェックリストセットを取り込む。
+ * - ドキュメント処理は行わない（テンプレートとして新規作成）。
+ * - modelId / toolConfigurationId は現環境に存在する場合のみ引き継ぐ（無ければ除去）。
+ * - items は新しい id で再構築し、parentId を旧id→新id でリマップして階層を復元。
+ */
+export const importChecklistSet = async (params: {
+  data: unknown;
+  user: RequestUser;
+  deps?: { repo?: CheckRepository };
+}): Promise<{ setId: string }> => {
+  const repo = params.deps?.repo || (await makePrismaCheckRepository());
 
-      // 残りのアイテムを更新
-      remainingItems = remainingItems.filter(
-        (item) => !currentLevelItems.includes(item)
-      );
-    }
-
-    // レベル順に保存
-    for (let level = 0; level <= currentLevel; level++) {
-      const levelItems = itemsByLevel.get(level) || [];
-      if (levelItems.length > 0) {
-        // このレベルのアイテムをバルク保存
-        await repo.bulkStoreCheckListItems({ items: levelItems });
-      }
-    }
+  let parsed;
+  try {
+    parsed = ImportChecklistSetSchema.parse(params.data);
+  } catch (e) {
+    throw new ValidationError(
+      `Invalid checklist set import file: ${(e as Error).message}`
+    );
   }
+  const { set: setInput, items: inputItems } = parsed;
+
+  // 参照先の妥当性チェック用: 現環境の有効なモデル ID と ツール設定 ID
+  const validModelIds = new Set(
+    getAvailableModelsFromEnv().map((m) => m.modelId)
+  );
+  const toolRepo = await makePrismaToolConfigurationRepository();
+  const validToolConfigIds = new Set(
+    (await toolRepo.findAll()).map((c) => c.id)
+  );
+
+  // 新しい set を作成（ドキュメント処理なしのテンプレート）
+  const newSetId = ulid();
+  const newSet: CheckListSetEntity = {
+    id: newSetId,
+    name: setInput.name,
+    description: setInput.description,
+    documents: [],
+    declaredDocumentTypes: setInput.declaredDocumentTypes,
+    createdAt: new Date(),
+  };
+  await repo.storeCheckListSet({
+    checkListSet: newSet,
+    ownerUserId: params.user.userId,
+  });
+
+  // items を新しい id で再構築。parentId は旧id→新id でリマップ。
+  const idMapping = new Map<string, string>();
+  inputItems.forEach((it) => idMapping.set(it.id, ulid()));
+
+  const newItems: CheckListItemEntity[] = inputItems.map((it) => ({
+    id: idMapping.get(it.id)!,
+    setId: newSetId,
+    name: it.name,
+    description: it.description || "",
+    parentId: it.parentId ? idMapping.get(it.parentId) : undefined,
+    requiredDocumentTypes: it.requiredDocumentTypes,
+    // 参照先が現環境に無ければ除外（FK 違反・無効参照を防ぐ）
+    modelId:
+      it.modelId && validModelIds.has(it.modelId) ? it.modelId : undefined,
+    toolConfigurationId:
+      it.toolConfigurationId && validToolConfigIds.has(it.toolConfigurationId)
+        ? it.toolConfigurationId
+        : undefined,
+  }));
+
+  await persistItemsInHierarchy(repo, newItems);
+
+  return { setId: newSetId };
 };
 
 export const removeChecklistSet = async (params: {

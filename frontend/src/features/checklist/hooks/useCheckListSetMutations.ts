@@ -1,4 +1,6 @@
 import { useApiClient } from "../../../hooks/useApiClient";
+import useHttp from "../../../hooks/useHttp";
+import type { ApiResponse } from "../../../types/api";
 import { mutate } from "swr";
 import type {
   CreateChecklistSetRequest,
@@ -6,6 +8,7 @@ import type {
   DuplicateChecklistSetRequest,
   DuplicateChecklistSetResponse,
   UpdateChecklistSetRequest,
+  ExportedChecklistSet,
   DetectAmbiguityResponse,
 } from "../types";
 
@@ -58,6 +61,50 @@ export function useDuplicateChecklistSet() {
   }
 
   return { duplicateChecklistSet, status, error };
+}
+
+/**
+ * チェックリストセット エクスポート（JSON ダウンロード）
+ */
+export function useExportChecklistSet() {
+  const http = useHttp();
+
+  const exportChecklistSet = async (id: string, name: string) => {
+    const res = await http.getOnce<ApiResponse<ExportedChecklistSet>>(
+      `/checklist-sets/${id}/export`
+    );
+    const exported = res.data.data;
+    const blob = new Blob([JSON.stringify(exported, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const safeName = (name || "checklist-set").replace(/[\\/:*?"<>|]/g, "_");
+    a.download = `${safeName}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return { exportChecklistSet };
+}
+
+/**
+ * チェックリストセット インポート
+ */
+export function useImportChecklistSet() {
+  const { mutateAsync, status, error } = useApiClient().useMutation<
+    { setId: string },
+    unknown
+  >("post", "/checklist-sets/import");
+
+  function importChecklistSet(data: unknown) {
+    return mutateAsync(data);
+  }
+
+  return { importChecklistSet, status, error };
 }
 
 /**

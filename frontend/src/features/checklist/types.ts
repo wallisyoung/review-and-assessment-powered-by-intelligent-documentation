@@ -54,6 +54,28 @@ export interface UpdateChecklistSetRequest {
 }
 
 /**
+ * エクスポート/インポート用のチェックリストセット JSON 形式
+ */
+export interface ExportedChecklistSet {
+  format: string;
+  version: number;
+  set: {
+    name: string;
+    description?: string;
+    declaredDocumentTypes?: string[];
+  };
+  items: Array<{
+    id: string;
+    parentId: string | null;
+    name: string;
+    description?: string;
+    requiredDocumentTypes?: string[];
+    modelId?: string;
+    toolConfigurationId?: string;
+  }>;
+}
+
+/**
  * Request type for duplicating a checklist set
  * POST /checklist-sets/:checklistSetId/duplicate
  */

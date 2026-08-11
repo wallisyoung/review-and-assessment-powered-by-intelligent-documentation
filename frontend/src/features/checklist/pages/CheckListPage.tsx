@@ -5,14 +5,17 @@ import { useChecklistSets } from "../hooks/useCheckListSetQueries";
 import {
   useDeleteChecklistSet,
   useDuplicateChecklistSet,
+  useExportChecklistSet,
 } from "../hooks/useCheckListSetMutations";
 import { useToast } from "../../../contexts/ToastContext";
+import Button from "../../../components/Button";
 import CheckListSetList from "../components/CheckListSetList";
 import CreateChecklistButton from "../components/CreateChecklistButton";
 import DuplicateChecklistModal from "../components/DuplicateChecklistModal";
+import CheckListSetImportModal from "../components/CheckListSetImportModal";
 import CheckListSetEditModal from "../components/CheckListSetEditModal";
 import Pagination from "../../../components/Pagination";
-import { HiCheck } from "react-icons/hi";
+import { HiCheck, HiUpload } from "react-icons/hi";
 import { mutate } from "swr";
 import { getChecklistSetsKey } from "../hooks/useCheckListSetQueries";
 import { OnboardingModal } from "../../examples";
@@ -43,6 +46,9 @@ export function CheckListPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editSetId, setEditSetId] = useState<string | null>(null);
 
+  // インポートモーダル用の状態
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
   // オンボーディングモーダル用の状態
   const [onboardingCompleted, setOnboardingCompleted] = useLocalStorage<boolean>(
     "onboarding_completed",
@@ -70,6 +76,7 @@ export function CheckListPage() {
   // 複製フックを追加
   const { duplicateChecklistSet, status: duplicateStatus } =
     useDuplicateChecklistSet();
+  const { exportChecklistSet } = useExportChecklistSet();
 
   // 画面表示時またはlocationが変わった時にデータを再取得
   useEffect(() => {
@@ -120,6 +127,23 @@ export function CheckListPage() {
   const handleEditClick = (id: string) => {
     setEditSetId(id);
     setIsEditModalOpen(true);
+  };
+
+  // エクスポート処理
+  const handleExport = async (id: string, name: string) => {
+    try {
+      await exportChecklistSet(id, name);
+      addToast(t("checklist.exportSuccess"), "success");
+    } catch (error) {
+      console.error("エクスポートに失敗しました", error);
+      addToast(t("checklist.exportError"), "error");
+    }
+  };
+
+  // インポート完了後の再取得
+  const handleImported = () => {
+    mutate(getChecklistSetsKey(currentPage, itemsPerPage));
+    refetch();
   };
 
   // 複製確認処理
@@ -183,7 +207,16 @@ export function CheckListPage() {
             {t("checklist.description")}
           </p>
         </div>
-        <CreateChecklistButton />
+        <div className="flex items-center space-x-3">
+          <Button
+            outline
+            type="button"
+            onClick={() => setIsImportModalOpen(true)}>
+            <HiUpload className="mr-1 h-4 w-4" />
+            {t("checklist.import")}
+          </Button>
+          <CreateChecklistButton />
+        </div>
       </div>
 
       <CheckListSetList
@@ -193,6 +226,7 @@ export function CheckListPage() {
         onDelete={handleDelete}
         onDuplicate={handleDuplicateClick} // 複製ハンドラーを渡す
         onEdit={handleEditClick}
+        onExport={handleExport}
       />
 
       {/* ページネーション */}
@@ -227,6 +261,15 @@ export function CheckListPage() {
             mutate(getChecklistSetsKey(currentPage, itemsPerPage));
             refetch();
           }}
+        />
+      )}
+
+      {/* インポートダイアログ */}
+      {isImportModalOpen && (
+        <CheckListSetImportModal
+          isOpen={isImportModalOpen}
+          onClose={() => setIsImportModalOpen(false)}
+          onImported={handleImported}
         />
       )}
 
