@@ -89,11 +89,8 @@ export default function CheckListSetEditModal({
       onClose();
     } catch (err) {
       console.error("チェックリストセットの更新に失敗しました", err);
-      const msg =
-        (err as { response?: { data?: { error?: string } }; message?: string })
-          ?.response?.data?.error ??
-        (err as { message?: string })?.message ??
-        t("checklist.editSetUpdateError");
+      const e = err as { data?: { error?: string }; message?: string };
+      const msg = e?.data?.error ?? e?.message ?? t("checklist.editSetUpdateError");
       setError(msg);
       addToast(t("checklist.editSetUpdateErrorToast"), "error");
     } finally {

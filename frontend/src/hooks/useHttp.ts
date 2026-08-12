@@ -38,7 +38,9 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
     }
 
     const errorData = await response.json().catch(() => ({}));
-    const error = new Error(errorData.message || response.statusText);
+    const error = new Error(
+      errorData.error || errorData.message || response.statusText
+    );
     throw Object.assign(error, {
       status: response.status,
       response,

@@ -17,7 +17,10 @@ import CheckListSetEditModal from "../components/CheckListSetEditModal";
 import Pagination from "../../../components/Pagination";
 import { HiCheck, HiUpload } from "react-icons/hi";
 import { mutate } from "swr";
-import { getChecklistSetsKey } from "../hooks/useCheckListSetQueries";
+import {
+  getChecklistSetsKey,
+  getChecklistSetKey,
+} from "../hooks/useCheckListSetQueries";
 import { OnboardingModal } from "../../examples";
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
 
@@ -259,6 +262,7 @@ export function CheckListPage() {
           checkListSetId={editSetId}
           onSuccess={() => {
             mutate(getChecklistSetsKey(currentPage, itemsPerPage));
+            mutate(getChecklistSetKey(editSetId));
             refetch();
           }}
         />
