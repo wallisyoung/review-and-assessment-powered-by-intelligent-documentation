@@ -8,3 +8,16 @@
 *.bat text eol=crlf
 *.cmd text eol=crlf
 *.reg text eol=crlf
+
+# --- deploy source export: 開発用リソースを git archive から除外（開発作業・checkout/clone には無影響）---
+.claude/**                            export-ignore
+.agents/**                            export-ignore
+docs/**                               export-ignore
+logs/**                               export-ignore
+review-item-processor/fixtures/**     export-ignore
+CLAUDE.md                             export-ignore
+CONTEXT.md                            export-ignore
+MyNeeds.md                            export-ignore
+skills-lock.json                      export-ignore
+touki-check-data.json                 export-ignore
+touki-check-propmt_02.md              export-ignore
