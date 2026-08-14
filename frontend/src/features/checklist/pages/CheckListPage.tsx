@@ -53,10 +53,8 @@ export function CheckListPage() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // オンボーディングモーダル用の状態
-  const [onboardingCompleted, setOnboardingCompleted] = useLocalStorage<boolean>(
-    "onboarding_completed",
-    false
-  );
+  const [onboardingCompleted, setOnboardingCompleted] =
+    useLocalStorage<boolean>("onboarding_completed", false);
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
 
   const {

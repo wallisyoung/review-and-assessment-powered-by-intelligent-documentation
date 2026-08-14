@@ -44,7 +44,10 @@ export default function CheckListSetEditModal({
     if (checklistSet) {
       setName(checklistSet.name || "");
       setDescription(checklistSet.description || "");
-      setDocTypes((checklistSet as { declaredDocumentTypes?: string[] })?.declaredDocumentTypes ?? []);
+      setDocTypes(
+        (checklistSet as { declaredDocumentTypes?: string[] })
+          ?.declaredDocumentTypes ?? []
+      );
       setError("");
       setNewType("");
     }
@@ -90,7 +93,8 @@ export default function CheckListSetEditModal({
     } catch (err) {
       console.error("チェックリストセットの更新に失敗しました", err);
       const e = err as { data?: { error?: string }; message?: string };
-      const msg = e?.data?.error ?? e?.message ?? t("checklist.editSetUpdateError");
+      const msg =
+        e?.data?.error ?? e?.message ?? t("checklist.editSetUpdateError");
       setError(msg);
       addToast(t("checklist.editSetUpdateErrorToast"), "error");
     } finally {
@@ -106,7 +110,7 @@ export default function CheckListSetEditModal({
       size="2xl">
       <form onSubmit={handleSubmit}>
         {error && (
-          <div className="mb-4 rounded-md border border-red bg-red/10 p-3 text-red whitespace-normal break-words">
+          <div className="mb-4 whitespace-normal break-words rounded-md border border-red bg-red/10 p-3 text-red">
             {error}
           </div>
         )}
@@ -188,7 +192,10 @@ export default function CheckListSetEditModal({
                 }
               }}
               className="flex-1 rounded-md border border-light-gray px-4 py-2 focus:outline-none focus:ring-2 focus:ring-aws-sea-blue-light"
-              placeholder={t("checklist.editSetDocTypePlaceholder", "新しい文書タイプ名")}
+              placeholder={t(
+                "checklist.editSetDocTypePlaceholder",
+                "新しい文書タイプ名"
+              )}
             />
             <Button
               type="button"
