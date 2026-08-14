@@ -125,8 +125,8 @@ export function Table<T>({
                     </td>
                   ))}
                   {actions && actions.length > 0 && (
-                    <td className="whitespace-nowrap px-6 py-4 text-sm">
-                      <div className="flex items-center justify-end space-x-3">
+                    <td className="px-6 py-4 text-sm max-w-[17rem]">
+                      <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
                         {actions
                           .filter((action) =>
                             action.show ? action.show(item) : true
