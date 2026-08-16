@@ -67,6 +67,7 @@ function extractIsAdmin(idToken: string | null): boolean {
 interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isOpsEngineer: boolean;
   isLoading: boolean;
   user: any | null;
   signIn: (username: string, password: string) => Promise<any>;
@@ -82,6 +83,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any | null>(null);
+
+  // PoC 段階では全ユーザー（admin 含む）に価格ラベルを表示しない。
+  // 将来 OpsEngineer ユーザータイプを導入した際は、isAdmin と同様に
+  // custom:rapid_role から判定する（価格ラベル表示条件: isAdmin && isOpsEngineer）。
+  const isOpsEngineer = false;
 
   useEffect(() => {
     checkAuthState();
@@ -144,6 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         isAuthenticated,
         isAdmin,
+        isOpsEngineer,
         isLoading,
         user,
         signIn: handleSignIn,
