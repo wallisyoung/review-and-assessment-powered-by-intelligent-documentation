@@ -43,7 +43,10 @@ export default function AssignToolConfigModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={t("checklist.assignToolConfiguration")}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t("checklist.assignToolConfiguration")}>
       <div className="space-y-4">
         <div className="space-y-2">
           {isLoading ? (
