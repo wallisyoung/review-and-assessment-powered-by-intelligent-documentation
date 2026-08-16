@@ -40,6 +40,8 @@ export interface TableProps<T> {
   keyExtractor: (item: T) => string | number;
   rowClassName?: (item: T) => string;
   rowClickable?: boolean; // Explicitly mark rows as clickable
+  // Width classes for the action cell (default: max-w-[17rem])
+  actionsCellClassName?: string;
 }
 
 /**
@@ -58,6 +60,7 @@ export function Table<T>({
   keyExtractor,
   rowClassName,
   rowClickable,
+  actionsCellClassName,
 }: TableProps<T>) {
   const { t } = useTranslation();
   // Show loading state
@@ -125,7 +128,10 @@ export function Table<T>({
                     </td>
                   ))}
                   {actions && actions.length > 0 && (
-                    <td className="px-6 py-4 text-sm max-w-[17rem]">
+                    <td
+                      className={`px-6 py-4 text-sm ${
+                        actionsCellClassName ?? "max-w-[17rem]"
+                      }`}>
                       <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
                         {actions
                           .filter((action) =>
