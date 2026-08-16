@@ -27,7 +27,7 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isPromptMenuOpen, setIsPromptMenuOpen] = useState(false);
   const location = useLocation();
-  const { signOut, user } = useAuth();
+  const { signOut, user, isAdmin } = useAuth();
   const { t } = useTranslation();
 
   // 現在のパスに基づいてアクティブなメニュー項目を判定
@@ -95,70 +95,76 @@ export default function Sidebar() {
                 </Link>
               </li>
 
-              <li className="mb-1">
-                <Link
-                  to="/examples"
-                  className={`flex items-center rounded-md px-4 py-3 transition-colors ${
-                    isActive("/examples")
-                      ? "bg-aws-sea-blue-light text-aws-font-color-white-light"
-                      : "text-aws-font-color-white-light hover:bg-aws-sea-blue-hover-light"
-                  }`}
-                  onClick={() => setIsOpen(false)}>
-                  <HiDownload className="mr-3 h-5 w-5" />
-                  {t("sidebar.examples")}
-                </Link>
-              </li>
+              {isAdmin && (
+                <li className="mb-1">
+                  <Link
+                    to="/examples"
+                    className={`flex items-center rounded-md px-4 py-3 transition-colors ${
+                      isActive("/examples")
+                        ? "bg-aws-sea-blue-light text-aws-font-color-white-light"
+                        : "text-aws-font-color-white-light hover:bg-aws-sea-blue-hover-light"
+                    }`}
+                    onClick={() => setIsOpen(false)}>
+                    <HiDownload className="mr-3 h-5 w-5" />
+                    {t("sidebar.examples")}
+                  </Link>
+                </li>
+              )}
 
-              <li className="mb-1">
-                <Link
-                  to="/tool-configurations"
-                  className={`flex items-center rounded-md px-4 py-3 transition-colors ${
-                    isActive("/tool-configurations")
-                      ? "bg-aws-sea-blue-light text-aws-font-color-white-light"
-                      : "text-aws-font-color-white-light hover:bg-aws-sea-blue-hover-light"
-                  }`}
-                  onClick={() => setIsOpen(false)}>
-                  <HiCog className="mr-3 h-5 w-5" />
-                  {t("sidebar.toolConfiguration")}
-                </Link>
-              </li>
+              {isAdmin && (
+                <li className="mb-1">
+                  <Link
+                    to="/tool-configurations"
+                    className={`flex items-center rounded-md px-4 py-3 transition-colors ${
+                      isActive("/tool-configurations")
+                        ? "bg-aws-sea-blue-light text-aws-font-color-white-light"
+                        : "text-aws-font-color-white-light hover:bg-aws-sea-blue-hover-light"
+                    }`}
+                    onClick={() => setIsOpen(false)}>
+                    <HiCog className="mr-3 h-5 w-5" />
+                    {t("sidebar.toolConfiguration")}
+                  </Link>
+                </li>
+              )}
 
-              <li className="mb-1">
-                <button
-                  className={`flex w-full items-center rounded-md px-4 py-3 transition-colors ${
-                    isActive("/prompt-templates")
-                      ? "bg-aws-sea-blue-light text-aws-font-color-white-light"
-                      : "text-aws-font-color-white-light hover:bg-aws-sea-blue-hover-light"
-                  }`}
-                  onClick={togglePromptMenu}>
-                  <HiAnnotation className="mr-3 h-5 w-5" />
-                  {t("sidebar.settings")}
-                  <span className="ml-auto">
-                    {isPromptMenuOpen ? (
-                      <HiChevronDown className="h-4 w-4" />
-                    ) : (
-                      <HiChevronRight className="h-4 w-4" />
-                    )}
-                  </span>
-                </button>
+              {isAdmin && (
+                <li className="mb-1">
+                  <button
+                    className={`flex w-full items-center rounded-md px-4 py-3 transition-colors ${
+                      isActive("/prompt-templates")
+                        ? "bg-aws-sea-blue-light text-aws-font-color-white-light"
+                        : "text-aws-font-color-white-light hover:bg-aws-sea-blue-hover-light"
+                    }`}
+                    onClick={togglePromptMenu}>
+                    <HiAnnotation className="mr-3 h-5 w-5" />
+                    {t("sidebar.settings")}
+                    <span className="ml-auto">
+                      {isPromptMenuOpen ? (
+                        <HiChevronDown className="h-4 w-4" />
+                      ) : (
+                        <HiChevronRight className="h-4 w-4" />
+                      )}
+                    </span>
+                  </button>
 
-                {isPromptMenuOpen && (
-                  <ul className="ml-6 mt-1 space-y-1">
-                    <li>
-                      <Link
-                        to="/prompt-templates/checklist"
-                        className={`mt-2 flex items-center rounded-md px-4 py-2 transition-colors ${
-                          isActive("/prompt-templates/checklist")
-                            ? "bg-aws-sea-blue-light text-aws-font-color-white-light"
-                            : "text-aws-font-color-white-light hover:bg-aws-sea-blue-hover-light"
-                        }`}
-                        onClick={() => setIsOpen(false)}>
-                        {t("sidebar.checklistPrompt")}
-                      </Link>
-                    </li>
-                  </ul>
-                )}
-              </li>
+                  {isPromptMenuOpen && (
+                    <ul className="ml-6 mt-1 space-y-1">
+                      <li>
+                        <Link
+                          to="/prompt-templates/checklist"
+                          className={`mt-2 flex items-center rounded-md px-4 py-2 transition-colors ${
+                            isActive("/prompt-templates/checklist")
+                              ? "bg-aws-sea-blue-light text-aws-font-color-white-light"
+                              : "text-aws-font-color-white-light hover:bg-aws-sea-blue-hover-light"
+                          }`}
+                          onClick={() => setIsOpen(false)}>
+                          {t("sidebar.checklistPrompt")}
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
+                </li>
+              )}
             </ul>
           </nav>
 

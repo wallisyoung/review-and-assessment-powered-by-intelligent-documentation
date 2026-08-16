@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../../contexts/AuthContext";
 import { HiExternalLink, HiX } from "react-icons/hi";
 import { useToolConfigurations } from "../../tool-configuration/hooks/useToolConfigurationQueries";
 import Modal from "../../../components/Modal";
@@ -19,6 +20,7 @@ export default function AssignToolConfigModal({
   currentConfigId,
 }: AssignToolConfigModalProps) {
   const { t } = useTranslation();
+  const { isAdmin } = useAuth();
   const { toolConfigurations, isLoading } = useToolConfigurations();
 
   const handleAssign = (configId: string | null) => {
@@ -53,11 +55,13 @@ export default function AssignToolConfigModal({
               <p className="mb-4 text-sm text-aws-font-color-gray">
                 {t("checklist.noToolConfigurationsFound")}
               </p>
-              <a
-                href="/tool-configurations/new"
-                className="inline-block rounded-lg bg-aws-sea-blue-light px-4 py-2 text-sm font-medium text-white hover:bg-aws-sea-blue-hover-light">
-                {t("checklist.createToolConfiguration")}
-              </a>
+              {isAdmin && (
+                <a
+                  href="/tool-configurations/new"
+                  className="inline-block rounded-lg bg-aws-sea-blue-light px-4 py-2 text-sm font-medium text-white hover:bg-aws-sea-blue-hover-light">
+                  {t("checklist.createToolConfiguration")}
+                </a>
+              )}
             </div>
           ) : (
             <>
@@ -84,14 +88,16 @@ export default function AssignToolConfigModal({
                       {getToolsText(config)}
                     </div>
                   </button>
-                  <a
-                    href={`/tool-configurations/${config.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="absolute right-2 top-2 rounded p-1 text-aws-font-color-gray hover:bg-aws-paper-light hover:text-aws-squid-ink-light">
-                    <HiExternalLink className="h-4 w-4" />
-                  </a>
+                  {isAdmin && (
+                    <a
+                      href={`/tool-configurations/${config.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-2 top-2 rounded p-1 text-aws-font-color-gray hover:bg-aws-paper-light hover:text-aws-squid-ink-light">
+                      <HiExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
                 </div>
               ))}
             </>

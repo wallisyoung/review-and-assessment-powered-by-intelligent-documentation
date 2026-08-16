@@ -19,6 +19,7 @@ import {
 import { ExamplesPage } from "./features/examples";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import { ToastProvider } from "./contexts/ToastContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -70,24 +71,47 @@ function App() {
                   <Route path="review/create" element={<CreateReviewPage />} />
                   <Route path="review/:id" element={<ReviewDetailPage />} />
 
-                  <Route path="examples" element={<ExamplesPage />} />
+                  <Route
+                    path="examples"
+                    element={
+                      <AdminRoute>
+                        <ExamplesPage />
+                      </AdminRoute>
+                    }
+                  />
 
                   <Route
                     path="tool-configurations"
-                    element={<ToolConfigurationListPage />}
+                    element={
+                      <AdminRoute>
+                        <ToolConfigurationListPage />
+                      </AdminRoute>
+                    }
                   />
                   <Route
                     path="tool-configurations/new"
-                    element={<CreateToolConfigurationPage />}
+                    element={
+                      <AdminRoute>
+                        <CreateToolConfigurationPage />
+                      </AdminRoute>
+                    }
                   />
                   <Route
                     path="tool-configurations/:id"
-                    element={<ToolConfigurationDetailPage />}
+                    element={
+                      <AdminRoute>
+                        <ToolConfigurationDetailPage />
+                      </AdminRoute>
+                    }
                   />
 
                   <Route
                     path="prompt-templates/checklist"
-                    element={<ChecklistPromptTemplatesPage />}
+                    element={
+                      <AdminRoute>
+                        <ChecklistPromptTemplatesPage />
+                      </AdminRoute>
+                    }
                   />
 
                   <Route path="documents" element={<ReviewListPage />} />

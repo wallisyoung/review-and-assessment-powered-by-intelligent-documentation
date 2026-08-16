@@ -23,6 +23,7 @@ import {
 } from "../hooks/useCheckListSetQueries";
 import { OnboardingModal } from "../../examples";
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
+import { useAuth } from "../../../contexts/AuthContext";
 
 /**
  * チェックリスト一覧ページ
@@ -34,6 +35,7 @@ export function CheckListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { addToast } = useToast();
   const { t } = useTranslation();
+  const { isAdmin } = useAuth();
 
   // 複製用の状態を追加
   const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
@@ -87,6 +89,9 @@ export function CheckListPage() {
 
   // オンボーディングモーダルの表示制御
   useEffect(() => {
+    // 事例ギャラリーへの導線のため、管理者以外には表示しない
+    if (!isAdmin) return;
+
     // 開発用: クエリパラメータで強制表示
     const showOnboardingParam = searchParams.get("showOnboarding");
     if (showOnboardingParam === "true") {
@@ -98,7 +103,7 @@ export function CheckListPage() {
     if (!onboardingCompleted && !isLoading && checkListSets?.length === 0) {
       setShowOnboardingModal(true);
     }
-  }, [onboardingCompleted, isLoading, checkListSets, searchParams]);
+  }, [isAdmin, onboardingCompleted, isLoading, checkListSets, searchParams]);
 
   // チェックリストセットの削除処理
   const handleDelete = async (id: string, name: string) => {
