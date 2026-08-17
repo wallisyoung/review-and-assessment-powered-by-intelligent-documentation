@@ -234,7 +234,7 @@ export default function CheckListSetList({
         keyExtractor={(item) => item.id}
         onRowClick={handleRowClick}
         rowClickable={true}
-        actionsCellClassName="min-w-[17rem] max-w-[17rem]"
+        actionsCellClassName="min-w-[18rem] max-w-[18rem]"
       />
       <AlertModal />
     </>

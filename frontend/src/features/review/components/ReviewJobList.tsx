@@ -166,6 +166,7 @@ export const ReviewJobList: React.FC<ReviewJobListProps> = ({
         keyExtractor={(item) => item.id}
         onRowClick={handleRowClick}
         rowClickable={true}
+        actionsCellClassName="min-w-[13rem] max-w-[13rem]"
       />
       <AlertModal />
     </>
