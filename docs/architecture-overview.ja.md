@@ -57,7 +57,7 @@
 |------|------|------|
 | CloudFront Distribution | CDN | フロントエンド（SPA）の配信。オリジンは S3（OAC による直接アクセス制限） |
 | フロントエンド用 WAF | WAF | CloudFront 前段の保護。IP 許可リスト方式（デフォルト拒否） |
-| バックエンド API 用 WAF | WAF | API Gateway 前段の保護。IP 許可リスト方式（デフォルト拒否） |
+| バックエンド API 用 WAF | WAF | API Gateway stage の保護（IP 許可リスト・デフォルト拒否）。**S3+API Gateway 構成・クローズドネットワーク構成のみ**。標準構成ではバックエンド API に WAF は付与されず、TLS とアプリ層の JWT 検証により保護 |
 | RapidApi（バックエンド） | API Gateway（REST） | 業務 API のエントリポイント。アクセスログを CloudWatch に出力 |
 | Cognito User Pool | AWS サービス | ユーザー認証（ユーザー名 / パスワード、ホスト UI）。JWT 発行とロールクレーム管理 |
 
@@ -81,20 +81,20 @@ sequenceDiagram
     autonumber
     participant U as ユーザー（ブラウザ）
     participant CF as CloudFront + WAF
-    participant AGW as API Gateway + WAF
+    participant AGW as API Gateway
     participant API as ApiFunction（Fastify）
     participant SFN as Step Functions
     participant INV as InvokeAgentFunction
     participant AC as AgentCore Runtime + Bedrock
     participant DS as データ層（S3・Aurora）
 
-    Note over U,CF: 全通信は TLS（HTTPS）で暗号化。WAF は IP 許可リスト方式（デフォルト拒否）
+    Note over U,CF: 全通信は TLS（HTTPS）で暗号化。CloudFront 前段の WAF は IP 許可リスト方式（デフォルト拒否）
     U->>CF: SPA へアクセス
     CF->>DS: 静的資産を S3 から取得（OAC 経由のみ・直接アクセス不可）
 
     U->>AGW: ログイン（Cognito で認証し JWT を取得）
     U->>AGW: API リクエスト（Authorization ヘッダに JWT）
-    Note over AGW,API: アクセスログを CloudWatch に記録
+    Note over AGW,API: 標準構成ではエッジ層 WAF なし（TLS＋アプリ層 JWT 検証）。アクセスログを CloudWatch に記録
     API->>API: JWT 検証（署名・発行者・有効期限）とロールクレームによる認可
     API->>DS: 署名付き URL を発行し文書を一時バケットへ直接アップロード
     Note over API,DS: 署名付き URL は期限付き・バケットは TLS 強制・7 日自動削除
@@ -122,9 +122,9 @@ sequenceDiagram
 
 ### 4.1 エッジ保護（WAF / CDN）
 
-- フロントエンド（CloudFront）とバックエンド API（API Gateway）のそれぞれに AWS WAF を配置
-- いずれも **IP 許可リスト方式（デフォルト拒否）**：許可された IP からのアクセスのみ受け付け、その他は全て遮蔽
-- S3 静的資産は CloudFront OAC（Origin Access Control）経由のみ配信され、バケットへの直接アクセスは不可
+- **フロントエンド（CloudFront）**：前段に AWS WAF を配置。**IP 許可リスト方式（デフォルト拒否）**により、許可された IP からのアクセスのみ受け付ける。静的資産は OAC（Origin Access Control）経由のみ配信され、バケットへの直接アクセスは不可
+- **バックエンド API（API Gateway）**：標準構成ではフロントエンドから execute-api エンドポイントへ直接接続するため、CloudFront WAF の適用範囲外。エッジ層の WAF は付与せず、TLS による通信暗号化とアプリ層での JWT 検証（4.2）により保護する設計
+- **S3+API Gateway 構成・クローズドネットワーク構成**では、フロントエンド・バックエンド両方の API stage に Regional WAF（IP 許可リスト・デフォルト拒否）を付与（多層防御）
 
 ### 4.2 認証（Authentication）
 
@@ -174,6 +174,7 @@ sequenceDiagram
 |------|---------|--------------------------|
 | サブネット | パブリック / プライベート + NAT | 分離（隔離）サブネットのみ、NAT なし（インターネット出口なし） |
 | API Gateway | 通常のエンドポイント | PRIVATE エンドポイント（VPC 内からのみアクセス可能） |
+| WAF | CloudFront にのみ付与（API stage にはなし） | フロントエンド・バックエンド両 API stage に Regional WAF を付与（IP 許可リスト・デフォルト拒否） |
 | AWS サービス接続 | インターネット経由 | PrivateLink（VPC エンドポイント）経由：S3・Bedrock・AgentCore・Cognito・Secrets Manager 等 |
 | エージェント実行環境 | AWS マネージドネットワーク | VPC 内で実行（外部への通信経路なし） |
 | モデル推論 | リージョン固定のモデル ID でデータ所在地を保証 | 同左（クロスリージョン推論は無効化） |
