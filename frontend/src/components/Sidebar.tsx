@@ -27,7 +27,8 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isPromptMenuOpen, setIsPromptMenuOpen] = useState(false);
   const location = useLocation();
-  const { signOut, user, isAdmin } = useAuth();
+  // サンプル・ツール設定・プロンプト設定は opsEngineer 専層（admin は不可視）
+  const { signOut, user, isOpsEngineer } = useAuth();
   const { t } = useTranslation();
 
   // 現在のパスに基づいてアクティブなメニュー項目を判定
@@ -95,7 +96,7 @@ export default function Sidebar() {
                 </Link>
               </li>
 
-              {isAdmin && (
+              {isOpsEngineer && (
                 <li className="mb-1">
                   <Link
                     to="/examples"
@@ -111,7 +112,7 @@ export default function Sidebar() {
                 </li>
               )}
 
-              {isAdmin && (
+              {isOpsEngineer && (
                 <li className="mb-1">
                   <Link
                     to="/tool-configurations"
@@ -127,7 +128,7 @@ export default function Sidebar() {
                 </li>
               )}
 
-              {isAdmin && (
+              {isOpsEngineer && (
                 <li className="mb-1">
                   <button
                     className={`flex w-full items-center rounded-md px-4 py-3 transition-colors ${

@@ -19,7 +19,7 @@ import {
 import { ExamplesPage } from "./features/examples";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AdminRoute from "./components/AdminRoute";
+import OpsEngineerRoute from "./components/OpsEngineerRoute";
 import { ToastProvider } from "./contexts/ToastContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -74,43 +74,43 @@ function App() {
                   <Route
                     path="examples"
                     element={
-                      <AdminRoute>
+                      <OpsEngineerRoute>
                         <ExamplesPage />
-                      </AdminRoute>
+                      </OpsEngineerRoute>
                     }
                   />
 
                   <Route
                     path="tool-configurations"
                     element={
-                      <AdminRoute>
+                      <OpsEngineerRoute>
                         <ToolConfigurationListPage />
-                      </AdminRoute>
+                      </OpsEngineerRoute>
                     }
                   />
                   <Route
                     path="tool-configurations/new"
                     element={
-                      <AdminRoute>
+                      <OpsEngineerRoute>
                         <CreateToolConfigurationPage />
-                      </AdminRoute>
+                      </OpsEngineerRoute>
                     }
                   />
                   <Route
                     path="tool-configurations/:id"
                     element={
-                      <AdminRoute>
+                      <OpsEngineerRoute>
                         <ToolConfigurationDetailPage />
-                      </AdminRoute>
+                      </OpsEngineerRoute>
                     }
                   />
 
                   <Route
                     path="prompt-templates/checklist"
                     element={
-                      <AdminRoute>
+                      <OpsEngineerRoute>
                         <ChecklistPromptTemplatesPage />
-                      </AdminRoute>
+                      </OpsEngineerRoute>
                     }
                   />
 
