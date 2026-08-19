@@ -48,19 +48,24 @@ export async function authMiddleware(
     const payload = await verifier.verify(token);
 
     // 検証に成功したらリクエストにユーザー情報を追加
-    // カスタムクレーム 'custom:rapid_role' を参照して isAdmin を設定する。
-    // payload 内に 'custom:rapid_role' がない場合はフォールバックとして isAdmin=false を採用する（運用でトークンに含めることを推奨）。
+    // カスタムクレーム 'custom:rapid_role'（"admin" | "opsEngineer" | 空）から
+    // 2 層権限モデルを設定する:
+    //   isAdmin       = admin 層権限（admin と opsEngineer の両方が持つ）
+    //   isOpsEngineer = opsEngineer 専層（admin 権限をすべて含む包含関係）
+    // payload 内に 'custom:rapid_role' がない場合は安全側に倒して false とする（運用でトークンに含めることを推奨）。
     // 必要に応じて Cognito Admin API を呼ぶフォールバック実装を追加できるがレイテンシの懸念があるためデフォルトでは実装しない。
     const userId =
       (payload.sub as string) || (payload.username as string) || "";
     const rapidRole = (payload["custom:rapid_role"] ??
       payload["custom_rapid_role"]) as string | undefined;
-    const isAdmin =
-      typeof rapidRole === "string" && rapidRole.toLowerCase() === "admin";
+    const role = typeof rapidRole === "string" ? rapidRole.toLowerCase() : "";
+    const isAdmin = role === "admin" || role === "opsengineer";
+    const isOpsEngineer = role === "opsengineer";
 
     request.user = {
       userId,
       isAdmin,
+      isOpsEngineer,
       rawClaims: payload,
       // 互換性のため一部クレームもプロパティとして残す
       sub: payload.sub,

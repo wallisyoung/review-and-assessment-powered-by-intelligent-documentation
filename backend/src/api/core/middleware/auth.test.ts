@@ -74,6 +74,37 @@ describe("authMiddleware", () => {
 
     expect(request.user?.userId).toBe("user-1");
     expect(request.user?.isAdmin).toBe(true);
+    expect(request.user?.isOpsEngineer).toBe(false);
+  });
+
+  it("sets both flags true when custom role is opsEngineer", async () => {
+    const request = makeRequest("Bearer token");
+    const reply = makeReply();
+    verifyMock.mockResolvedValue({
+      sub: "user-ops",
+      "custom:rapid_role": "opsEngineer",
+    });
+
+    await authMiddleware(request, reply);
+
+    expect(request.user?.userId).toBe("user-ops");
+    // 包含関係: opsEngineer は admin 層権限も持つ
+    expect(request.user?.isAdmin).toBe(true);
+    expect(request.user?.isOpsEngineer).toBe(true);
+  });
+
+  it("parses role case-insensitively", async () => {
+    const request = makeRequest("Bearer token");
+    const reply = makeReply();
+    verifyMock.mockResolvedValue({
+      sub: "user-3",
+      "custom:rapid_role": "OpsEngineer",
+    });
+
+    await authMiddleware(request, reply);
+
+    expect(request.user?.isAdmin).toBe(true);
+    expect(request.user?.isOpsEngineer).toBe(true);
   });
 
   it("sets isAdmin false when custom role is missing", async () => {
@@ -87,6 +118,7 @@ describe("authMiddleware", () => {
 
     expect(request.user?.userId).toBe("user-2");
     expect(request.user?.isAdmin).toBe(false);
+    expect(request.user?.isOpsEngineer).toBe(false);
   });
 
   it("skips jwt verification when local development auth is handled", async () => {

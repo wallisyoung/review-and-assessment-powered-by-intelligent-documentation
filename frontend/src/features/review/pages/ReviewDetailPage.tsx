@@ -15,7 +15,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 
 export default function ReviewDetailPage() {
   const { t } = useTranslation();
-  const { isAdmin, isOpsEngineer } = useAuth();
+  const { isOpsEngineer } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -89,8 +89,8 @@ export default function ReviewDetailPage() {
             </h1>
           </div>
           <div className="mt-3 flex items-center justify-between">
-            {/* 合計料金表示（管理者のみ） */}
-            {job.totalCost && isAdmin && isOpsEngineer && (
+            {/* 合計料金表示（opsEngineer 専層） */}
+            {job.totalCost && isOpsEngineer && (
               <TotalReviewCostSummary
                 formattedTotalCost={`$${job.totalCost.toFixed(4)}`}
                 summary={{

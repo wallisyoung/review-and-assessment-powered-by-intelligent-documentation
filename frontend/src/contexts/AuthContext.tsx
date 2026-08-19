@@ -50,18 +50,28 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 }
 
 /**
- * ID トークンから custom:rapid_role を読み取り isAdmin を判定する。
+ * ID トークンから custom:rapid_role（"admin" | "opsEngineer" | 空）を読み取り
+ * 2 層権限モデルのフラグを判定する:
+ *   isAdmin       = admin 層権限（admin と opsEngineer の両方が持つ）
+ *   isOpsEngineer = opsEngineer 専層（admin 権限をすべて含む包含関係）
  * バックエンド (api/core/middleware/auth.ts) と同一の claim 参照ロジック。
  * claim が無い/読めない場合は安全側に倒して false とする。
  */
-function extractIsAdmin(idToken: string | null): boolean {
-  if (!idToken) return false;
+function extractRoles(idToken: string | null): {
+  isAdmin: boolean;
+  isOpsEngineer: boolean;
+} {
+  if (!idToken) return { isAdmin: false, isOpsEngineer: false };
   const payload = decodeJwtPayload(idToken);
-  if (!payload) return false;
+  if (!payload) return { isAdmin: false, isOpsEngineer: false };
   const rapidRole =
     (payload["custom:rapid_role"] as string | undefined) ??
     (payload["custom_rapid_role"] as string | undefined);
-  return typeof rapidRole === "string" && rapidRole.toLowerCase() === "admin";
+  const role = typeof rapidRole === "string" ? rapidRole.toLowerCase() : "";
+  return {
+    isAdmin: role === "admin" || role === "opsengineer",
+    isOpsEngineer: role === "opsengineer",
+  };
 }
 
 interface AuthContextType {
@@ -81,13 +91,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isOpsEngineer, setIsOpsEngineer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any | null>(null);
-
-  // PoC 段階では全ユーザー（admin 含む）に価格ラベルを表示しない。
-  // 将来 OpsEngineer ユーザータイプを導入した際は、isAdmin と同様に
-  // custom:rapid_role から判定する（価格ラベル表示条件: isAdmin && isOpsEngineer）。
-  const isOpsEngineer = false;
 
   useEffect(() => {
     checkAuthState();
@@ -100,15 +106,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser({ ...currentUser, ...attributes });
       setIsAuthenticated(true);
 
-      // ID トークンから custom:rapid_role を読み取り isAdmin を設定。
+      // ID トークンから custom:rapid_role を読み取り権限フラグを設定。
       // バックエンド (auth.ts) と同じ claim を使い、真実の情報源を一つにする。
       const session = await fetchAuthSession();
       const idToken = session.tokens?.idToken?.toString() ?? null;
-      setIsAdmin(extractIsAdmin(idToken));
+      const roles = extractRoles(idToken);
+      setIsAdmin(roles.isAdmin);
+      setIsOpsEngineer(roles.isOpsEngineer);
     } catch (error) {
       setUser(null);
       setIsAuthenticated(false);
       setIsAdmin(false);
+      setIsOpsEngineer(false);
     } finally {
       setIsLoading(false);
     }
@@ -130,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
       setIsAuthenticated(false);
       setIsAdmin(false);
+      setIsOpsEngineer(false);
     } catch (error) {
       console.error("Error signing out:", error);
     }

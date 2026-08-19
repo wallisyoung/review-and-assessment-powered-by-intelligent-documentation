@@ -25,6 +25,8 @@ export const setupLocalDevelopmentUser = (request: FastifyRequest): void => {
   request.user = {
     userId: "local-dev-user-id",
     isAdmin: true,
+    // ローカル開発では全権限を持つユーザーとして扱う（価格ラベル等の開発確認用）
+    isOpsEngineer: true,
     rawClaims: {
       sub: "local-dev-user-id",
       email: "local-dev@example.com",

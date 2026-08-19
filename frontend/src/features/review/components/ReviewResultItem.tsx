@@ -53,7 +53,7 @@ export default function ReviewResultItem({
   documents,
 }: ReviewResultItemProps) {
   const { t } = useTranslation();
-  const { isAdmin, isOpsEngineer } = useAuth();
+  const { isOpsEngineer } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visibleReferencesCount, setVisibleReferencesCount] = useState(5); // 初期表示数
   const [showDetails, setShowDetails] = useState(false); // いかなる場合も詳細を最初は隠した状態に設定
@@ -236,7 +236,7 @@ export default function ReviewResultItem({
                 {!hasChildren && renderConfidenceScore() && (
                   <div className="ml-3 flex items-center space-x-2">
                     {renderConfidenceScore()}
-                    {costInfo.hasCost && isAdmin && isOpsEngineer && (
+                    {costInfo.hasCost && isOpsEngineer && (
                       <ReviewItemCostBadge
                         formattedCost={costInfo.formattedCost}
                         size="sm"

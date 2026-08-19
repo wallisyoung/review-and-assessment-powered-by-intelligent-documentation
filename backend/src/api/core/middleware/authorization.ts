@@ -6,6 +6,8 @@ import { ForbiddenError } from "../../core/errors/application-errors";
 export type RequestUser = {
   userId: string;
   isAdmin: boolean;
+  // opsEngineer 専層フラグ（admin 権限をすべて含む包含関係。admin 層は isAdmin を参照）
+  isOpsEngineer: boolean;
   rawClaims?: Record<string, any>;
   // 既存のクレームも参照できるようにオプションで保持
   sub?: string;
