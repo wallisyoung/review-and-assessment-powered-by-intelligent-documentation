@@ -25,6 +25,7 @@ import Button from "../../../components/Button";
 import ResultCard from "../../../components/ResultCard";
 import Tooltip from "../../../components/Tooltip";
 import ModelSelector from "./ModelSelector";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface CheckListItemTreeNodeProps {
   setId: string;
@@ -50,6 +51,8 @@ export default function CheckListItemTreeNode({
   const [isExpanded, setIsExpanded] = useState(level < maxDepth || autoExpand);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddChildModalOpen, setIsAddChildModalOpen] = useState(false);
+  // 行内の管理操作は admin 層のみ（checkbox は親から onToggleSelect 未伝達で非表示）
+  const { isAdmin } = useAuth();
 
   const {
     deleteCheckListItem,
@@ -187,74 +190,77 @@ export default function CheckListItemTreeNode({
                   )}
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                {/* モデル選択 - リーフノードのみ表示 */}
-                {!item.hasChildren && (
-                  <ModelSelector
-                    setId={setId}
-                    itemId={item.id}
-                    currentModelId={item.modelId}
+              {/* 行内の管理操作（モデル選択・子項目追加・編集・削除）は admin 層のみ */}
+              {isAdmin && (
+                <div className="flex items-center space-x-2">
+                  {/* モデル選択 - リーフノードのみ表示 */}
+                  {!item.hasChildren && (
+                    <ModelSelector
+                      setId={setId}
+                      itemId={item.id}
+                      currentModelId={item.modelId}
+                      disabled={!isEditable}
+                    />
+                  )}
+
+                  {/* 子項目追加ボタン - Button コンポーネントを使用 */}
+                  <Button
+                    variant="text"
+                    size="sm"
+                    icon={<HiPlus className="h-5 w-5" />}
+                    onClick={() => isEditable && setIsAddChildModalOpen(true)}
                     disabled={!isEditable}
+                    title={t("checklist.addChildItem")}
+                    aria-label={t("checklist.addChildItem")}
+                    className={
+                      !isEditable ? "text-gray-300 cursor-not-allowed" : ""
+                    }
                   />
-                )}
 
-                {/* 子項目追加ボタン - Button コンポーネントを使用 */}
-                <Button
-                  variant="text"
-                  size="sm"
-                  icon={<HiPlus className="h-5 w-5" />}
-                  onClick={() => isEditable && setIsAddChildModalOpen(true)}
-                  disabled={!isEditable}
-                  title={t("checklist.addChildItem")}
-                  aria-label={t("checklist.addChildItem")}
-                  className={
-                    !isEditable ? "text-gray-300 cursor-not-allowed" : ""
-                  }
-                />
+                  {/* 既存の編集ボタン - Button コンポーネントを使用 */}
+                  <Button
+                    variant="text"
+                    size="sm"
+                    icon={
+                      <div className="relative">
+                        <HiPencil className="h-5 w-5" />
+                        {item.ambiguityReview && isEditable && (
+                          <span className="absolute -bottom-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-yellow text-xs text-white">
+                            !
+                          </span>
+                        )}
+                      </div>
+                    }
+                    onClick={() => isEditable && setIsEditModalOpen(true)}
+                    disabled={!isEditable}
+                    title={t("common.edit")}
+                    aria-label={t("common.edit")}
+                    className={
+                      !isEditable
+                        ? "text-gray-300 cursor-not-allowed"
+                        : item.ambiguityReview && isEditable
+                          ? "border-yellow text-yellow hover:bg-yellow hover:bg-opacity-10"
+                          : "text-aws-aqua hover:text-aws-sea-blue-light"
+                    }
+                  />
 
-                {/* 既存の編集ボタン - Button コンポーネントを使用 */}
-                <Button
-                  variant="text"
-                  size="sm"
-                  icon={
-                    <div className="relative">
-                      <HiPencil className="h-5 w-5" />
-                      {item.ambiguityReview && isEditable && (
-                        <span className="absolute -bottom-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-yellow text-xs text-white">
-                          !
-                        </span>
-                      )}
-                    </div>
-                  }
-                  onClick={() => isEditable && setIsEditModalOpen(true)}
-                  disabled={!isEditable}
-                  title={t("common.edit")}
-                  aria-label={t("common.edit")}
-                  className={
-                    !isEditable
-                      ? "text-gray-300 cursor-not-allowed"
-                      : item.ambiguityReview && isEditable
-                        ? "border-yellow text-yellow hover:bg-yellow hover:bg-opacity-10"
-                        : "text-aws-aqua hover:text-aws-sea-blue-light"
-                  }
-                />
-
-                {/* 既存の削除ボタン - Button コンポーネントを使用 */}
-                <Button
-                  variant="text"
-                  size="sm"
-                  icon={<HiTrash className="h-5 w-5" />}
-                  onClick={handleDelete}
-                  disabled={!isEditable}
-                  title={t("common.delete")}
-                  aria-label={t("common.delete")}
-                  className={
-                    !isEditable
-                      ? "text-gray-300 cursor-not-allowed"
-                      : "rounded p-1 text-red hover:bg-light-red hover:text-light-red"
-                  }
-                />
-              </div>
+                  {/* 既存の削除ボタン - Button コンポーネントを使用 */}
+                  <Button
+                    variant="text"
+                    size="sm"
+                    icon={<HiTrash className="h-5 w-5" />}
+                    onClick={handleDelete}
+                    disabled={!isEditable}
+                    title={t("common.delete")}
+                    aria-label={t("common.delete")}
+                    className={
+                      !isEditable
+                        ? "text-gray-300 cursor-not-allowed"
+                        : "rounded p-1 text-red hover:bg-light-red hover:text-light-red"
+                    }
+                  />
+                </div>
+              )}
             </div>
           </ResultCard>
         </div>

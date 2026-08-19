@@ -213,16 +213,19 @@ export function CheckListPage() {
             {t("checklist.description")}
           </p>
         </div>
-        <div className="flex items-center space-x-3">
-          <Button
-            outline
-            type="button"
-            onClick={() => setIsImportModalOpen(true)}>
-            <HiUpload className="mr-1 h-4 w-4" />
-            {t("checklist.import")}
-          </Button>
-          <CreateChecklistButton />
-        </div>
+        {/* インポート・新規作成は admin 層（admin / opsEngineer）のみ */}
+        {isAdmin && (
+          <div className="flex items-center space-x-3">
+            <Button
+              outline
+              type="button"
+              onClick={() => setIsImportModalOpen(true)}>
+              <HiUpload className="mr-1 h-4 w-4" />
+              {t("checklist.import")}
+            </Button>
+            <CreateChecklistButton />
+          </div>
+        )}
       </div>
 
       <CheckListSetList

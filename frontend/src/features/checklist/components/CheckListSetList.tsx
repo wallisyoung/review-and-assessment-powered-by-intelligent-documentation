@@ -13,6 +13,7 @@ import {
 import { CHECK_LIST_STATUS, CheckListSetSummary } from "../types";
 import Table, { TableColumn, TableAction } from "../../../components/Table";
 import StatusBadge from "../../../components/StatusBadge";
+import { useAuth } from "../../../contexts/AuthContext";
 
 type CheckListSetListProps = {
   checkListSets: {
@@ -44,6 +45,8 @@ export default function CheckListSetList({
   onExport,
 }: CheckListSetListProps) {
   const { t } = useTranslation();
+  // 管理操作（編集・削除・複製・エクスポート）は admin 層のみ。詳細は全ユーザーに表示
+  const { isAdmin } = useAuth();
 
   const navigate = useNavigate();
 
@@ -191,6 +194,7 @@ export default function CheckListSetList({
       label: t("common.edit", "編集"),
       onClick: (item) => onEdit(item.id),
       disabled: (item) => !item.isEditable,
+      show: () => isAdmin,
       variant: "secondary",
       outline: true,
       className: "transition-all duration-200",
@@ -200,6 +204,7 @@ export default function CheckListSetList({
       label: t("common.delete"),
       onClick: handleDelete,
       disabled: (item) => !item.isEditable,
+      show: () => isAdmin,
       variant: "danger",
       outline: true,
       className: "transition-all duration-200",
@@ -208,6 +213,7 @@ export default function CheckListSetList({
       icon: <HiDuplicate className="mr-1 h-4 w-4" />,
       label: t("common.duplicate"),
       onClick: (item) => onDuplicate(item.id, item.name),
+      show: () => isAdmin,
       variant: "secondary",
       outline: true,
       className: "transition-all duration-200",
@@ -216,6 +222,7 @@ export default function CheckListSetList({
       icon: <HiDownload className="mr-1 h-4 w-4" />,
       label: t("checklist.export", "エクスポート"),
       onClick: (item) => onExport(item.id, item.name),
+      show: () => isAdmin,
       variant: "secondary",
       outline: true,
       className: "transition-all duration-200",
@@ -234,7 +241,9 @@ export default function CheckListSetList({
         keyExtractor={(item) => item.id}
         onRowClick={handleRowClick}
         rowClickable={true}
-        actionsCellClassName="min-w-[18rem] max-w-[18rem]"
+        actionsCellClassName={
+          isAdmin ? "min-w-[18rem] max-w-[18rem]" : undefined
+        }
       />
       <AlertModal />
     </>

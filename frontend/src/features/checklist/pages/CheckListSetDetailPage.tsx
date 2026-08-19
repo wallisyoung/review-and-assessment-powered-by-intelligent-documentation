@@ -34,6 +34,7 @@ import { mutate } from "swr";
 import { getChecklistSetsKey } from "../hooks/useCheckListSetQueries";
 import { AmbiguityFilter } from "../types";
 import { useBulkAssignToolConfiguration } from "../hooks/useCheckListItemMutations";
+import { useAuth } from "../../../contexts/AuthContext";
 
 /**
  * チェックリストセット詳細ページ
@@ -43,6 +44,8 @@ export function CheckListSetDetailPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { addToast } = useToast();
+  // 管理操作（複製・削除・曖昧検知・ツール割当・項目編集等）は admin 層のみ
+  const { isAdmin } = useAuth();
   const { checklistSet, isLoading, error } = useChecklistSetDetail(id || null);
   const {
     deleteChecklistSet,
@@ -55,14 +58,21 @@ export function CheckListSetDetailPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
   const [isToolConfigModalOpen, setIsToolConfigModalOpen] = useState(false);
-  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(
+    new Set()
+  );
   const [newName, setNewName] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [ambiguityFilter, setAmbiguityFilter] = useState<AmbiguityFilter>(
     AmbiguityFilter.ALL
   );
-  const { refetch: refetchRoot } = useChecklistItems(id || null, undefined, false, ambiguityFilter);
-  const isDetecting = checklistSet?.processingStatus === 'detecting';
+  const { refetch: refetchRoot } = useChecklistItems(
+    id || null,
+    undefined,
+    false,
+    ambiguityFilter
+  );
+  const isDetecting = checklistSet?.processingStatus === "detecting";
   const { bulkAssignToolConfiguration } = useBulkAssignToolConfiguration();
 
   const { showConfirm, AlertModal } = useAlert();
@@ -213,17 +223,19 @@ export function CheckListSetDetailPage() {
             )}
         </div>
         <div className="flex space-x-3">
-          {/* 複製ボタン - 常に表示（編集不可でも複製は可能） */}
-          <Button
-            variant="secondary"
-            onClick={handleDuplicateClick}
-            disabled={duplicateStatus === "loading"}
-            icon={<HiDuplicate className="h-5 w-5" />}>
-            {t("common.duplicate")}
-          </Button>
+          {/* 複製ボタン - admin 層のみ（編集不可でも複製は可能） */}
+          {isAdmin && (
+            <Button
+              variant="secondary"
+              onClick={handleDuplicateClick}
+              disabled={duplicateStatus === "loading"}
+              icon={<HiDuplicate className="h-5 w-5" />}>
+              {t("common.duplicate")}
+            </Button>
+          )}
 
-          {/* 削除ボタン - 編集可能な場合のみ表示 */}
-          {checklistSet && checklistSet.isEditable && (
+          {/* 削除ボタン - admin 層かつ編集可能な場合のみ表示 */}
+          {checklistSet && checklistSet.isEditable && isAdmin && (
             <Button
               variant="danger"
               onClick={handleDelete}
@@ -286,7 +298,7 @@ export function CheckListSetDetailPage() {
                   name="ambiguity-filter"
                 />
               )}
-              {checklistSet && checklistSet.isEditable && (
+              {checklistSet && checklistSet.isEditable && isAdmin && (
                 <div className="flex space-x-2">
                   <Tooltip content={t("checklist.ambiguityDetectTooltip")}>
                     <Button
@@ -318,16 +330,16 @@ export function CheckListSetDetailPage() {
                 </div>
               )}
             </div>
-            <CheckListItemTree 
-              setId={id} 
+            <CheckListItemTree
+              setId={id}
               ambiguityFilter={ambiguityFilter}
               selectedIds={selectedItemIds}
-              onToggleSelect={handleToggleSelect}
+              onToggleSelect={isAdmin ? handleToggleSelect : undefined}
             />
           </>
         )}
 
-        {checklistSet && (
+        {checklistSet && isAdmin && (
           <div className="mt-6 flex justify-end">
             <Button
               variant="primary"
