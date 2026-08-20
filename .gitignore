@@ -19,6 +19,8 @@ memory-bank/
 .playwright-mcp/
 # Kiro session artifacts (specs, settings) — local working files, not committed
 .kiro/
+.mimosa/
+.zcode/
 
 # Personal / machine-local agent workspace (instructions, reports, tools, scratch) — never committed
 .local/
