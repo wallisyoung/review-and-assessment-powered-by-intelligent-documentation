@@ -94,7 +94,7 @@ export const parameters = {
   // cognitoUserPoolId: "ap-northeast-1_xxxxxxxxx", // 既存のCognito User Pool ID
   // cognitoUserPoolClientId: "1example23456789", // 既存のCognito User Pool Client ID
   // cognitoDomainPrefix: "myapp-login", // Cognitoドメインのプレフィックス
-  // cognitoSelfSignUpEnabled: false, // Cognito User Poolのセルフサインアップを無効化（セキュリティ強化のため推奨）
+  // cognitoSelfSignUpEnabled: true, // セルフサインアップを有効化（デフォルトは無効。アカウントは管理者がアプリ内で発行）
   // Prismaマイグレーション設定
   // デプロイ時に自動的にマイグレーションを実行するかどうか
   // ---------------------------------------------------

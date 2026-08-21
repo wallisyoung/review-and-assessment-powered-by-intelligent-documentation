@@ -42,20 +42,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
           <Authenticator
             initialState="signIn"
             loginMechanisms={["username"]}
+            hideSignUp={true}
             components={{
               SignIn: {
-                Header() {
-                  return (
-                    <h3
-                      style={{
-                        fontSize: "1.25rem",
-                        fontWeight: "600",
-                        textAlign: "center",
-                      }}></h3>
-                  );
-                },
-              },
-              SignUp: {
                 Header() {
                   return (
                     <h3

@@ -90,7 +90,7 @@ RAPID は AWS のサーバーレスサービス（Amazon CloudFront、API Gatewa
    `--ipv4-ranges` や `--closed-network` などのオプションは、[パラメータカスタマイズ](#パラメータカスタマイズ)で説明する CDK パラメータに対応しています。オプションの一覧は [CloudShell デプロイのオプション](./deployment-options.md#cloudshell-デプロイのオプション)をご覧ください。
 
 > [!Important]
-> このデプロイ方法では、オプションパラメータを設定しない場合、URL を知っている誰もがサインアップできます。本番環境で使用する場合は、IP アドレス制限の追加とセルフサインアップの無効化（`--cognito-self-signup false`）を強く推奨します。
+> セルフサインアップは既定で無効です。URL を知っているだけではサインインできず、管理者が発行したアカウントが必要です。アカウントはアプリ内の「ユーザー管理」ページ（管理者のみ）から発行し、最初の管理者のみ Cognito コンソールで作成します（[管理者の初期セットアップ](#管理者の初期セットアップ)参照）。本番環境では IP アドレス制限の追加も推奨します。試用目的でセルフサインアップを許可する場合は `--cognito-self-signup true` を指定してください。
 
 ### 2. ローカル環境からのデプロイ（カスタマイズが必要な場合に推奨）
 
@@ -181,7 +181,7 @@ CDK デプロイ時に以下のパラメータをカスタマイズできます�
 | **Cognito 設定**       | cognitoUserPoolId                    | 既存の Cognito User Pool ID                                                                                                                                            | 新規作成                                  |
 |                        | cognitoUserPoolClientId              | 既存の Cognito User Pool Client ID                                                                                                                                     | 新規作成                                  |
 |                        | cognitoDomainPrefix                  | Cognito ドメインのプレフィックス                                                                                                                                       | 自動生成                                  |
-|                        | cognitoSelfSignUpEnabled             | Cognito User Pool のセルフサインアップを有効にするかどうか                                                                                                             | true (有効)                               |
+|                        | cognitoSelfSignUpEnabled             | Cognito User Pool のセルフサインアップを有効にするかどうか                                                                                                             | false (無効)                               |
 | **マイグレーション**   | autoMigrate                          | デプロイ時に自動的にデータベースマイグレーションを実行するかどうか                                                                                                     | true (自動実行する)                       |
 | **MCP 機能**           | mcpAdmin                             | MCP ランタイム Lambda 関数に管理者権限を付与するかどうか                                                                                                               | false (無効)                              |
 | **Citations API**      | enableCitations                      | PDF ドキュメントの Citations API を有効にするかどうか ([AWS 発表](https://aws.amazon.com/about-aws/whats-new/2025/06/citations-api-pdf-claude-models-amazon-bedrock/)) | true (有効)                               |
@@ -207,7 +207,7 @@ CDK デプロイ時に以下のパラメータをカスタマイズできます�
 > デフォルト値は、本番運用での堅牢さよりも簡単に試せることを優先しています。
 >
 > - **WAF の IP 制限**: 既定値は**すべての** IP アドレスを許可します。本番環境では、許可したい具体的な IP 範囲を設定してください。
-> - **セルフサインアップ**は既定で有効です。本番環境では `cognitoSelfSignUpEnabled: false` の設定を強く推奨します。有効のままにすると、URL に到達した誰もがアカウント登録できます。
+> - **セルフサインアップ**は既定で無効です。アカウントは管理者がアプリ内のユーザー管理ページから発行します。URL に到達した誰もがアカウント登録できる状態を許容する場合（短期の試用など）のみ `cognitoSelfSignUpEnabled: true` を有効化してください。
 > - **autoMigrate** はデプロイのたびに自動でデータベースマイグレーションを実行します。本番環境や重要なデータを含む環境では、`false` に設定してマイグレーションを手動で制御することを検討してください。
 
 ### 閉域網デプロイ
@@ -263,8 +263,13 @@ RAPID では Strands エージェントがファイル読み込みなどのツ�
 
 このプロジェクトは Cognito のカスタム属性 `rapid_role` を使用します。ID トークンに `custom:rapid_role=admin` が含まれる場合、バックエンドはそのユーザーを管理者として扱います。
 
-1. Cognito User Pool で対象ユーザーのカスタム属性 `rapid_role` を `admin` に設定します。
-2. ログイン後、ID トークンに `custom:rapid_role=admin` が含まれることを確認します。
+セルフサインアップは既定で無効のため、最初のユーザーは AWS コンソールで作成する必要があります。
+
+1. Cognito User Pool のコンソールで最初のユーザーを作成（「ユーザーの作成」）します。メールアドレスには初期管理者のアドレスを指定し、「E メールで招待を送信」を選ぶか、管理者自身が一時パスワードを設定して別の手段で伝えます。
+2. 同じくコンソールで、そのユーザーのカスタム属性 `rapid_role` を `admin` に設定します。
+3. 初回ログイン後、ID トークンに `custom:rapid_role=admin` が含まれることを確認します。
+
+最初の管理者がログインできたら、以降のアカウント発行とロール変更はすべてアプリ内の**ユーザー管理**ページ（`/users`、管理者のみ表示）で行います。ユーザー作成時に一時パスワードが一度だけ画面に表示され、管理者が別の手段でユーザーに伝えます。ユーザーは初回サインイン時に新しいパスワードの設定を求められます。
 
 ローカル開発では `RAPID_LOCAL_DEV=true` を設定すると管理者として動作します。
 

@@ -113,6 +113,21 @@ export class Api extends Construct {
       }),
     );
 
+    // アプリ内ユーザー管理（管理者によるアカウント発行・ロール変更）のための
+    // Cognito管理API権限。対象はこのスタックのUser Poolのみに限定する
+    handlerRole.addToPolicy(
+      new iam.PolicyStatement({
+        sid: "ManageUsersForAdminUserManagement",
+        effect: iam.Effect.ALLOW,
+        actions: [
+          "cognito-idp:AdminCreateUser",
+          "cognito-idp:ListUsers",
+          "cognito-idp:AdminUpdateUserAttributes",
+        ],
+        resources: [props.auth.userPool.userPoolArn],
+      }),
+    );
+
     // Lambda 関数の作成
     this.apiLambda = new lambda.DockerImageFunction(this, "ApiFunction", {
       role: handlerRole,

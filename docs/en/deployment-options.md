@@ -24,7 +24,7 @@ Most options map directly to the CDK parameters described in [Parameter Customiz
 | `--ipv4-ranges`                  | IPv4 address ranges to allow in the frontend WAF (JSON array format). Maps to `allowedIpV4AddressRanges`.          |
 | `--ipv6-ranges`                  | IPv6 address ranges to allow in the frontend WAF (JSON array format). Maps to `allowedIpV6AddressRanges`.          |
 | `--auto-migrate`                 | Whether to automatically run database migration during deployment (true/false). Maps to `autoMigrate`.             |
-| `--cognito-self-signup`          | Whether to enable self-signup for the Cognito User Pool (true/false). Maps to `cognitoSelfSignUpEnabled`.          |
+| `--cognito-self-signup`          | Whether to enable self-signup for the Cognito User Pool (true/false, default: false). Maps to `cognitoSelfSignUpEnabled`. |
 | `--cognito-user-pool-id`         | Existing Cognito User Pool ID (creates a new pool if not specified). Maps to `cognitoUserPoolId`.                  |
 | `--cognito-user-pool-client-id`  | Existing Cognito User Pool Client ID (creates a new client if not specified). Maps to `cognitoUserPoolClientId`.   |
 | `--cognito-domain-prefix`        | Prefix for the Cognito domain (auto-generated if not specified). Maps to `cognitoDomainPrefix`.                    |

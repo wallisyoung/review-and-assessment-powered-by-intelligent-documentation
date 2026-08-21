@@ -8,7 +8,7 @@ describe("Parameter Handling Tests", () => {
       const parameters = resolveParameters({});
 
       // THEN - default parameters should be set correctly
-      expect(parameters.cognitoSelfSignUpEnabled).toBe(true);
+      expect(parameters.cognitoSelfSignUpEnabled).toBe(false);
       expect(parameters.allowedIpV4AddressRanges).toEqual([
         "0.0.0.0/1",
         "128.0.0.0/1",

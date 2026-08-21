@@ -26,8 +26,8 @@ Parameters:
 
   CognitoSelfSignUpEnabled:
     Type: String
-    Default: "true"
-    Description: Cognito User Poolのセルフサインアップを有効にするかどうか
+    Default: "false"
+    Description: Cognito User Poolのセルフサインアップを有効にするかどうか（デフォルト無効: アカウントは管理者がアプリ内で発行）
     AllowedValues: ["true", "false"]
 
   CognitoUserPoolId:

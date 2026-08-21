@@ -100,8 +100,10 @@ const parameterSchema = z.object({
 
   cognitoSelfSignUpEnabled: z
     .boolean()
-    .default(true)
-    .describe("Cognito User Poolのセルフサインアップを有効にするかどうか"),
+    .default(false)
+    .describe(
+      "Cognito User Poolのセルフサインアップを有効にするかどうか（デフォルト無効: アカウントは管理者がアプリ内で発行）",
+    ),
 
   // Prismaマイグレーション設定
   autoMigrate: z.boolean().default(true), // デフォルトはtrue（自動マイグレーションを実行する）

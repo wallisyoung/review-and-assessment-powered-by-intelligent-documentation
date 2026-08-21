@@ -28,7 +28,8 @@ export default function Sidebar() {
   const [isPromptMenuOpen, setIsPromptMenuOpen] = useState(false);
   const location = useLocation();
   // サンプル・ツール設定・プロンプト設定は opsEngineer 専層（admin は不可視）
-  const { signOut, user, isOpsEngineer } = useAuth();
+  // ユーザー管理は管理者層（admin / opsEngineer）に表示する
+  const { signOut, user, isOpsEngineer, isAdmin } = useAuth();
   const { t } = useTranslation();
 
   // 現在のパスに基づいてアクティブなメニュー項目を判定
@@ -95,6 +96,22 @@ export default function Sidebar() {
                   {t("sidebar.review")}
                 </Link>
               </li>
+
+              {isAdmin && (
+                <li className="mb-1">
+                  <Link
+                    to="/users"
+                    className={`flex items-center rounded-md px-4 py-3 transition-colors ${
+                      isActive("/users")
+                        ? "bg-aws-sea-blue-light text-aws-font-color-white-light"
+                        : "text-aws-font-color-white-light hover:bg-aws-sea-blue-hover-light"
+                    }`}
+                    onClick={() => setIsOpen(false)}>
+                    <HiUser className="mr-3 h-5 w-5" />
+                    {t("sidebar.users")}
+                  </Link>
+                </li>
+              )}
 
               {isOpsEngineer && (
                 <li className="mb-1">

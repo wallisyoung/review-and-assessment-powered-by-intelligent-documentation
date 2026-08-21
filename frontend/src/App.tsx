@@ -17,9 +17,11 @@ import {
   ToolConfigurationDetailPage,
 } from "./features/tool-configuration";
 import { ExamplesPage } from "./features/examples";
+import { UserManagementPage } from "./features/user-management";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import OpsEngineerRoute from "./components/OpsEngineerRoute";
+import AdminRoute from "./components/AdminRoute";
 import { ToastProvider } from "./contexts/ToastContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -70,6 +72,15 @@ function App() {
                   <Route path="review" element={<ReviewListPage />} />
                   <Route path="review/create" element={<CreateReviewPage />} />
                   <Route path="review/:id" element={<ReviewDetailPage />} />
+
+                  <Route
+                    path="users"
+                    element={
+                      <AdminRoute>
+                        <UserManagementPage />
+                      </AdminRoute>
+                    }
+                  />
 
                   <Route
                     path="examples"

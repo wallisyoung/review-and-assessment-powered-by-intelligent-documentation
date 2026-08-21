@@ -24,7 +24,7 @@ wget -O - https://raw.githubusercontent.com/aws-samples/review-and-assessment-po
 | `--ipv4-ranges`                  | フロントエンド WAF で許可する IPv4 アドレス範囲を指定します（JSON 配列形式）。`allowedIpV4AddressRanges` に対応します。                                        |
 | `--ipv6-ranges`                  | フロントエンド WAF で許可する IPv6 アドレス範囲を指定します（JSON 配列形式）。`allowedIpV6AddressRanges` に対応します。                                        |
 | `--auto-migrate`                 | デプロイ時に自動的にデータベースマイグレーションを実行するかどうかを指定します（true/false）。`autoMigrate` に対応します。                                                 |
-| `--cognito-self-signup`          | Cognito User Pool のセルフサインアップを有効にするかどうかを指定します（true/false）。`cognitoSelfSignUpEnabled` に対応します。                              |
+| `--cognito-self-signup`          | Cognito User Pool のセルフサインアップを有効にするかどうかを指定します（true/false、既定: false）。`cognitoSelfSignUpEnabled` に対応します。                 |
 | `--cognito-user-pool-id`         | 既存の Cognito User Pool ID を指定します（指定しない場合は新規作成します）。`cognitoUserPoolId` に対応します。                                              |
 | `--cognito-user-pool-client-id`  | 既存の Cognito User Pool Client ID を指定します（指定しない場合は新規作成します）。`cognitoUserPoolClientId` に対応します。                                 |
 | `--cognito-domain-prefix`        | Cognito ドメインのプレフィックスを指定します（指定しない場合は自動生成します）。`cognitoDomainPrefix` に対応します。                                                  |

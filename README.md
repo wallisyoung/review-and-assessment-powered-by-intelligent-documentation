@@ -90,7 +90,7 @@ This method allows you to deploy directly from your browser using AWS CloudShell
    Options such as `--ipv4-ranges` and `--closed-network` correspond to the CDK parameters described in [Parameter Customization](#parameter-customization). For the full list of options, see [CloudShell Deployment Options](./docs/en/deployment-options.md#cloudshell-deployment-options).
 
 > [!Important]
-> With this deployment method, if you do not set option parameters, anyone who knows the URL can sign up. For production use, we strongly recommend adding IP address restrictions and disabling self-signup (`--cognito-self-signup false`).
+> Self-signup is disabled by default: anyone who knows the URL can only sign in with an account issued by an administrator. Accounts are created from the in-app "User Management" page (admin only), and the first administrator is bootstrapped in the Cognito console (see [Admin Initial Setup](#admin-initial-setup)). For production use, we also recommend adding IP address restrictions. If you want to allow open self-signup (e.g. for a trial), pass `--cognito-self-signup true`.
 
 ### 2. Deployment from Local Environment (Recommended for Customization)
 
@@ -181,7 +181,7 @@ The following parameters can be customized during CDK deployment. Edit [`cdk/lib
 | **Cognito Settings**      | cognitoUserPoolId                    | Existing Cognito User Pool ID                                                                                                                                              | Create new                                 |
 |                           | cognitoUserPoolClientId              | Existing Cognito User Pool Client ID                                                                                                                                       | Create new                                 |
 |                           | cognitoDomainPrefix                  | Prefix for the Cognito domain                                                                                                                                              | Auto-generated                             |
-|                           | cognitoSelfSignUpEnabled             | Whether to enable self-signup for the Cognito User Pool                                                                                                                    | true (enabled)                             |
+|                           | cognitoSelfSignUpEnabled             | Whether to enable self-signup for the Cognito User Pool                                                                                                                    | false (disabled)                             |
 | **Migration**             | autoMigrate                          | Whether to automatically run database migration during deployment                                                                                                          | true (auto-run)                            |
 | **MCP Features**          | mcpAdmin                             | Whether to grant admin permissions to the MCP runtime Lambda function                                                                                                      | false (disabled)                           |
 | **Citations API**         | enableCitations                      | Whether to enable the Citations API for PDF documents ([AWS announcement](https://aws.amazon.com/about-aws/whats-new/2025/06/citations-api-pdf-claude-models-amazon-bedrock/)) | true (enabled)                             |
@@ -207,7 +207,7 @@ The following parameters can be customized during CDK deployment. Edit [`cdk/lib
 > The default values prioritize an easy trial over production hardening:
 >
 > - **WAF IP restrictions**: the defaults allow **all** IP addresses. For production, set the specific IP ranges you want to allow.
-> - **Self-signup** is enabled by default. For production use, we strongly recommend setting `cognitoSelfSignUpEnabled: false`; leaving it enabled allows anyone who reaches the URL to register an account.
+> - **Self-signup** is disabled by default; accounts are issued by administrators from the in-app User Management page. Only enable `cognitoSelfSignUpEnabled: true` (e.g. for a short-term trial) if you accept that anyone who reaches the URL can register an account.
 > - **autoMigrate** runs database migrations automatically on every deployment. For production environments or environments containing important data, consider setting it to `false` and controlling migrations manually.
 
 ### Closed / Private Network Deployment
@@ -263,8 +263,13 @@ This solution incurs infrastructure fixed costs (~$5/day, ~$150/month, mainly fo
 
 This project uses a Cognito custom attribute `rapid_role`. When the ID token contains `custom:rapid_role=admin`, the backend treats the user as an admin.
 
-1. In the Cognito User Pool, set the custom attribute `rapid_role` to `admin` for the target user.
-2. Confirm the ID token includes `custom:rapid_role=admin` after login.
+Self-signup is disabled by default, so the first user must be bootstrapped in the AWS console:
+
+1. In the Cognito User Pool console, create the first user ("Create user") with the email address of the initial administrator. Use the "Send an email invitation" option, or set a temporary password yourself and share it with the user out-of-band.
+2. Still in the console, set the custom attribute `rapid_role` of that user to `admin`.
+3. After the first login, the ID token includes `custom:rapid_role=admin`.
+
+Once the first admin exists, all further accounts (and role changes) are managed from the in-app **User Management** page (`/users`, visible to admins only): creating a user shows a one-time temporary password that the admin hands to the user out-of-band; the user is asked to set a new password at first sign-in.
 
 For local development, setting `RAPID_LOCAL_DEV=true` makes requests run as an admin user.
 
