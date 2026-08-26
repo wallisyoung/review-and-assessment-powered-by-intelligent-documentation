@@ -1,0 +1,81 @@
+[ec2-user@ip-172 ~]$ aws logs tail "/aws/lambda/RapidStackTouki-ApiApiFunctionAA82C666-FehkqjIycgeW" --since 30m --format short
+2026-08-26T02:25:36 Using default document processing model: global.anthropic.claude-sonnet-4-6
+2026-08-26T02:25:36 /var/task/node_modules/@aws-sdk/client-cognito-identity-provider/dist-cjs/index.js:4683
+2026-08-26T02:25:36 const command = makeBuilder(commonParams, "AWSCognitoIdentityProviderService", "CognitoIdentityProviderClient", getEndpointPlugin);
+2026-08-26T02:25:36 ^
+2026-08-26T02:25:36 TypeError: makeBuilder is not a function
+2026-08-26T02:25:36 at Object.<anonymous> (/var/task/node_modules/@aws-sdk/client-cognito-identity-provider/dist-cjs/index.js:4683:17)
+2026-08-26T02:25:36 at Module._compile (node:internal/modules/cjs/loader:1781:14)
+2026-08-26T02:25:36 at Object..js (node:internal/modules/cjs/loader:1913:10)
+2026-08-26T02:25:36 at Module.load (node:internal/modules/cjs/loader:1505:32)
+2026-08-26T02:25:36 at Function._load (node:internal/modules/cjs/loader:1309:12)
+2026-08-26T02:25:36 at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-08-26T02:25:36 at Module.require (node:internal/modules/cjs/loader:1527:12)
+2026-08-26T02:25:36 at require (node:internal/modules/helpers:147:16)
+2026-08-26T02:25:36 at Object.<anonymous> (/var/task/dist/api/features/users/usecase/cognito-user.js:14:44)
+2026-08-26T02:25:36 at Module._compile (node:internal/modules/cjs/loader:1781:14)
+2026-08-26T02:25:36 Node.js v22.23.2
+2026-08-26T02:25:36 EXTENSION   Name: lambda-adapter    State: Ready    Events: []
+2026-08-26T02:25:36 INIT_REPORT Init Duration: 1091.41 ms       Phase: init     Status: error   Error Type: Runtime.ExitError
+2026-08-26T02:25:37 Using default document processing model: global.anthropic.claude-sonnet-4-6
+2026-08-26T02:25:37 /var/task/node_modules/@aws-sdk/client-cognito-identity-provider/dist-cjs/index.js:4683
+2026-08-26T02:25:37 const command = makeBuilder(commonParams, "AWSCognitoIdentityProviderService", "CognitoIdentityProviderClient", getEndpointPlugin);
+2026-08-26T02:25:37 ^
+2026-08-26T02:25:37 TypeError: makeBuilder is not a function
+2026-08-26T02:25:37 at Object.<anonymous> (/var/task/node_modules/@aws-sdk/client-cognito-identity-provider/dist-cjs/index.js:4683:17)
+2026-08-26T02:25:37 at Module._compile (node:internal/modules/cjs/loader:1781:14)
+2026-08-26T02:25:37 at Object..js (node:internal/modules/cjs/loader:1913:10)
+2026-08-26T02:25:37 at Module.load (node:internal/modules/cjs/loader:1505:32)
+2026-08-26T02:25:37 at Function._load (node:internal/modules/cjs/loader:1309:12)
+2026-08-26T02:25:37 at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-08-26T02:25:37 at Module.require (node:internal/modules/cjs/loader:1527:12)
+2026-08-26T02:25:37 at require (node:internal/modules/helpers:147:16)
+2026-08-26T02:25:37 at Object.<anonymous> (/var/task/dist/api/features/users/usecase/cognito-user.js:14:44)
+2026-08-26T02:25:37 at Module._compile (node:internal/modules/cjs/loader:1781:14)
+2026-08-26T02:25:37 Node.js v22.23.2
+2026-08-26T02:25:37 EXTENSION   Name: lambda-adapter    State: Ready    Events: []
+2026-08-26T02:25:37 INIT_REPORT Init Duration: 781.41 ms        Phase: invoke   Status: error   Error Type: Runtime.ExitError
+2026-08-26T02:25:37 START RequestId: 50a82aad-e744-4296-b138-ca53d7cc2a5c Version: $LATEST
+2026-08-26T02:25:37 END RequestId: 50a82aad-e744-4296-b138-ca53d7cc2a5c
+2026-08-26T02:25:37 REPORT RequestId: 50a82aad-e744-4296-b138-ca53d7cc2a5c      Duration: 794.40 ms     Billed Duration: 795 ms Memory Size: 1024 MB    Max Memory Used: 141 MB Status: error   Error Type: Runtime.ExitError
+XRAY TraceId: 1-6a8e4e9f-7c7f8485611b690237dd5549       Sampled: true
+2026-08-26T02:42:14 Using default document processing model: global.anthropic.claude-sonnet-4-6
+2026-08-26T02:42:14 /var/task/node_modules/@aws-sdk/client-cognito-identity-provider/dist-cjs/index.js:4683
+2026-08-26T02:42:14 const command = makeBuilder(commonParams, "AWSCognitoIdentityProviderService", "CognitoIdentityProviderClient", getEndpointPlugin);
+2026-08-26T02:42:14 ^
+2026-08-26T02:42:14 TypeError: makeBuilder is not a function
+2026-08-26T02:42:14 at Object.<anonymous> (/var/task/node_modules/@aws-sdk/client-cognito-identity-provider/dist-cjs/index.js:4683:17)
+2026-08-26T02:42:14 at Module._compile (node:internal/modules/cjs/loader:1781:14)
+2026-08-26T02:42:14 at Object..js (node:internal/modules/cjs/loader:1913:10)
+2026-08-26T02:42:14 at Module.load (node:internal/modules/cjs/loader:1505:32)
+2026-08-26T02:42:14 at Function._load (node:internal/modules/cjs/loader:1309:12)
+2026-08-26T02:42:14 at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-08-26T02:42:14 at Module.require (node:internal/modules/cjs/loader:1527:12)
+2026-08-26T02:42:14 at require (node:internal/modules/helpers:147:16)
+2026-08-26T02:42:14 at Object.<anonymous> (/var/task/dist/api/features/users/usecase/cognito-user.js:14:44)
+2026-08-26T02:42:14 at Module._compile (node:internal/modules/cjs/loader:1781:14)
+2026-08-26T02:42:14 Node.js v22.23.2
+2026-08-26T02:42:14 EXTENSION   Name: lambda-adapter    State: Ready    Events: []
+2026-08-26T02:42:14 INIT_REPORT Init Duration: 1158.50 ms       Phase: init     Status: error   Error Type: Runtime.ExitError
+2026-08-26T02:42:15 Using default document processing model: global.anthropic.claude-sonnet-4-6
+2026-08-26T02:42:15 /var/task/node_modules/@aws-sdk/client-cognito-identity-provider/dist-cjs/index.js:4683
+2026-08-26T02:42:15 const command = makeBuilder(commonParams, "AWSCognitoIdentityProviderService", "CognitoIdentityProviderClient", getEndpointPlugin);
+2026-08-26T02:42:15 ^
+2026-08-26T02:42:15 TypeError: makeBuilder is not a function
+2026-08-26T02:42:15 at Object.<anonymous> (/var/task/node_modules/@aws-sdk/client-cognito-identity-provider/dist-cjs/index.js:4683:17)
+2026-08-26T02:42:15 at Module._compile (node:internal/modules/cjs/loader:1781:14)
+2026-08-26T02:42:15 at Object..js (node:internal/modules/cjs/loader:1913:10)
+2026-08-26T02:42:15 at Module.load (node:internal/modules/cjs/loader:1505:32)
+2026-08-26T02:42:15 at Function._load (node:internal/modules/cjs/loader:1309:12)
+2026-08-26T02:42:15 at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-08-26T02:42:15 at Module.require (node:internal/modules/cjs/loader:1527:12)
+2026-08-26T02:42:15 at require (node:internal/modules/helpers:147:16)
+2026-08-26T02:42:15 at Object.<anonymous> (/var/task/dist/api/features/users/usecase/cognito-user.js:14:44)
+2026-08-26T02:42:15 at Module._compile (node:internal/modules/cjs/loader:1781:14)
+2026-08-26T02:42:15 Node.js v22.23.2
+2026-08-26T02:42:15 EXTENSION   Name: lambda-adapter    State: Ready    Events: []
+2026-08-26T02:42:15 INIT_REPORT Init Duration: 883.43 ms        Phase: invoke   Status: error   Error Type: Runtime.ExitError
+2026-08-26T02:42:15 START RequestId: 674eb8ea-abf9-431e-8350-455fd75dbf47 Version: $LATEST
+2026-08-26T02:42:15 END RequestId: 674eb8ea-abf9-431e-8350-455fd75dbf47
+2026-08-26T02:42:15 REPORT RequestId: 674eb8ea-abf9-431e-8350-455fd75dbf47      Duration: 895.23 ms     Billed Duration: 896 ms Memory Size: 1024 MB    Max Memory Used: 141 MB Status: error   Error Type: Runtime.ExitError
+XRAY TraceId: 1-6a8e5284-7ea0a9b60c7ca7450c9c9e0b       Sampled: true
