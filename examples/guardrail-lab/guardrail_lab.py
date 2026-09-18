@@ -2,10 +2,19 @@
 Amazon Bedrock Guardrails 动手实验（boto3）
 
 验证 docs/research/aws-bedrock-guardrails-mechanism.md 的三个结论：
-  [1] text 中的 PII（EMAIL/PHONE 等）会被干预（BLOCK/ANONYMIZE）—— 阳性对照
-      （email_only = EMAIL+BLOCK 最小文本 A/B；en_pii = PHONE/NAME/ADDRESS+ANONYMIZE）
-  [2] 日本语氏名/住址不在内置实体清单，大概率不命中 —— 日文实体缺位
+  [1] text 中的 PII 会被干预（BLOCK / ANONYMIZE）—— 阳性对照
+  [2] 日本语氏名/住址不在内置实体清单 —— 日文实体缺位
   [3] PDF 以 document 块直传时，敏感信息过滤器不评估其内容 —— 主路径不被覆盖
+
+实验设计（v3，双 guardrail 对照）：
+  同一套实体（EMAIL/PHONE/NAME/ADDRESS）分别建 BLOCK 版与 ANONYMIZE 版，
+  相同文本各跑一遍。判读矩阵：
+    - BLOCK 版命中、ANONYMIZE 版不命中 → ANONYMIZE 在独立 ApplyGuardrail
+      输入方向存在行为问题（再试 inputAction 显式指定 / Converse 路径）
+    - 两版都不命中 PHONE/NAME → 该实体类型对此文本未检出（换典型格式再试）
+    - ANONYMIZE 版命中且 output 出现 {EMAIL} 占位符 → 一切正常
+  注：GetGuardrail 响应键为 sensitiveInformationPolicy（非创建请求的
+  sensitiveInformationPolicyConfig），回显按此读取。
 
 前置：
   - IAM: bedrock:CreateGuardrail / ApplyGuardrail / DeleteGuardrail
@@ -27,10 +36,12 @@ import time
 import boto3
 from botocore.exceptions import ClientError
 
+ENTITY_TYPES = ("EMAIL", "PHONE", "NAME", "ADDRESS")
+
 SAMPLE_TEXTS = {
-    # [1a] 最小文本：隔离变量，验证 EMAIL+BLOCK（最基础动作）是否触发
+    # [1a] 最小文本：隔离变量
     "email_only": "Contact: john@example.com.",
-    # [1] 阳性对照：英文 + 邮箱/电话/姓名（内置实体，ANONYMIZE）
+    # [1] 阳性对照：英文 + 邮箱/电话/姓名
     "en_pii": (
         "My name is John Smith. Please reply to john.smith@example.com "
         "or call +1 206-555-0100."
@@ -44,35 +55,34 @@ def dump(obj) -> str:
     return json.dumps(obj, ensure_ascii=False, indent=2)
 
 
-def create_guardrail(bedrock, name: str) -> str:
+def create_guardrail(bedrock, name: str, action: str) -> str:
     resp = bedrock.create_guardrail(
         name=name,
-        description="lab: PII anonymize experiment (auto-cleanup)",
+        description=f"lab: PII {action} experiment (auto-cleanup)",
         sensitiveInformationPolicyConfig={
             "piiEntitiesConfig": [
-                # A/B 诊断：EMAIL 用 BLOCK（最基础动作），其余用 ANONYMIZE。
-                # 若 BLOCK 触发而 ANONYMIZE 不触发 → 动作特有问题；
-                # 若两者都不触发 → 检测侧（实体/账号/区域）问题。
-                {"type": "EMAIL", "action": "BLOCK"},
-                {"type": "PHONE", "action": "ANONYMIZE"},
-                {"type": "NAME", "action": "ANONYMIZE"},
-                {"type": "ADDRESS", "action": "ANONYMIZE"},
+                {"type": t, "action": action} for t in ENTITY_TYPES
             ],
         },
         blockedInputMessaging="[BLOCKED] 入力はガードレールによりブロックされました。",
         blockedOutputsMessaging="[BLOCKED] 出力はガードレールによりブロックされました。",
     )
     gid = resp["guardrailId"]
-    print(f"[create] guardrailId={gid} (DRAFT)")
-    # 诊断：回显服务端实际存储的 PII 配置（确认实体与动作已落盘）
+    print(f"[create:{action}] guardrailId={gid} (DRAFT)")
+    # 诊断：回显服务端实际存储的 PII 配置。
+    # 注意 GetGuardrail 响应键是 sensitiveInformationPolicy（内层 piiEntities），
+    # 与创建请求的 sensitiveInformationPolicyConfig.piiEntitiesConfig 不同名。
     stored = bedrock.get_guardrail(guardrailIdentifier=gid)
-    print("[create] stored sensitiveInformationPolicyConfig:")
-    print(dump(stored.get("sensitiveInformationPolicyConfig", {})))
+    print(f"[create:{action}] response keys: {sorted(stored.keys())}")
+    sip = stored.get("sensitiveInformationPolicy",
+                     stored.get("sensitiveInformationPolicyConfig"))
+    print(f"[create:{action}] stored sensitive information policy:")
+    print(dump(sip))
     return gid
 
 
-def run_apply_guardrail(brt, gid: str, label: str, text: str) -> None:
-    print(f"\n=== ApplyGuardrail [{label}] ===")
+def run_apply_guardrail(brt, gid: str, action: str, label: str, text: str) -> None:
+    print(f"\n=== ApplyGuardrail [{action}/{label}] ===")
     print(f"input : {text}")
     resp = brt.apply_guardrail(
         guardrailIdentifier=gid,
@@ -134,16 +144,19 @@ def main() -> int:
 
     bedrock = boto3.client("bedrock", region_name=args.region)
     brt = boto3.client("bedrock-runtime", region_name=args.region)
-    name = f"lab-guardrail-{int(time.time())}"
-
-    gid = create_guardrail(bedrock, name)
+    ts = int(time.time())
+    gids = {}
     try:
-        # [1a] 最小文本 A/B & [1] 阳性对照 & [2] 日文实体缺位（不调模型，零模型费用）
-        run_apply_guardrail(brt, gid, "email_only", SAMPLE_TEXTS["email_only"])
-        run_apply_guardrail(brt, gid, "en_pii", SAMPLE_TEXTS["en_pii"])
-        run_apply_guardrail(brt, gid, "ja_pii", SAMPLE_TEXTS["ja_pii"])
+        # 双 guardrail 对照：BLOCK 版与 ANONYMIZE 版
+        gids["BLOCK"] = create_guardrail(bedrock, f"lab-gr-block-{ts}", "BLOCK")
+        gids["ANONYMIZE"] = create_guardrail(bedrock, f"lab-gr-anon-{ts}", "ANONYMIZE")
+
+        for label, text in SAMPLE_TEXTS.items():
+            for action in ("BLOCK", "ANONYMIZE"):
+                run_apply_guardrail(brt, gids[action], action, label, text)
 
         if args.converse:
+            gid = gids["ANONYMIZE"]
             # 模型收到的 prompt 已被脱敏（ANONYMIZE 占位符，trace 可见命中项）
             run_converse(brt, gid, args.model_id, "en_pii",
                          [{"text": SAMPLE_TEXTS["en_pii"]}])
@@ -161,8 +174,9 @@ def main() -> int:
                     }},
                 ])
     finally:
-        bedrock.delete_guardrail(guardrailIdentifier=gid)
-        print(f"\n[cleanup] deleted guardrail {gid}")
+        for action, gid in gids.items():
+            bedrock.delete_guardrail(guardrailIdentifier=gid)
+            print(f"\n[cleanup] deleted {action} guardrail {gid}")
     return 0
 
 
