@@ -1,0 +1,80 @@
+]$ python3.12 guardrail_lab.py --region us-east-1
+[create] guardrailId=rmp5hxidvous (DRAFT)
+
+=== ApplyGuardrail [en_pii] ===
+input : My name is John Smith. Please reply to john.smith@example.com or call +1 206-555-0100.
+action: NONE
+assessments:
+[
+  {
+    "invocationMetrics": {
+      "guardrailProcessingLatency": 45,
+      "usage": {
+        "topicPolicyUnits": 0,
+        "contentPolicyUnits": 0,
+        "wordPolicyUnits": 0,
+        "sensitiveInformationPolicyUnits": 0,
+        "sensitiveInformationPolicyFreeUnits": 0,
+        "contextualGroundingPolicyUnits": 0,
+        "contentPolicyImageUnits": 0,
+        "automatedReasoningPolicyUnits": 0,
+        "automatedReasoningPolicies": 0
+      },
+      "guardrailCoverage": {
+        "textCharacters": {
+          "guarded": 86,
+          "total": 86
+        }
+      }
+    },
+    "appliedGuardrailDetails": {
+      "guardrailId": "rmp5hxidvous",
+      "guardrailVersion": "DRAFT",
+      "guardrailArn": "arn:aws:bedrock:us-east-1:555555555555553:guardrail/rmp5hxidvous",
+      "guardrailOrigin": [
+        "REQUEST"
+      ],
+      "guardrailOwnership": "SELF"
+    }
+  }
+]
+
+=== ApplyGuardrail [ja_pii] ===
+input : 担当者は山田太郎です。住所は東京都千代田区一番町1-2-3です。
+action: NONE
+assessments:
+[
+  {
+    "invocationMetrics": {
+      "guardrailProcessingLatency": 40,
+      "usage": {
+        "topicPolicyUnits": 0,
+        "contentPolicyUnits": 0,
+        "wordPolicyUnits": 0,
+        "sensitiveInformationPolicyUnits": 0,
+        "sensitiveInformationPolicyFreeUnits": 0,
+        "contextualGroundingPolicyUnits": 0,
+        "contentPolicyImageUnits": 0,
+        "automatedReasoningPolicyUnits": 0,
+        "automatedReasoningPolicies": 0
+      },
+      "guardrailCoverage": {
+        "textCharacters": {
+          "guarded": 32,
+          "total": 32
+        }
+      }
+    },
+    "appliedGuardrailDetails": {
+      "guardrailId": "rmp5hxidvous",
+      "guardrailVersion": "DRAFT",
+      "guardrailArn": "arn:aws:bedrock:us-east-1:5555555555555555:guardrail/rmp5hxidvous",
+      "guardrailOrigin": [
+        "REQUEST"
+      ],
+      "guardrailOwnership": "SELF"
+    }
+  }
+]
+
+[cleanup] deleted guardrail rmp5hxidvous
