@@ -2,7 +2,8 @@
 Amazon Bedrock Guardrails 动手实验（boto3）
 
 验证 docs/research/aws-bedrock-guardrails-mechanism.md 的三个结论：
-  [1] text 中的 PII（EMAIL/PHONE 等）会被 ANONYMIZE（占位符替换）—— 阳性对照
+  [1] text 中的 PII（EMAIL/PHONE 等）会被干预（BLOCK/ANONYMIZE）—— 阳性对照
+      （email_only = EMAIL+BLOCK 最小文本 A/B；en_pii = PHONE/NAME/ADDRESS+ANONYMIZE）
   [2] 日本语氏名/住址不在内置实体清单，大概率不命中 —— 日文实体缺位
   [3] PDF 以 document 块直传时，敏感信息过滤器不评估其内容 —— 主路径不被覆盖
 
@@ -27,7 +28,9 @@ import boto3
 from botocore.exceptions import ClientError
 
 SAMPLE_TEXTS = {
-    # [1] 阳性对照：英文 + 邮箱/电话（内置实体）
+    # [1a] 最小文本：隔离变量，验证 EMAIL+BLOCK（最基础动作）是否触发
+    "email_only": "Contact: john@example.com.",
+    # [1] 阳性对照：英文 + 邮箱/电话/姓名（内置实体，ANONYMIZE）
     "en_pii": (
         "My name is John Smith. Please reply to john.smith@example.com "
         "or call +1 206-555-0100."
@@ -47,8 +50,10 @@ def create_guardrail(bedrock, name: str) -> str:
         description="lab: PII anonymize experiment (auto-cleanup)",
         sensitiveInformationPolicyConfig={
             "piiEntitiesConfig": [
-                # action 现行枚举仅 BLOCK / ANONYMIZE / NONE（MASK 已被 ANONYMIZE 取代）
-                {"type": "EMAIL", "action": "ANONYMIZE"},
+                # A/B 诊断：EMAIL 用 BLOCK（最基础动作），其余用 ANONYMIZE。
+                # 若 BLOCK 触发而 ANONYMIZE 不触发 → 动作特有问题；
+                # 若两者都不触发 → 检测侧（实体/账号/区域）问题。
+                {"type": "EMAIL", "action": "BLOCK"},
                 {"type": "PHONE", "action": "ANONYMIZE"},
                 {"type": "NAME", "action": "ANONYMIZE"},
                 {"type": "ADDRESS", "action": "ANONYMIZE"},
@@ -59,6 +64,10 @@ def create_guardrail(bedrock, name: str) -> str:
     )
     gid = resp["guardrailId"]
     print(f"[create] guardrailId={gid} (DRAFT)")
+    # 诊断：回显服务端实际存储的 PII 配置（确认实体与动作已落盘）
+    stored = bedrock.get_guardrail(guardrailIdentifier=gid)
+    print("[create] stored sensitiveInformationPolicyConfig:")
+    print(dump(stored.get("sensitiveInformationPolicyConfig", {})))
     return gid
 
 
@@ -72,9 +81,13 @@ def run_apply_guardrail(brt, gid: str, label: str, text: str) -> None:
         content=[{"text": {"text": text}}],
     )
     print(f"action: {resp['action']}")
-    for out in resp.get("output", []):
-        if "text" in out:
-            print(f"output: {out['text']}")
+    outputs = resp.get("output", [])
+    if outputs:
+        for out in outputs:
+            if "text" in out:
+                print(f"output: {out['text']}")
+    else:
+        print("output: (empty — 无任何干预/脱敏输出)")
     assessments = resp.get("assessments", [])
     if assessments:
         print("assessments:")
@@ -125,7 +138,8 @@ def main() -> int:
 
     gid = create_guardrail(bedrock, name)
     try:
-        # [1] 阳性对照 & [2] 日文实体缺位（不调模型，零模型费用）
+        # [1a] 最小文本 A/B & [1] 阳性对照 & [2] 日文实体缺位（不调模型，零模型费用）
+        run_apply_guardrail(brt, gid, "email_only", SAMPLE_TEXTS["email_only"])
         run_apply_guardrail(brt, gid, "en_pii", SAMPLE_TEXTS["en_pii"])
         run_apply_guardrail(brt, gid, "ja_pii", SAMPLE_TEXTS["ja_pii"])
 
