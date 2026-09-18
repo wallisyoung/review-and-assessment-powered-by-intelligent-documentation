@@ -546,3 +546,12 @@ FAQ 侧同义表述（[Bedrock FAQ](https://aws.amazon.com/bedrock/faqs/)）：
 ## 勘误（2026-09-18，实测发现）
 
 **"MASK" 作为 PII 动作名在现行 CreateGuardrail API 中不存在。** 实测（us-east-1，2026-09-18）`CreateGuardrail` 服务端校验返回：`sensitiveInformationPolicyConfig.piiEntitiesConfig.*.member.action` 合法枚举为 **`[BLOCK, ANONYMIZE, NONE]`**。旧文档/博客行文中的 "mask/masking" 在现行 API 里对应 **ANONYMIZE**（将 PII 替换为实体类型占位符）。本文主报告与追加调查一中所有涉及 "MASK 动作" 的表述，机制结论不变（命中时**生成模型收到的是占位符替换后的脱敏文本，PII 原文不会到达生成模型**），但动作名应以 ANONYMIZE 读解。实验脚本 `examples/guardrail-lab/guardrail_lab.py` 已改用 ANONYMIZE。
+
+---
+
+## 实测补充（2026-09-18，run16 双 guardrail 对照）
+
+同一账号/区域、同一文本，对 BLOCK 版与 ANONYMIZE 版 guardrail 做干净对照（`examples/guardrail-lab/guardrail_lab.py`，日志 `logs/16.log`，配置回显确认两版均正确存储）。两个结论：
+
+1. **日语检出成立——追加节 B 的"日本格式需自定义 regex"推断予以更正**。BLOCK 版的一般实体对纯日语文本命中：`山田太郎`（NAME，detected=true）、`東京都千代田区一番町1-2-3`（ADDRESS，detected=true）。即实体清单虽无"日本特有实体类型"，但通用 NAME/ADDRESS 的 ML 检测器可检出日语氏名/住址，与语言支持页 "Japanese: Optimized and supported" 一致。原"日语实体缺位"不适用理由不成立；提案资料（2026-09-16 版）的理由③已同步修正。
+2. **独立 ApplyGuardrail 的 INPUT 方向对 ANONYMIZE 不做评估（实测异常，原因待定）**。同一文本下 BLOCK 版三条样本全部 `GUARDRAIL_INTERVENED`（EMAIL/PHONE/NAME/ADDRESS 四类实体均命中），而 ANONYMIZE 版三条均为 `action=NONE`、assessments 无 sensitiveInformationPolicy 段、`sensitiveInformationPolicyUnits: 0`——PII 评估未发生、未计费。对照官方 ApplyGuardrail 文档：响应 schema 明确支持 `"action": "ANONYMIZED"`，但 masking 示例为 `source: "OUTPUT"`，INPUT 方向示例均为 BLOCK 类策略（https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-use-independent-api.html）。待验证：OUTPUT 方向、正则实体、以及 Converse（guardrailConfig）路径下 ANONYMIZE 是否正常（v4 实验脚本已就绪）。
