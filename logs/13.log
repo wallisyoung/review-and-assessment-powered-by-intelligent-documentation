@@ -1,0 +1,20 @@
+$ python3.12 guardrail_lab.py --region us-east-1
+Traceback (most recent call last):
+  File "/home/ec2-user/review-and-assessment-powered-by-intelligent-documentation/examples/guardrail-lab/guardrail_lab.py", line 155, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/ec2-user/review-and-assessment-powered-by-intelligent-documentation/examples/guardrail-lab/guardrail_lab.py", line 125, in main
+    gid = create_guardrail(bedrock, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ec2-user/review-and-assessment-powered-by-intelligent-documentation/examples/guardrail-lab/guardrail_lab.py", line 45, in create_guardrail
+    resp = bedrock.create_guardrail(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ec2-user/.local/lib/python3.12/site-packages/botocore/client.py", line 606, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ec2-user/.local/lib/python3.12/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ec2-user/.local/lib/python3.12/site-packages/botocore/client.py", line 1094, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+botocore.errorfactory.ValidationException: An error occurred (ValidationException) when calling the CreateGuardrail operation: 4 validation errors detected: Value at 'sensitiveInformationPolicyConfig.piiEntitiesConfig.1.member.action' failed to satisfy constraint: Member must satisfy enum value set: [BLOCK, ANONYMIZE, NONE]; Value at 'sensitiveInformationPolicyConfig.piiEntitiesConfig.2.member.action' failed to satisfy constraint: Member must satisfy enum value set: [BLOCK, ANONYMIZE, NONE]; Value at 'sensitiveInformationPolicyConfig.piiEntitiesConfig.3.member.action' failed to satisfy constraint: Member must satisfy enum value set: [BLOCK, ANONYMIZE, NONE]; Value at 'sensitiveInformationPolicyConfig.piiEntitiesConfig.4.member.action' failed to satisfy constraint: Member must satisfy enum value set: [BLOCK, ANONYMIZE, NONE]
