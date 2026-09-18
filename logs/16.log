@@ -1,0 +1,338 @@
+$ python3.12 guardrail_lab.py --region us-east-1
+[create:BLOCK] guardrailId=950n887rn2is (DRAFT)
+[create:BLOCK] response keys: ['ResponseMetadata', 'blockedInputMessaging', 'blockedOutputsMessaging', 'createdAt', 'description', 'failureRecommendations', 'guardrailArn', 'guardrailId', 'name', 'sensitiveInformationPolicy', 'status', 'statusReasons', 'updatedAt', 'version']
+[create:BLOCK] stored sensitive information policy:
+{
+  "piiEntities": [
+    {
+      "type": "EMAIL",
+      "action": "BLOCK"
+    },
+    {
+      "type": "PHONE",
+      "action": "BLOCK"
+    },
+    {
+      "type": "NAME",
+      "action": "BLOCK"
+    },
+    {
+      "type": "ADDRESS",
+      "action": "BLOCK"
+    }
+  ],
+  "regexes": []
+}
+[create:ANONYMIZE] guardrailId=j4cqn0jnb7a3 (DRAFT)
+[create:ANONYMIZE] response keys: ['ResponseMetadata', 'blockedInputMessaging', 'blockedOutputsMessaging', 'createdAt', 'description', 'failureRecommendations', 'guardrailArn', 'guardrailId', 'name', 'sensitiveInformationPolicy', 'status', 'statusReasons', 'updatedAt', 'version']
+[create:ANONYMIZE] stored sensitive information policy:
+{
+  "piiEntities": [
+    {
+      "type": "EMAIL",
+      "action": "ANONYMIZE"
+    },
+    {
+      "type": "PHONE",
+      "action": "ANONYMIZE"
+    },
+    {
+      "type": "NAME",
+      "action": "ANONYMIZE"
+    },
+    {
+      "type": "ADDRESS",
+      "action": "ANONYMIZE"
+    }
+  ],
+  "regexes": []
+}
+
+=== ApplyGuardrail [BLOCK/email_only] ===
+input : Contact: john@example.com.
+action: GUARDRAIL_INTERVENED
+output: (empty — 无任何干预/脱敏输出)
+assessments:
+[
+  {
+    "sensitiveInformationPolicy": {
+      "piiEntities": [
+        {
+          "match": "john@example.com",
+          "type": "EMAIL",
+          "action": "BLOCKED",
+          "detected": true
+        }
+      ],
+      "regexes": []
+    },
+    "invocationMetrics": {
+      "guardrailProcessingLatency": 71,
+      "usage": {
+        "topicPolicyUnits": 0,
+        "contentPolicyUnits": 0,
+        "wordPolicyUnits": 0,
+        "sensitiveInformationPolicyUnits": 1,
+        "sensitiveInformationPolicyFreeUnits": 0,
+        "contextualGroundingPolicyUnits": 0,
+        "contentPolicyImageUnits": 0,
+        "automatedReasoningPolicyUnits": 0,
+        "automatedReasoningPolicies": 0
+      },
+      "guardrailCoverage": {
+        "textCharacters": {
+          "guarded": 26,
+          "total": 26
+        }
+      }
+    },
+    "appliedGuardrailDetails": {
+      "guardrailId": "950n887rn2is",
+      "guardrailVersion": "DRAFT",
+      "guardrailArn": "arn:aws:bedrock:us-east-1:xxxxxxxxxxx:guardrail/950n887rn2is",
+      "guardrailOrigin": [
+        "REQUEST"
+      ],
+      "guardrailOwnership": "SELF"
+    }
+  }
+]
+
+=== ApplyGuardrail [ANONYMIZE/email_only] ===
+input : Contact: john@example.com.
+action: NONE
+output: (empty — 无任何干预/脱敏输出)
+assessments:
+[
+  {
+    "invocationMetrics": {
+      "guardrailProcessingLatency": 39,
+      "usage": {
+        "topicPolicyUnits": 0,
+        "contentPolicyUnits": 0,
+        "wordPolicyUnits": 0,
+        "sensitiveInformationPolicyUnits": 0,
+        "sensitiveInformationPolicyFreeUnits": 0,
+        "contextualGroundingPolicyUnits": 0,
+        "contentPolicyImageUnits": 0,
+        "automatedReasoningPolicyUnits": 0,
+        "automatedReasoningPolicies": 0
+      },
+      "guardrailCoverage": {
+        "textCharacters": {
+          "guarded": 26,
+          "total": 26
+        }
+      }
+    },
+    "appliedGuardrailDetails": {
+      "guardrailId": "j4cqn0jnb7a3",
+      "guardrailVersion": "DRAFT",
+      "guardrailArn": "arn:aws:bedrock:us-east-1:xxxxxxxxxxx:guardrail/j4cqn0jnb7a3",
+      "guardrailOrigin": [
+        "REQUEST"
+      ],
+      "guardrailOwnership": "SELF"
+    }
+  }
+]
+
+=== ApplyGuardrail [BLOCK/en_pii] ===
+input : My name is John Smith. Please reply to john.smith@example.com or call +1 206-555-0100.
+action: GUARDRAIL_INTERVENED
+output: (empty — 无任何干预/脱敏输出)
+assessments:
+[
+  {
+    "sensitiveInformationPolicy": {
+      "piiEntities": [
+        {
+          "match": "John Smith",
+          "type": "NAME",
+          "action": "BLOCKED",
+          "detected": true
+        },
+        {
+          "match": "john.smith@example.com",
+          "type": "EMAIL",
+          "action": "BLOCKED",
+          "detected": true
+        },
+        {
+          "match": "+1 206-555-0100",
+          "type": "PHONE",
+          "action": "BLOCKED",
+          "detected": true
+        }
+      ],
+      "regexes": []
+    },
+    "invocationMetrics": {
+      "guardrailProcessingLatency": 99,
+      "usage": {
+        "topicPolicyUnits": 0,
+        "contentPolicyUnits": 0,
+        "wordPolicyUnits": 0,
+        "sensitiveInformationPolicyUnits": 1,
+        "sensitiveInformationPolicyFreeUnits": 0,
+        "contextualGroundingPolicyUnits": 0,
+        "contentPolicyImageUnits": 0,
+        "automatedReasoningPolicyUnits": 0,
+        "automatedReasoningPolicies": 0
+      },
+      "guardrailCoverage": {
+        "textCharacters": {
+          "guarded": 86,
+          "total": 86
+        }
+      }
+    },
+    "appliedGuardrailDetails": {
+      "guardrailId": "950n887rn2is",
+      "guardrailVersion": "DRAFT",
+      "guardrailArn": "arn:aws:bedrock:us-east-1:xxxxxxxxxxx:guardrail/950n887rn2is",
+      "guardrailOrigin": [
+        "REQUEST"
+      ],
+      "guardrailOwnership": "SELF"
+    }
+  }
+]
+
+=== ApplyGuardrail [ANONYMIZE/en_pii] ===
+input : My name is John Smith. Please reply to john.smith@example.com or call +1 206-555-0100.
+action: NONE
+output: (empty — 无任何干预/脱敏输出)
+assessments:
+[
+  {
+    "invocationMetrics": {
+      "guardrailProcessingLatency": 38,
+      "usage": {
+        "topicPolicyUnits": 0,
+        "contentPolicyUnits": 0,
+        "wordPolicyUnits": 0,
+        "sensitiveInformationPolicyUnits": 0,
+        "sensitiveInformationPolicyFreeUnits": 0,
+        "contextualGroundingPolicyUnits": 0,
+        "contentPolicyImageUnits": 0,
+        "automatedReasoningPolicyUnits": 0,
+        "automatedReasoningPolicies": 0
+      },
+      "guardrailCoverage": {
+        "textCharacters": {
+          "guarded": 86,
+          "total": 86
+        }
+      }
+    },
+    "appliedGuardrailDetails": {
+      "guardrailId": "j4cqn0jnb7a3",
+      "guardrailVersion": "DRAFT",
+      "guardrailArn": "arn:aws:bedrock:us-east-1:xxxxxxxxxxx:guardrail/j4cqn0jnb7a3",
+      "guardrailOrigin": [
+        "REQUEST"
+      ],
+      "guardrailOwnership": "SELF"
+    }
+  }
+]
+
+=== ApplyGuardrail [BLOCK/ja_pii] ===
+input : 担当者は山田太郎です。住所は東京都千代田区一番町1-2-3です。
+action: GUARDRAIL_INTERVENED
+output: (empty — 无任何干预/脱敏输出)
+assessments:
+[
+  {
+    "sensitiveInformationPolicy": {
+      "piiEntities": [
+        {
+          "match": "山田太郎",
+          "type": "NAME",
+          "action": "BLOCKED",
+          "detected": true
+        },
+        {
+          "match": "東京都千代田区一番町1-2-3",
+          "type": "ADDRESS",
+          "action": "BLOCKED",
+          "detected": true
+        }
+      ],
+      "regexes": []
+    },
+    "invocationMetrics": {
+      "guardrailProcessingLatency": 72,
+      "usage": {
+        "topicPolicyUnits": 0,
+        "contentPolicyUnits": 0,
+        "wordPolicyUnits": 0,
+        "sensitiveInformationPolicyUnits": 1,
+        "sensitiveInformationPolicyFreeUnits": 0,
+        "contextualGroundingPolicyUnits": 0,
+        "contentPolicyImageUnits": 0,
+        "automatedReasoningPolicyUnits": 0,
+        "automatedReasoningPolicies": 0
+      },
+      "guardrailCoverage": {
+        "textCharacters": {
+          "guarded": 32,
+          "total": 32
+        }
+      }
+    },
+    "appliedGuardrailDetails": {
+      "guardrailId": "950n887rn2is",
+      "guardrailVersion": "DRAFT",
+      "guardrailArn": "arn:aws:bedrock:us-east-1:xxxxxxxxxxx:guardrail/950n887rn2is",
+      "guardrailOrigin": [
+        "REQUEST"
+      ],
+      "guardrailOwnership": "SELF"
+    }
+  }
+]
+
+=== ApplyGuardrail [ANONYMIZE/ja_pii] ===
+input : 担当者は山田太郎です。住所は東京都千代田区一番町1-2-3です。
+action: NONE
+output: (empty — 无任何干预/脱敏输出)
+assessments:
+[
+  {
+    "invocationMetrics": {
+      "guardrailProcessingLatency": 47,
+      "usage": {
+        "topicPolicyUnits": 0,
+        "contentPolicyUnits": 0,
+        "wordPolicyUnits": 0,
+        "sensitiveInformationPolicyUnits": 0,
+        "sensitiveInformationPolicyFreeUnits": 0,
+        "contextualGroundingPolicyUnits": 0,
+        "contentPolicyImageUnits": 0,
+        "automatedReasoningPolicyUnits": 0,
+        "automatedReasoningPolicies": 0
+      },
+      "guardrailCoverage": {
+        "textCharacters": {
+          "guarded": 32,
+          "total": 32
+        }
+      }
+    },
+    "appliedGuardrailDetails": {
+      "guardrailId": "j4cqn0jnb7a3",
+      "guardrailVersion": "DRAFT",
+      "guardrailArn": "arn:aws:bedrock:us-east-1:xxxxxxxxxxx:guardrail/j4cqn0jnb7a3",
+      "guardrailOrigin": [
+        "REQUEST"
+      ],
+      "guardrailOwnership": "SELF"
+    }
+  }
+]
+
+[cleanup] deleted BLOCK guardrail 950n887rn2is
+
+[cleanup] deleted ANONYMIZE guardrail j4cqn0jnb7a3
