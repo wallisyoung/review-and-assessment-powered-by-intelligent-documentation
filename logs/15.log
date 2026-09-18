@@ -1,0 +1,145 @@
+$ python3.12 guardrail_lab.py --region us-east-1
+[create] guardrailId=ozs1xqowqbmn (DRAFT)
+[create] stored sensitiveInformationPolicyConfig:
+{}
+
+=== ApplyGuardrail [email_only] ===
+input : Contact: john@example.com.
+action: GUARDRAIL_INTERVENED
+output: (empty — 无任何干预/脱敏输出)
+assessments:
+[
+  {
+    "sensitiveInformationPolicy": {
+      "piiEntities": [
+        {
+          "match": "john@example.com",
+          "type": "EMAIL",
+          "action": "BLOCKED",
+          "detected": true
+        }
+      ],
+      "regexes": []
+    },
+    "invocationMetrics": {
+      "guardrailProcessingLatency": 72,
+      "usage": {
+        "topicPolicyUnits": 0,
+        "contentPolicyUnits": 0,
+        "wordPolicyUnits": 0,
+        "sensitiveInformationPolicyUnits": 1,
+        "sensitiveInformationPolicyFreeUnits": 0,
+        "contextualGroundingPolicyUnits": 0,
+        "contentPolicyImageUnits": 0,
+        "automatedReasoningPolicyUnits": 0,
+        "automatedReasoningPolicies": 0
+      },
+      "guardrailCoverage": {
+        "textCharacters": {
+          "guarded": 26,
+          "total": 26
+        }
+      }
+    },
+    "appliedGuardrailDetails": {
+      "guardrailId": "ozs1xqowqbmn",
+      "guardrailVersion": "DRAFT",
+      "guardrailArn": "arn:aws:bedrock:us-east-1:xxxxxxxxxxxxx:guardrail/ozs1xqowqbmn",
+      "guardrailOrigin": [
+        "REQUEST"
+      ],
+      "guardrailOwnership": "SELF"
+    }
+  }
+]
+
+=== ApplyGuardrail [en_pii] ===
+input : My name is John Smith. Please reply to john.smith@example.com or call +1 206-555-0100.
+action: GUARDRAIL_INTERVENED
+output: (empty — 无任何干预/脱敏输出)
+assessments:
+[
+  {
+    "sensitiveInformationPolicy": {
+      "piiEntities": [
+        {
+          "match": "john.smith@example.com",
+          "type": "EMAIL",
+          "action": "BLOCKED",
+          "detected": true
+        }
+      ],
+      "regexes": []
+    },
+    "invocationMetrics": {
+      "guardrailProcessingLatency": 188,
+      "usage": {
+        "topicPolicyUnits": 0,
+        "contentPolicyUnits": 0,
+        "wordPolicyUnits": 0,
+        "sensitiveInformationPolicyUnits": 1,
+        "sensitiveInformationPolicyFreeUnits": 0,
+        "contextualGroundingPolicyUnits": 0,
+        "contentPolicyImageUnits": 0,
+        "automatedReasoningPolicyUnits": 0,
+        "automatedReasoningPolicies": 0
+      },
+      "guardrailCoverage": {
+        "textCharacters": {
+          "guarded": 86,
+          "total": 86
+        }
+      }
+    },
+    "appliedGuardrailDetails": {
+      "guardrailId": "ozs1xqowqbmn",
+      "guardrailVersion": "DRAFT",
+      "guardrailArn": "arn:aws:bedrock:us-east-1:xxxxxxxxxxxxxxxxxx:guardrail/ozs1xqowqbmn",
+      "guardrailOrigin": [
+        "REQUEST"
+      ],
+      "guardrailOwnership": "SELF"
+    }
+  }
+]
+
+=== ApplyGuardrail [ja_pii] ===
+input : 担当者は山田太郎です。住所は東京都千代田区一番町1-2-3です。
+action: NONE
+output: (empty — 无任何干预/脱敏输出)
+assessments:
+[
+  {
+    "invocationMetrics": {
+      "guardrailProcessingLatency": 83,
+      "usage": {
+        "topicPolicyUnits": 0,
+        "contentPolicyUnits": 0,
+        "wordPolicyUnits": 0,
+        "sensitiveInformationPolicyUnits": 1,
+        "sensitiveInformationPolicyFreeUnits": 0,
+        "contextualGroundingPolicyUnits": 0,
+        "contentPolicyImageUnits": 0,
+        "automatedReasoningPolicyUnits": 0,
+        "automatedReasoningPolicies": 0
+      },
+      "guardrailCoverage": {
+        "textCharacters": {
+          "guarded": 32,
+          "total": 32
+        }
+      }
+    },
+    "appliedGuardrailDetails": {
+      "guardrailId": "ozs1xqowqbmn",
+      "guardrailVersion": "DRAFT",
+      "guardrailArn": "arn:aws:bedrock:us-east-1:xxxxxxxxxx:guardrail/ozs1xqowqbmn",
+      "guardrailOrigin": [
+        "REQUEST"
+      ],
+      "guardrailOwnership": "SELF"
+    }
+  }
+]
+
+[cleanup] deleted guardrail ozs1xqowqbmn
