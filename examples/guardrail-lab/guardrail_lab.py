@@ -2,7 +2,7 @@
 Amazon Bedrock Guardrails 动手实验（boto3）
 
 验证 docs/research/aws-bedrock-guardrails-mechanism.md 的三个结论：
-  [1] text 中的 PII（EMAIL/PHONE 等）会被 MASK —— 阳性对照
+  [1] text 中的 PII（EMAIL/PHONE 等）会被 ANONYMIZE（占位符替换）—— 阳性对照
   [2] 日本语氏名/住址不在内置实体清单，大概率不命中 —— 日文实体缺位
   [3] PDF 以 document 块直传时，敏感信息过滤器不评估其内容 —— 主路径不被覆盖
 
@@ -44,13 +44,14 @@ def dump(obj) -> str:
 def create_guardrail(bedrock, name: str) -> str:
     resp = bedrock.create_guardrail(
         name=name,
-        description="lab: PII mask experiment (auto-cleanup)",
+        description="lab: PII anonymize experiment (auto-cleanup)",
         sensitiveInformationPolicyConfig={
             "piiEntitiesConfig": [
-                {"type": "EMAIL", "action": "MASK"},
-                {"type": "PHONE", "action": "MASK"},
-                {"type": "NAME", "action": "MASK"},
-                {"type": "ADDRESS", "action": "MASK"},
+                # action 现行枚举仅 BLOCK / ANONYMIZE / NONE（MASK 已被 ANONYMIZE 取代）
+                {"type": "EMAIL", "action": "ANONYMIZE"},
+                {"type": "PHONE", "action": "ANONYMIZE"},
+                {"type": "NAME", "action": "ANONYMIZE"},
+                {"type": "ADDRESS", "action": "ANONYMIZE"},
             ],
         },
         blockedInputMessaging="[BLOCKED] 入力はガードレールによりブロックされました。",
@@ -129,7 +130,7 @@ def main() -> int:
         run_apply_guardrail(brt, gid, "ja_pii", SAMPLE_TEXTS["ja_pii"])
 
         if args.converse:
-            # 模型收到的 prompt 已被 MASK（trace 可见命中项）
+            # 模型收到的 prompt 已被脱敏（ANONYMIZE 占位符，trace 可见命中项）
             run_converse(brt, gid, args.model_id, "en_pii",
                          [{"text": SAMPLE_TEXTS["en_pii"]}])
             if args.pdf:

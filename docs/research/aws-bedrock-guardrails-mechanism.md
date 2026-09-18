@@ -540,3 +540,9 @@ FAQ 侧同义表述（[Bedrock FAQ](https://aws.amazon.com/bedrock/faqs/)）：
 - EUSC 中 Bedrock 的**具体模型阵容**（是否含 Anthropic 等第三方模型）——docs.aws.eu 为 JS 渲染，未能抓取。
 - Vertex AI Model Garden "Deploy to GKE" 文档页——本次两处 URL 抓取失败（404/重定向），GKE 自部署的逐字表述未核验。
 - NTT Com "Local LLM つづみ" 商用页正文——反爬 403，未取得原文（以 NTT R&D 官网替代佐证本地部署定位）。
+
+---
+
+## 勘误（2026-09-18，实测发现）
+
+**"MASK" 作为 PII 动作名在现行 CreateGuardrail API 中不存在。** 实测（us-east-1，2026-09-18）`CreateGuardrail` 服务端校验返回：`sensitiveInformationPolicyConfig.piiEntitiesConfig.*.member.action` 合法枚举为 **`[BLOCK, ANONYMIZE, NONE]`**。旧文档/博客行文中的 "mask/masking" 在现行 API 里对应 **ANONYMIZE**（将 PII 替换为实体类型占位符）。本文主报告与追加调查一中所有涉及 "MASK 动作" 的表述，机制结论不变（命中时**生成模型收到的是占位符替换后的脱敏文本，PII 原文不会到达生成模型**），但动作名应以 ANONYMIZE 读解。实验脚本 `examples/guardrail-lab/guardrail_lab.py` 已改用 ANONYMIZE。
