@@ -45,12 +45,14 @@ def create_guardrail(bedrock, name: str) -> str:
     resp = bedrock.create_guardrail(
         name=name,
         description="lab: PII mask experiment (auto-cleanup)",
-        sensitiveInformationPolicyPiiEntitiesConfig=[
-            {"type": "EMAIL", "action": "MASK"},
-            {"type": "PHONE", "action": "MASK"},
-            {"type": "NAME", "action": "MASK"},
-            {"type": "ADDRESS", "action": "MASK"},
-        ],
+        sensitiveInformationPolicyConfig={
+            "piiEntitiesConfig": [
+                {"type": "EMAIL", "action": "MASK"},
+                {"type": "PHONE", "action": "MASK"},
+                {"type": "NAME", "action": "MASK"},
+                {"type": "ADDRESS", "action": "MASK"},
+            ],
+        },
         blockedInputMessaging="[BLOCKED] 入力はガードレールによりブロックされました。",
         blockedOutputsMessaging="[BLOCKED] 出力はガードレールによりブロックされました。",
     )
