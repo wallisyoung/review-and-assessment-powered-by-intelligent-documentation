@@ -1,0 +1,27 @@
+$ python3.12 guardrail_lab.py
+Traceback (most recent call last):
+  File "/home/ec2-user/review-and-assessment-powered-by-intelligent-documentation/examples/guardrail-lab/guardrail_lab.py", line 153, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/ec2-user/review-and-assessment-powered-by-intelligent-documentation/examples/guardrail-lab/guardrail_lab.py", line 123, in main
+    gid = create_guardrail(bedrock, name)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ec2-user/review-and-assessment-powered-by-intelligent-documentation/examples/guardrail-lab/guardrail_lab.py", line 45, in create_guardrail
+    resp = bedrock.create_guardrail(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ec2-user/.local/lib/python3.12/site-packages/botocore/client.py", line 606, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ec2-user/.local/lib/python3.12/site-packages/botocore/context.py", line 123, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ec2-user/.local/lib/python3.12/site-packages/botocore/client.py", line 1051, in _make_api_call
+    request_dict = self._convert_to_request_dict(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ec2-user/.local/lib/python3.12/site-packages/botocore/client.py", line 1118, in _convert_to_request_dict
+    request_dict = self._serializer.serialize_to_request(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ec2-user/.local/lib/python3.12/site-packages/botocore/validate.py", line 424, in serialize_to_request
+    raise ParamValidationError(report=report.generate_report())
+botocore.exceptions.ParamValidationError: Parameter validation failed:
+Unknown parameter in input: "sensitiveInformationPolicyPiiEntitiesConfig", must be one of: name, description, topicPolicyConfig, contentPolicyConfig, wordPolicyConfig, sensitiveInformationPolicyConfig, contextualGroundingPolicyConfig, automatedReasoningPolicyConfig, crossRegionConfig, blockedInputMessaging, blockedOutputsMessaging, kmsKeyId, tags, clientRequestToken
